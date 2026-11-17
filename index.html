@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Smith Chart Simulator — Animated Solution</title>
-<meta name="description" content="Animated, step-by-step Smith chart solution: find the normalized load admittance and VSWR for any load on a transmission line.">
+<meta name="description" content="Animated, step-by-step Smith chart solutions: admittance and VSWR, input impedance, voltage maxima and minima, load from measurements, single- and double-stub matching, quarter-wave transformers and stub lengths.">
 <meta name="theme-color" content="#150f36">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237047ff'/%3E%3Cstop offset='.55' stop-color='%23ff4fa3'/%3E%3Cstop offset='1' stop-color='%23ffb84d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
     --night:#150f36; --night-2:#23175a; --violet:#7047ff; --magenta:#ff4fa3; --amber:#ffb84d; --cyan:#41d9e8;
     --text:#f1edff; --muted:#b4acdc; --glass:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.14);
     --paper:#fdfcff; --ink:#221b45;
-    --c-r:#e0367a; --c-x:#0f8fb3; --c-s:#e58a00; --c-y:#6c3cf0;
+    --c-r:#e0367a; --c-x:#0f8fb3; --c-s:#e58a00; --c-y:#6c3cf0; --c-m:#13906a;
     --grad:linear-gradient(115deg,var(--violet),var(--magenta) 55%,var(--amber));
     --ease:cubic-bezier(.2,.7,.2,1);
   }
@@ -126,16 +126,43 @@
   .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:18px;font-size:13px;color:var(--muted)}
   .legend span{display:inline-flex;align-items:center;gap:7px}
   .legend i{width:20px;height:4px;border-radius:2px;display:inline-block}
-  details.inputs{margin-top:20px;border-top:1px solid var(--stroke);padding-top:14px}
-  details.inputs summary{cursor:pointer;font-weight:650;font-size:15px;list-style:none;display:flex;align-items:center;gap:8px}
-  details.inputs summary::-webkit-details-marker{display:none}
-  details.inputs summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--amber);border-bottom:2px solid var(--amber);transform:rotate(-45deg);transition:transform .25s var(--ease)}
-  details.inputs[open] summary::before{transform:rotate(45deg)}
-  .form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
-  .form label{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
-  .form input{width:100%}
-  .form .row{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .err{color:#ff8fb8;font-size:13.5px}
+
+
+  /* ---------- question types ---------- */
+  .modes{max-width:1220px;margin:0 auto;padding:12px 24px 10px;scroll-margin-top:12px}
+  .modes-head h2{margin:0 0 4px;font-size:24px;letter-spacing:-.02em;font-weight:750}
+  .modes-head p{margin:0 0 16px;color:var(--muted);font-size:15px;max-width:70ch}
+  .mode-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .mode-card{
+    font:inherit;color:var(--text);text-align:left;cursor:pointer;display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:12px;row-gap:3px;align-items:start;
+    padding:14px 14px 15px;border-radius:16px;border:1.5px solid transparent;
+    background:linear-gradient(#1c1449,#1c1449) padding-box,linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.06)) border-box;
+    transition:transform .22s var(--ease),box-shadow .3s,background .3s;
+  }
+  .mode-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px -18px rgba(112,71,255,.9)}
+  .mode-card svg{grid-row:span 2;width:34px;height:34px;color:#c9bdff;transition:color .3s}
+  .mode-card b{font-size:15.5px;font-weight:700;line-height:1.25}
+  .mode-card span{font-size:13px;color:var(--muted);line-height:1.38}
+  .mode-card[aria-pressed="true"]{background:linear-gradient(#271b63,#271b63) padding-box,var(--grad) border-box;box-shadow:0 16px 36px -18px rgba(255,79,163,.95)}
+  .mode-card[aria-pressed="true"] svg{color:#ffd29a}
+  .inputs-bar{margin-top:14px;padding:16px 18px;border-radius:18px;background:linear-gradient(165deg,rgba(255,255,255,.09),rgba(255,255,255,.035));border:1px solid var(--stroke);display:flex;flex-wrap:wrap;gap:14px 18px;align-items:flex-end}
+  .fields{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end;flex:1 1 520px}
+  .field{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
+  .field[hidden]{display:none}
+  .field input{width:118px}
+  .field select{min-width:150px}
+  .field .len{display:flex;gap:6px}
+  .field .len input{width:96px}
+  .field .len select{min-width:0;width:auto}
+  .form-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .err{color:#ff8fb8;font-size:13.5px;max-width:52ch}
+  @media (max-width:940px){
+    .mode-grid{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(230px,74%);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}
+    .mode-card{scroll-snap-align:start}
+  }
+  @media (max-width:520px){ .modes{padding-left:16px;padding-right:16px} .field input{width:104px} }
+  @media (prefers-reduced-motion:reduce){ .mode-card{transition:none} }
 
   footer{max-width:1220px;margin:0 auto;padding:6px 24px 40px;color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
   footer a{color:#ffd9a0;text-decoration:none;border-bottom:1px solid rgba(255,184,77,.4);transition:color .2s,border-color .2s}
@@ -201,11 +228,11 @@
 <header class="hero">
   <div>
     <h1 class="rise">Smith chart, drawn step by step</h1>
-    <p class="lede rise d1" id="lede">A 50 Ω line ends in a 25 − j50 Ω load. Watch the chart find the load admittance y<sub>L</sub> and the VSWR, one construction line at a time.</p>
+    <p class="lede rise d1" id="lede"></p>
     <div class="chips rise d2" id="chips"></div>
     <div class="cta rise d3">
       <button class="btn primary big" id="hStart">Start the walkthrough</button>
-      <button class="btn big" id="hTry">Try your own load</button>
+      <button class="btn big" id="hPick">Pick a question type</button>
     </div>
   </div>
   <figure class="wave-card rise d4">
@@ -219,6 +246,21 @@
     <figcaption id="waveCap"></figcaption>
   </figure>
 </header>
+
+<section class="modes" id="modes">
+  <div class="modes-head">
+    <h2>Choose a question type</h2>
+    <p>Pick what the question asks for and enter its values. The chart then solves it step by step, and the full solution appears further down.</p>
+  </div>
+  <div class="mode-grid" id="modeGrid"></div>
+  <form class="inputs-bar" id="form" novalidate>
+    <div class="fields" id="fields"></div>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">Solve on the chart</button>
+      <span class="err" id="err" role="alert"></span>
+    </div>
+  </form>
+</section>
 
 <main id="lab">
   <section id="stage">
@@ -253,17 +295,9 @@
       <span><i style="background:var(--c-r)"></i>r circle</span>
       <span><i style="background:var(--c-x)"></i>x arc</span>
       <span><i style="background:var(--c-s)"></i>VSWR circle</span>
-      <span><i style="background:var(--c-y)"></i>λ/4 turn to admittance</span>
+      <span><i style="background:var(--c-y)"></i>moves along the line</span>
+      <span><i style="background:var(--c-m)"></i>g = 1 circle and stubs</span>
     </div>
-    <details class="inputs" id="tryBox">
-      <summary>Try another load</summary>
-      <form class="form" id="form">
-        <label><span>Z₀ (Ω)</span><input id="iZ0" type="number" step="any" value="50"></label>
-        <label><span>R<sub>L</sub> (Ω)</span><input id="iR" type="number" step="any" value="25"></label>
-        <label><span>X<sub>L</sub> (Ω)</span><input id="iX" type="number" step="any" value="-50"></label>
-        <div class="row"><button class="btn primary" type="submit">Solve this load</button><span class="err" id="err" role="alert"></span></div>
-      </form>
-    </details>
   </aside>
 </main>
 
@@ -291,52 +325,81 @@
       <p class="sub" id="solSub"></p>
       <ol class="readings" id="readings"></ol>
       <div class="extras" id="extras"></div>
-      <div class="answer" id="finalAns"></div>
+      <div id="finalAns"></div>
     </aside>
   </div>
 </section>
 
 <footer>
-  <span>Made for EMTI practice. Readings from a paper chart will differ slightly from the exact values shown here.</span>
+  <span>Made for EMTI practice. Lossless lines only. Readings from a paper chart will differ slightly from the exact values shown here.</span>
   <a href="https://github.com/shourayaVishnoi/smith-chart-simulator">Source on GitHub</a>
 </footer>
 
 <script>
 (() => {
+  'use strict';
   const NS = 'http://www.w3.org/2000/svg';
-  const CX = 300, CY = 300, RAD = 228;
   const FONT = 'Bricolage Grotesque, system-ui, sans-serif';
-  const gridG = document.getElementById('grid');
-  const ov = document.getElementById('ov');
-  const COL = {red:'#e0367a', blue:'#0f8fb3', green:'#e58a00', purple:'#6c3cf0', ink:'#221b45'};
-  const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COL = {red:'#e0367a', blue:'#0f8fb3', green:'#e58a00', purple:'#6c3cf0', ink:'#221b45', match:'#13906a'};
+  const PI = Math.PI, TAU = 2*Math.PI;
+  const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const $ = id => document.getElementById(id);
+  const gridG = $('grid'), ov = $('ov');
 
-  // ---------- math helpers ----------
-  const clamp = (v, a=0, b=1) => Math.min(b, Math.max(a, v));
+  // ---------- maths ----------
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
-  const seg = (p, a, b) => clamp((p - a) / (b - a));
-  const px = (u, v) => [CX + RAD*u, CY - RAD*v];
-  function gam(r, x){ const d = (r+1)*(r+1) + x*x; return [(r*r + x*x - 1)/d, 2*x/d]; }
-  function circlePts(cu, cv, rho, a0, a1, n=240){
+  const seg = (p, a, b) => clamp((p - a)/(b - a));
+  const mod = (a, n) => ((a % n) + n) % n;
+  const deg = a => a*180/PI;
+  const polar = (r, a) => [r*Math.cos(a), r*Math.sin(a)];
+  const rot = (P, a) => [P[0]*Math.cos(a) - P[1]*Math.sin(a), P[0]*Math.sin(a) + P[1]*Math.cos(a)];
+  const cdiv = (a, b) => { const d = b[0]*b[0] + b[1]*b[1]; return [(a[0]*b[0] + a[1]*b[1])/d, (a[1]*b[0] - a[0]*b[1])/d]; };
+  function toG(z){
+    if (!isFinite(z[0]) || !isFinite(z[1])) return [1, 0];
+    const d = (z[0] + 1)*(z[0] + 1) + z[1]*z[1];
+    return [(z[0]*z[0] + z[1]*z[1] - 1)/d, 2*z[1]/d];
+  }
+  const gam = (r, x) => toG([r, x]);
+  function fromG(G){
+    const d = (1 - G[0])*(1 - G[0]) + G[1]*G[1];
+    if (d < 1e-14) return [Infinity, 0];
+    return [(1 - G[0]*G[0] - G[1]*G[1])/d, 2*G[1]/d];
+  }
+  const ang = P => Math.atan2(P[1], P[0]);
+  const wtgA = a => mod(0.25 - a/(2*TAU), 0.5);            // wavelengths-toward-generator reading at angle a
+  const cw = (a0, a1) => mod(a0 - a1, TAU)/(2*TAU);         // clockwise distance (in λ) from angle a0 to a1
+  const stubLen = (bs, a0) => cw(a0, ang(toG([0, bs])));    // stub length for susceptance bs, starting at a0
+
+  // ---------- formatting ----------
+  const isNeg = (v, d) => v < 0 && +Math.abs(v).toFixed(d) !== 0;
+  const f = (v, d = 3) => !isFinite(v) ? '∞' : (isNeg(v, d) ? '−' : '') + (+Math.abs(v).toFixed(d)).toString();
+  const fc = (re, im, d = 3) => (!isFinite(re) || !isFinite(im)) ? '∞' : `${f(re, d)} ${isNeg(im, d) ? '−' : '+'} j${f(Math.abs(im), d)}`;
+  const fz = (z, d = 3) => fc(z[0], z[1], d);
+  const fj = (x, d = 3) => !isFinite(x) ? 'j∞' : `${isNeg(x, d) ? '−' : '+'}j${f(Math.abs(x), d)}`;
+  const fS = s => isFinite(s) ? f(s, 2) : '∞';
+
+  // ---------- drawing views: the walkthrough chart and the full chart ----------
+  const WALK = {cx:300, cy:300, R:228, W:600, g:ov, ring:1.075, labR:1.2};
+  const FULL = {cx:410, cy:430, R:330, W:820, g:null, ring:1.135, labR:1.2};
+  let VIEW = WALK;
+  const px = (u, v) => [VIEW.cx + VIEW.R*u, VIEW.cy - VIEW.R*v];
+
+  function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || VIEW.g).appendChild(e); return e; }
+  function circlePts(cu, cv, rho, a0, a1, n = 240){
     const pts = [];
     for (let i = 0; i <= n; i++){ const a = a0 + (a1 - a0)*i/n; pts.push([cu + rho*Math.cos(a), cv + rho*Math.sin(a)]); }
     return pts;
   }
-  function rPts(r){ const c = r/(1+r), rho = 1/(1+r); return circlePts(c, 0, rho, Math.PI, -Math.PI); }
-  function xPts(x, n=200){
-    if (Math.abs(x) < 1e-12){ const pts=[]; for(let i=0;i<=n;i++) pts.push([-1 + 2*i/n, 0]); return pts; }
+  function rPts(r){ const c = r/(1+r), rho = 1/(1+r); return circlePts(c, 0, rho, PI, -PI); }
+  function xPts(x, n = 200){
+    if (Math.abs(x) < 1e-12){ const pts = []; for (let i = 0; i <= n; i++) pts.push([-1 + 2*i/n, 0]); return pts; }
     const ax = Math.abs(x), s = Math.sign(x), g0 = gam(0, ax);
     let a0 = Math.atan2(g0[1] - 1/ax, g0[0] - 1);
-    while (a0 < Math.PI/2) a0 += 2*Math.PI;
-    while (a0 > 1.5*Math.PI) a0 -= 2*Math.PI;
-    return circlePts(1, 1/ax, 1/ax, a0, 1.5*Math.PI, n).map(p => [p[0], s*p[1]]);
+    while (a0 < PI/2) a0 += TAU;
+    while (a0 > 1.5*PI) a0 -= TAU;
+    return circlePts(1, 1/ax, 1/ax, a0, 1.5*PI, n).map(p => [p[0], s*p[1]]);
   }
-  const f = (v, d=3) => (+v.toFixed(d)).toString().replace('-', '−');
-  const fc = (re, im, d=3) => `${f(re,d)} ${im < 0 ? '−' : '+'} j${f(Math.abs(im),d)}`;
-  const wtg = th => { const deg = th*180/Math.PI; return (((180 - deg)/720) % 0.5 + 0.5) % 0.5; };
-
-  // ---------- svg helpers ----------
-  function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || ov).appendChild(e); return e; }
   function pathD(pts, p){
     if (p <= 0) return '';
     const n = pts.length - 1, fr = p*n, k = Math.floor(fr);
@@ -345,35 +408,88 @@
     if (k < n){ const t = fr - k, a = pts[k], b = pts[k+1]; const [X, Y] = px(a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t); d += 'L' + X.toFixed(2) + ' ' + Y.toFixed(2); }
     return d;
   }
-  function stroke(pts, p, color, w, extra={}, parent){
+  function stroke(pts, p, color, w, extra = {}, parent){
     const d = pathD(pts, p); if (!d) return null;
     return el('path', Object.assign({d, fill:'none', stroke:color, 'stroke-width':w, 'stroke-linecap':'round', 'stroke-linejoin':'round'}, extra), parent);
   }
-  function text(u, v, str, o={}, parent){
-    const [X, Y] = px(u, v);
-    const t = el('text', {x:X, y:Y, 'text-anchor':o.anchor || 'middle', 'dominant-baseline':'middle', fill:o.color || COL.ink,
-      'font-size':o.size || 13, 'font-weight':o.weight || 650, opacity:o.op ?? 1, class:o.halo === false ? '' : 'halo', 'font-family':FONT}, parent);
+  function text(u, v, str, o = {}, parent){
+    let [X, Y] = px(u, v);
+    const anchor = o.anchor || 'middle', w = 0.58*(o.size || 13)*String(str).length, W = VIEW.W || 600;
+    const left = anchor === 'start' ? X : anchor === 'end' ? X - w : X - w/2;
+    if (left < 4) X += 4 - left; else if (left + w > W - 4) X -= left + w - (W - 4);
+    const t = el('text', {x:X.toFixed(1), y:Y.toFixed(1), 'text-anchor':anchor, 'dominant-baseline':'middle', fill:o.color || COL.ink,
+      'font-size':o.size || 13, 'font-weight':o.weight || 650, opacity:o.op ?? 1, 'font-family':FONT}, parent);
+    if (o.halo !== false) t.setAttribute('class', 'halo');
     t.textContent = str; return t;
   }
-  function dot(u, v, r, color, op=1){ const [X, Y] = px(u, v); return el('circle', {cx:X, cy:Y, r:Math.max(0, r), fill:color, stroke:'#fff', 'stroke-width':1.8, opacity:op}); }
-  function ring(u, v, r, color, op){ const [X, Y] = px(u, v); return el('circle', {cx:X, cy:Y, r:Math.max(0, r), fill:'none', stroke:color, 'stroke-width':2.2, opacity:op}); }
-  function pointLabel(u, v, str, color, op=1, k=0.08){
+  function dot(u, v, r, color, op = 1){ const [X, Y] = px(u, v); return el('circle', {cx:X.toFixed(1), cy:Y.toFixed(1), r:Math.max(0, r), fill:color, stroke:'#fff', 'stroke-width':1.8, opacity:op}); }
+  function ring(u, v, r, color, op){ const [X, Y] = px(u, v); return el('circle', {cx:X.toFixed(1), cy:Y.toFixed(1), r:Math.max(0, r), fill:'none', stroke:color, 'stroke-width':2.2, opacity:op}); }
+  function pointLabel(u, v, str, color, op = 1, k = 0.08, dir){
+    if (op <= 0) return null;
     const m = Math.hypot(u, v);
-    const dx = m < 1e-6 ? 0.6 : u/m, dy = m < 1e-6 ? 0.8 : v/m;
+    const dx = dir ? dir[0] : m < 1e-6 ? 0.6 : u/m, dy = dir ? dir[1] : m < 1e-6 ? 0.8 : v/m;
     return text(u + dx*k, v + dy*k, str, {color, op, size:13.5, anchor: dx > 0.35 ? 'start' : dx < -0.35 ? 'end' : 'middle'});
   }
 
-  // ---------- model ----------
-  let M;
-  function compute(Z0, RL, XL){
-    const r = RL/Z0, x = XL/Z0;
-    const [gu, gv] = gam(r, x);
-    const mag = Math.hypot(gu, gv), th = Math.atan2(gv, gu);
-    const s = mag < 1 - 1e-12 ? (1 + mag)/(1 - mag) : Infinity;
-    const d = r*r + x*x, g = r/d, b = -x/d;
-    const w1 = wtg(th), w2 = (w1 + 0.25) % 0.5;
-    const dmax = ((th/(4*Math.PI)) % 0.5 + 0.5) % 0.5, dmin = (dmax + 0.25) % 0.5;
-    return {Z0, RL, XL, r, x, gu, gv, mag, th, s, g, b, w1, w2, dmax, dmin, yu:-gu, yv:-gv};
+  // ---------- chart building blocks ----------
+  function radial(a, q, color = COL.purple){ return stroke([[0, 0], polar(VIEW.ring, a)], q, color, 1.3, {'stroke-dasharray':'3 4', opacity:.85}); }
+  function ringText(a, str, color, op = 1){
+    if (op <= 0) return null;
+    const [u, v] = polar(VIEW.labR, a), c = Math.cos(a);
+    return text(u, v, str, {color, size:12.5, op, anchor: c > .4 ? 'start' : c < -.4 ? 'end' : 'middle'});
+  }
+  function arcCW(rho, a0, sweep, p, color, w = 3.2, extra = {}){
+    if (sweep <= 1e-9 || rho <= 1e-9) return null;
+    return stroke(circlePts(0, 0, rho, a0, a0 - sweep, Math.max(24, Math.round(sweep*40))), p, color, w, Object.assign({opacity:.9}, extra));
+  }
+  function arcCCW(rho, a0, sweep, p, color, w = 3.2, extra = {}){
+    if (sweep <= 1e-9 || rho <= 1e-9) return null;
+    return stroke(circlePts(0, 0, rho, a0, a0 + sweep, Math.max(24, Math.round(sweep*40))), p, color, w, Object.assign({opacity:.9}, extra));
+  }
+  function rimArc(a0, sweep, p, color, dashed, rr = 0.982){
+    return arcCW(rr, a0, sweep, p, color, 3.6, dashed ? {'stroke-dasharray':'7 5', opacity:.85} : {opacity:.95});
+  }
+  function movingDot(rho, a, color){ const [u, v] = polar(rho, a); dot(u, v, 6.5, color); }
+  function plotPoint(u, v, label, color, p, rr, xx){
+    if (rr != null){
+      stroke(rPts(rr), ease(seg(p, 0, .45)), COL.red, 2.4, {opacity:.9});
+      stroke(xPts(xx), ease(seg(p, .25, .7)), COL.blue, 2.4, {opacity:.9});
+    }
+    const e = seg(p, rr != null ? .65 : 0, 1);
+    if (e > 0){ dot(u, v, 6*ease(e), color); pointLabel(u, v, label, color, e); }
+  }
+  function vswrCircle(mag, th, p){
+    const p1 = ease(seg(p, 0, .25)), p2 = ease(seg(p, .25, 1));
+    stroke([[0, 0], polar(mag, th)], p1, COL.green, 2, {'stroke-dasharray':'5 4'});
+    if (p1 >= 1 && mag > .15){ const [u, v] = polar(mag/2, th); text(u + .03, v, `|Γ| = ${f(mag, 2)}`, {color:COL.green, size:12, anchor:'start'}); }
+    if (mag > 1e-6) stroke(circlePts(0, 0, mag, th, th - TAU, 360), p2, COL.green, 2.8);
+    dot(0, 0, 4.5, COL.ink);
+  }
+  function faintRX(z, p, color){
+    if (!isFinite(z[0]) || !isFinite(z[1])) return;
+    stroke(rPts(z[0]), ease(seg(p, 0, .6)), color, 1.4, {'stroke-dasharray':'5 4', opacity:.6});
+    stroke(xPts(z[1]), ease(seg(p, .25, .85)), color, 1.4, {'stroke-dasharray':'5 4', opacity:.6});
+  }
+  function curveArrow(P0, P1, bend, p, color){
+    const dx = P1[0] - P0[0], dy = P1[1] - P0[1], c = [(P0[0] + P1[0])/2 - dy*bend, (P0[1] + P1[1])/2 + dx*bend], pts = [];
+    for (let i = 0; i <= 40; i++){ const t = i/40; pts.push([(1-t)*(1-t)*P0[0] + 2*(1-t)*t*c[0] + t*t*P1[0], (1-t)*(1-t)*P0[1] + 2*(1-t)*t*c[1] + t*t*P1[1]]); }
+    return stroke(pts, p, color, 2, {'stroke-dasharray':'6 4'});
+  }
+  // path along a constant-g (or constant-r) circle between two points, never crossing the right edge (b = ∞)
+  function gPath(g, A, B, n = 90){
+    const c = g/(1 + g), rr = 1/(1 + g);
+    const angOf = P => { let a = Math.atan2(P[1], P[0] - c); if (a <= 0) a += TAU; return a; };
+    const a0 = angOf(A), a1 = angOf(B), pts = [];
+    for (let i = 0; i <= n; i++){ const a = a0 + (a1 - a0)*i/n; pts.push([c + rr*Math.cos(a), rr*Math.sin(a)]); }
+    return pts;
+  }
+  function circleIntersect(c1, r1, c2, r2){
+    const dx = c2[0] - c1[0], dy = c2[1] - c1[1], D = Math.hypot(dx, dy);
+    if (D < 1e-12 || D > r1 + r2 + 1e-12 || D < Math.abs(r1 - r2) - 1e-12) return [];
+    const a = (r1*r1 - r2*r2 + D*D)/(2*D), h = Math.sqrt(Math.max(0, r1*r1 - a*a));
+    const mx = c1[0] + a*dx/D, my = c1[1] + a*dy/D;
+    const p1 = [mx - h*dy/D, my + h*dx/D], p2 = [mx + h*dy/D, my - h*dx/D];
+    return h < 1e-9 ? [p1] : [p1, p2];
   }
 
   // ---------- grid ----------
@@ -399,7 +515,7 @@
     if (lp > 0){
       const ringG = el('g', {opacity:lp}, gridG);
       const [cx, cy] = px(0, 0);
-      el('circle', {cx, cy, r:RAD*1.075, fill:'none', stroke:'#d6d1ea', 'stroke-width':1}, ringG);
+      el('circle', {cx, cy, r:WALK.R*1.075, fill:'none', stroke:'#d6d1ea', 'stroke-width':1}, ringG);
       for (let i = 0; i < 50; i++){
         const th = (180 - 720*i*0.01)*Math.PI/180;
         const big = i % 5 === 0, r2 = big ? 1.055 : 1.03;
@@ -418,162 +534,646 @@
     }
   }
 
-  // ---------- steps ----------
-  const steps = [
-    { dot:'◎', dur:3600,
-      info: m => ({
-        title:'Meet the Smith chart',
-        body:`<p>Every point inside the big circle is a normalized impedance <b>z = r + jx</b>.</p>
+  // ---------- input helpers ----------
+  function needNum(v, what){ if (!isFinite(v)) throw new Error(`Enter a number for ${what}.`); return v; }
+  function loadModel(v, opts = {}){
+    needNum(v.Z0, 'Z₀'); needNum(v.RL, 'R_L'); needNum(v.XL, 'X_L');
+    if (v.Z0 <= 0) throw new Error('Z₀ must be greater than 0.');
+    if (v.RL < 0) throw new Error('R_L must be 0 or more for a passive load.');
+    if (opts.needY && v.RL === 0 && v.XL === 0) throw new Error('A short-circuit load has infinite admittance. Try another load.');
+    return modelFromZ(v.Z0, [v.RL/v.Z0, v.XL/v.Z0]);
+  }
+  function modelFromZ(Z0, z){
+    const G = toG(z), mag = Math.hypot(G[0], G[1]), th = mag < 1e-12 ? 0 : ang(G);
+    const s = mag < 1 - 1e-9 ? (1 + mag)/(1 - mag) : Infinity;
+    const zz = z[0]*z[0] + z[1]*z[1];
+    return {Z0, RL:z[0]*Z0, XL:z[1]*Z0, r:z[0], x:z[1], gu:G[0], gv:G[1], mag, th, s,
+      g: zz > 0 ? z[0]/zz : Infinity, b: zz > 0 ? -z[1]/zz : 0, yu:-G[0], yv:-G[1],
+      w1:wtgA(th), dmax:cw(th, 0), dmin:cw(th, PI)};
+  }
+  function lenIn(v, key, what){
+    const val = v[key], unit = v[key + '_u'] || 'lam';
+    needNum(val, what);
+    if (val < 0) throw new Error(`The ${what} can't be negative.`);
+    if (unit === 'cm'){
+      if (!(v.lam > 0)) throw new Error('Enter the wavelength λ in cm, so lengths in cm can be converted to λ.');
+      return {lam:val/v.lam, text:`${f(val)} cm`, conv:`${f(val)} cm ÷ ${f(v.lam)} cm = ${f(val/v.lam)}λ`};
+    }
+    return {lam:val, text:`${f(val)}λ`, conv:null};
+  }
+  function noMatchErr(m){
+    if (m.mag < 1e-9) throw new Error('This load is already matched (Z_L = Z₀), so there is nothing to solve.');
+    if (m.mag > 1 - 1e-9) throw new Error('A purely reactive load (R_L = 0) has |Γ| = 1 and cannot be matched with lossless elements.');
+  }
+  const chipZ0 = m => `Z<sub>0</sub> = ${f(m.Z0)} Ω`;
+  const chipZL = m => `Z<sub>L</sub> = ${fc(m.RL, m.XL, 2)} Ω`;
+  const cardsHTML = cards => `<div class="answer">${cards.filter(Boolean).map(c => `<div class="ans ${c.tone || 'y'}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s || ''}</div></div>`).join('')}</div>`;
+
+  // ---------- shared steps ----------
+  const stIntro = () => ({ dur:3600,
+    info: () => ({ title:'Meet the Smith chart',
+      body:`<p>Every point inside the big circle is a normalized impedance <b>z = r + jx</b>.</p>
         <p>The <b>full circles</b> are constant-<i>r</i> circles. They all touch the right edge, where r = ∞. The <b>arcs</b> are constant-<i>x</i> arcs: the upper half is +x (inductive) and the lower half is −x (capacitive).</p>
-        <p>The horizontal line is pure resistance. The centre is z = 1, a perfect match. The outer ring is the wavelength scale, read toward the generator.</p>`,
-        work:'' }),
-      draw: () => {} },
-    { dot:'1', dur:1600,
-      info: m => ({
-        title:'Normalize the load',
-        body:`<p>The chart only works with normalized values, so divide the load by Z<sub>0</sub> first. The centre O (z = 1 + j0) is your reference point.</p>`,
-        work:`z<sub>L</sub> = Z<sub>L</sub> / Z<sub>0</sub><br>&nbsp;&nbsp;&nbsp;= (${fc(m.RL, m.XL)}) / ${f(m.Z0)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.r, m.x)}</b><br><span class="c">So r = ${f(m.r)} and x = ${f(m.x)}.</span>` }),
-      draw: (m, p) => { const e = ease(p); dot(0, 0, 5*e, COL.ink); text(0.03, -0.055, 'O (z = 1)', {size:12, op:e, anchor:'start'}); } },
-    { dot:'2', dur:2200,
-      info: m => ({
-        title:`Find the r = ${f(m.r)} circle`,
-        body:`<p>Find the constant-resistance circle for <b>r = ${f(m.r)}</b>. It crosses the horizontal axis at the point marked ${f(m.r)}. The point we want lies somewhere on this circle.</p>`,
-        work:`<span class="c">Centre of the r-circle: (r/(1+r), 0) = (${f(m.r/(1+m.r))}, 0)<br>Radius: 1/(1+r) = ${f(1/(1+m.r))}</span>` }),
-      draw: (m, p) => {
-        stroke(rPts(m.r), ease(p), COL.red, 2.8);
-        const c = m.r/(1+m.r), rho = 1/(1+m.r);
-        text(c, rho > 0.25 ? rho - 0.06 : rho + 0.045, `r = ${f(m.r)}`, {color:COL.red, op:seg(p, .6, 1), size:13.5});
-      } },
-    { dot:'3', dur:2200,
-      info: m => ({
-        title:`Find the x = ${f(m.x)} arc`,
-        body: Math.abs(m.x) < 1e-12
-          ? `<p>x = 0, so the load is purely resistive and the point lies on the horizontal axis.</p>`
-          : `<p>x is <b>${m.x < 0 ? 'negative (capacitive)' : 'positive (inductive)'}</b>, so look in the <b>${m.x < 0 ? 'lower' : 'upper'} half</b>. Start at <b>${m.x < 0 ? '−' : '+'}j${f(Math.abs(m.x))}</b> on the rim and follow that arc toward the right edge.</p>`,
-        work: Math.abs(m.x) < 1e-12 ? '' : `<span class="c">Centre of the x-arc: (1, 1/x) = (1, ${f(1/m.x)})<br>Radius: 1/|x| = ${f(1/Math.abs(m.x))}</span>` }),
-      draw: (m, p) => {
-        stroke(xPts(m.x), ease(p), COL.blue, 2.8);
-        if (Math.abs(m.x) > 1e-12){ const g0 = gam(0, m.x); text(0.8*g0[0] - 0.03, 0.8*g0[1], `x = ${f(m.x)}`, {color:COL.blue, op:seg(p, .6, 1), size:13.5, anchor:'end'}); }
-      } },
-    { dot:'4', dur:1600,
-      info: m => ({
-        title:'Plot z<sub>L</sub> where they cross',
-        body:`<p>The r circle and the x arc cross at one point. That point is <b>z<sub>L</sub> = ${fc(m.r, m.x)}</b>. Label it <b>P</b>.</p>
-              <p>The distance OP, as a fraction of the chart's radius, is the size of the reflection coefficient |Γ<sub>L</sub>|.</p>`,
-        work:`Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1)<br>&nbsp;&nbsp;&nbsp;= ${fc(m.gu, m.gv)}<br>|Γ<sub>L</sub>| = <b>${f(m.mag)}</b>&nbsp;&nbsp;∠Γ<sub>L</sub> = ${f(m.th*180/Math.PI, 1)}°` }),
-      draw: (m, p) => {
-        const e = ease(seg(p, 0, .5)), pp = seg(p, .3, 1);
-        if (pp > 0 && pp < 1) ring(m.gu, m.gv, 6 + 22*pp, COL.ink, 1 - pp);
-        dot(m.gu, m.gv, 6*e, COL.ink);
-        pointLabel(m.gu, m.gv, `P: z = ${fc(m.r, m.x)}`, COL.ink, seg(p, .4, .9));
-      } },
-    { dot:'5', dur:3000,
-      info: m => ({
-        title:'Draw the constant-VSWR circle',
-        body:`<p>Put the compass point on <b>O</b>, open it to <b>P</b>, and draw a full circle.</p>
-              <p>|Γ| stays the same everywhere on a lossless line. So moving along the line only moves you <b>around this circle</b>, and every impedance on the line sits on it.</p>`,
-        work:`<span class="c">Circle radius = OP = |Γ<sub>L</sub>| × (chart radius)</span><br>|Γ<sub>L</sub>| = ${f(m.mag)}` }),
-      draw: (m, p) => {
-        const p1 = ease(seg(p, 0, .25)), p2 = ease(seg(p, .25, 1));
-        stroke([[0,0],[m.gu, m.gv]], p1, COL.green, 2, {'stroke-dasharray':'5 4'});
-        if (p1 >= 1 && m.mag > 0.12) text(m.gu/2 + 0.03, m.gv/2, `|Γ| = ${f(m.mag, 2)}`, {color:COL.green, size:12, anchor:'start'});
-        stroke(circlePts(0, 0, m.mag, m.th, m.th - 2*Math.PI, 360), p2, COL.green, 2.8);
-        dot(0, 0, 5, COL.ink); dot(m.gu, m.gv, 6, COL.ink);
-      } },
-    { dot:'6', dur:2400,
-      info: m => ({
-        title:'Read the VSWR',
-        body: isFinite(m.s)
-          ? `<p>Follow the circle to where it crosses the <b>right half</b> of the horizontal axis. The r value there <b>is the VSWR</b>: about <b>${f(m.s, 2)}</b>.</p>
-             <p>The crossing on the left half gives 1/VSWR ≈ ${f(1/m.s, 2)}. That is the normalized impedance at a voltage minimum.</p>`
-          : `<p>|Γ| = 1, so the circle is the rim itself and the VSWR is infinite. All the power is reflected.</p>`,
-        work: isFinite(m.s)
-          ? `VSWR = (1 + |Γ|)/(1 − |Γ|)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${f(1 + m.mag)}/${f(1 - m.mag)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b>${f(m.s, 2)}</b><br><span class="c">On a paper chart, expect a reading within about ±0.1 of this.</span>`
-          : `VSWR = ∞` }),
-      draw: (m, p) => {
-        if (isFinite(m.s) && m.s < 60) stroke(rPts(m.s), ease(seg(p, 0, .6)), COL.green, 1.6, {'stroke-dasharray':'4 4', opacity:.8});
-        const e = ease(seg(p, .4, .8));
-        dot(m.mag, 0, 6*e, COL.green);
-        if (m.mag > 0.02) dot(-m.mag, 0, 4.5*e, COL.green, .8);
-        const lo = seg(p, .6, 1);
-        if (isFinite(m.s)){
-          text(m.mag + 0.02, -0.075, `VSWR ≈ ${f(m.s, 2)}`, {color:COL.green, op:lo, size:14, anchor: m.mag > 0.75 ? 'end' : 'start'});
-          if (m.mag > 0.02) text(-m.mag, -0.075, `1/VSWR ≈ ${f(1/m.s, 2)}`, {color:COL.green, op:lo*.85, size:11.5});
-        } else text(0.98, -0.075, 'VSWR = ∞', {color:COL.green, op:lo, size:14, anchor:'end'});
-      } },
-    { dot:'7', dur:4200,
-      info: m => {
-        const sum = m.w1 + 0.25;
-        return {
-          title:'Rotate 180° to get the admittance',
-          body:`<p>Moving λ/4 along the line turns z into y = 1/z. On the chart, λ/4 is <b>half a turn (180°)</b> around the VSWR circle.</p>
-                <p>In practice: draw a straight line from <b>P</b> through <b>O</b> to the other side of the circle. Where it lands, <b>P′</b>, is y<sub>L</sub>.</p>`,
-          work:`<span class="c">On the outer (WTG) scale:</span><br>P at ${f(m.w1)}λ<br>+ 0.25λ → ${f(sum)}λ${sum >= 0.5 ? ` − 0.5λ = ${f(m.w2)}λ` : ''}<br>P′ at <b>${f(m.w2)}λ</b><br><span class="c">(One full turn of the chart = 0.5λ.)</span>`
-        };
+        <p>The horizontal line is pure resistance. The centre is z = 1, a perfect match. The outer ring is the wavelength scale, read toward the generator.</p>`, work:'' }),
+    draw: () => {} });
+  const stNormalize = () => ({ dur:1600,
+    info: m => ({ title:'Normalize the load',
+      body:`<p>The chart only works with normalized values, so divide the load by Z<sub>0</sub> first. The centre O (z = 1 + j0) is your reference point.</p>`,
+      work:`z<sub>L</sub> = Z<sub>L</sub> / Z<sub>0</sub><br>&nbsp;&nbsp;&nbsp;= (${fc(m.RL, m.XL)}) / ${f(m.Z0)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.r, m.x)}</b><br><span class="c">So r = ${f(m.r)} and x = ${f(m.x)}.</span>` }),
+    draw: (m, p) => { const e = ease(p); dot(0, 0, 5*e, COL.ink); text(0.03, -0.055, 'O (z = 1)', {size:12, op:e, anchor:'start'}); },
+    rd: m => ['Normalize the load', `z<sub>L</sub> = ${fc(m.r, m.x)}`] });
+  const stPlot = () => ({ dur:2600,
+    info: m => ({ title:'Plot z<sub>L</sub>',
+      body:`<p>Find the <b>r = ${f(m.r)}</b> circle and the <b>x = ${f(m.x)}</b> arc (${m.x < 0 ? 'lower half, capacitive' : m.x > 0 ? 'upper half, inductive' : 'on the horizontal axis'}). Where they cross is z<sub>L</sub>. Label it <b>P</b>.</p>`,
+      work:`Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1) = ${fc(m.gu, m.gv)}<br>|Γ<sub>L</sub>| = <b>${f(m.mag)}</b>&nbsp;&nbsp;∠Γ<sub>L</sub> = ${f(deg(m.th), 1)}°` }),
+    draw: (m, p) => plotPoint(m.gu, m.gv, `P: z = ${fc(m.r, m.x)}`, COL.ink, p, m.r, m.x),
+    rd: m => [`Plot P where r = ${f(m.r)} meets x = ${f(m.x)}`, `|Γ<sub>L</sub>| = ${f(m.mag)}, ∠Γ<sub>L</sub> = ${f(deg(m.th), 1)}°`] });
+  const stVswr = () => ({ dur:2800,
+    info: m => ({ title:'Draw the VSWR circle',
+      body:`<p>Compass on <b>O</b>, open it to <b>P</b>, and draw a full circle. |Γ| is the same everywhere on a lossless line, so every point on the line sits on this circle. Where it cuts the right half of the axis you can read the VSWR.</p>`,
+      work: isFinite(m.s) ? `VSWR = (1 + |Γ|)/(1 − |Γ|) = (1 + ${f(m.mag)})/(1 − ${f(m.mag)})<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b>${f(m.s, 2)}</b>` : 'VSWR = ∞ (|Γ| = 1)' }),
+    draw: (m, p) => {
+      vswrCircle(m.mag, m.th, seg(p, 0, .8)); dot(m.gu, m.gv, 6, COL.ink);
+      const e = seg(p, .8, 1);
+      if (e > 0 && isFinite(m.s) && m.mag > .02){ dot(m.mag, 0, 5*e, COL.green); text(m.mag + .02, -.075, `VSWR ≈ ${f(m.s, 2)}`, {color:COL.green, size:13, op:e, anchor: m.mag > .75 ? 'end' : 'start'}); }
+    },
+    rd: m => ['VSWR circle through P', `VSWR = ${fS(m.s)}`] });
+  const stWtgP = () => ({ dur:1500,
+    info: m => ({ title:'Read P on the wavelength scale',
+      body:`<p>Draw a line from O through P out to the outer scale (wavelengths toward generator). Distances along the line are measured from this reading.</p>`,
+      work:`P is at <b>${f(m.w1)}λ</b> toward generator` }),
+    draw: (m, p) => { radial(m.th, ease(p), COL.ink); if (p >= 1) ringText(m.th, `${f(m.w1)}λ`, COL.ink); dot(m.gu, m.gv, 6, COL.ink); },
+    rd: m => ['Read P on the WTG scale', `${f(m.w1)}λ`] });
+  const stToY = why => ({ dur:2600,
+    info: m => ({ title:'Switch to admittance',
+      body:`<p>${why} Rotate P by <b>180°</b> (a λ/4 move) to get y<sub>L</sub> at <b>P′</b>, and read the chart as an admittance chart from here on.</p>`,
+      work:`y<sub>L</sub> = 1/z<sub>L</sub> = <b>${fc(m.g, m.b)}</b>` }),
+    draw: (m, p) => {
+      const q = ease(seg(p, 0, .8));
+      arcCW(m.mag, m.th, PI, q, COL.purple, 2.6, {opacity:.7});
+      if (q > 0 && q < 1) movingDot(m.mag, m.th - PI*q, COL.purple);
+      const e = seg(p, .8, 1);
+      if (e > 0){ stroke([[m.gu, m.gv], [m.yu, m.yv]], e, COL.purple, 1.4, {'stroke-dasharray':'6 4'}); dot(m.yu, m.yv, 6.5, COL.purple); pointLabel(m.yu, m.yv, `P′: y = ${fc(m.g, m.b)}`, COL.purple, e); }
+      dot(m.gu, m.gv, 6, COL.ink);
+    },
+    rd: m => ['Rotate 180° to y<sub>L</sub>', `y<sub>L</sub> = ${fc(m.g, m.b)}`] });
+  const stAnswer = () => ({ dur:1600,
+    info: m => ({ title:'Answer', body: cardsHTML(MODE.answer(m)) + (MODE.note ? `<p>${MODE.note(m)}</p>` : ''), work:'' }),
+    draw: (m, p) => { if (p >= 1 || !MODE.keys) return; MODE.keys(m).forEach(([u, v, c]) => ring(u, v, 7 + 20*p, c, 1 - p)); } });
+
+  // ---------- question types ----------
+  const GLYPH = {
+    adm:'<circle cx="16" cy="16" r="12"/><path d="M10 23 L22 9" stroke-dasharray="3 3"/><circle cx="10" cy="23" r="2.4" fill="currentColor" stroke="none"/><circle cx="22" cy="9" r="2.4" fill="currentColor" stroke="none"/>',
+    zin:'<circle cx="16" cy="16" r="12" opacity=".45"/><path d="M16 7 A9 9 0 1 1 7.6 19.4"/><path d="M6.6 15.8 L7.6 19.4 L11.2 18.4"/>',
+    mm:'<circle cx="16" cy="16" r="12" opacity=".45"/><path d="M4 16 H28"/><circle cx="9" cy="16" r="2.6" fill="currentColor" stroke="none"/><circle cx="23" cy="16" r="2.6" fill="currentColor" stroke="none"/>',
+    meas:'<path d="M3 24 H29"/><path d="M6 24 V20.5 M10 24 V22 M14 24 V20.5 M18 24 V22 M22 24 V20.5 M26 24 V22"/><path d="M3 12 C8 4, 12 20, 16 12 S 24 4, 29 12"/>',
+    ss:'<path d="M3 10 H29"/><path d="M18 10 V26"/><path d="M13.5 26 H22.5"/>',
+    qw:'<path d="M3 16 H9 M23 16 H29"/><rect x="9" y="11.5" width="14" height="9" rx="2"/><path d="M9 25.5 H23" stroke-dasharray="2 2.5"/>',
+    sx:'<path d="M16 4 V20"/><path d="M9.5 20 H22.5 M11.8 24 H20.2 M14 28 H18"/>',
+    ds:'<path d="M3 10 H29"/><path d="M11 10 V25 M21 10 V25"/><path d="M7.5 25 H14.5 M17.5 25 H24.5"/>'
+  };
+  const glyph = k => `<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${GLYPH[k]}</svg>`;
+
+  const MODES = [
+    // 1 ----------------------------------------------------------------
+    { id:'admittance', title:'Admittance & VSWR', desc:'y<sub>L</sub>, |Γ| and VSWR for a load', glyph:glyph('adm'),
+      fields:['Z0', 'RL', 'XL'], defaults:{Z0:'50', RL:'25', XL:'-50'},
+      compute: v => { const m = loadModel(v, {needY:true}); m.w2 = mod(m.w1 + .25, .5); return m; },
+      problem: m => ({ lede:`A ${f(m.Z0)} Ω line ends in a ${fc(m.RL, m.XL, 2)} Ω load. Watch the chart find the load admittance y<sub>L</sub> and the VSWR, one construction line at a time.`, chips:[chipZ0(m), chipZL(m)], find:'find y<sub>L</sub> and VSWR' }),
+      steps: () => [stIntro(), stNormalize(),
+        { dur:2200,
+          info: m => ({ title:`Find the r = ${f(m.r)} circle`, body:`<p>Find the constant-resistance circle for <b>r = ${f(m.r)}</b>. It crosses the horizontal axis at the point marked ${f(m.r)}. The point we want lies somewhere on this circle.</p>`,
+            work:`<span class="c">Centre of the r-circle: (r/(1+r), 0) = (${f(m.r/(1+m.r))}, 0)<br>Radius: 1/(1+r) = ${f(1/(1+m.r))}</span>` }),
+          draw: (m, p) => { stroke(rPts(m.r), ease(p), COL.red, 2.8); const c = m.r/(1+m.r), rho = 1/(1+m.r); text(c, rho > 0.25 ? rho - 0.06 : rho + 0.045, `r = ${f(m.r)}`, {color:COL.red, op:seg(p, .6, 1), size:13.5}); } },
+        { dur:2200,
+          info: m => ({ title:`Find the x = ${f(m.x)} arc`,
+            body: Math.abs(m.x) < 1e-12 ? `<p>x = 0, so the load is purely resistive and the point lies on the horizontal axis.</p>`
+              : `<p>x is <b>${m.x < 0 ? 'negative (capacitive)' : 'positive (inductive)'}</b>, so look in the <b>${m.x < 0 ? 'lower' : 'upper'} half</b>. Start at <b>${m.x < 0 ? '−' : '+'}j${f(Math.abs(m.x))}</b> on the rim and follow that arc toward the right edge.</p>`,
+            work: Math.abs(m.x) < 1e-12 ? '' : `<span class="c">Centre of the x-arc: (1, 1/x) = (1, ${f(1/m.x)})<br>Radius: 1/|x| = ${f(1/Math.abs(m.x))}</span>` }),
+          draw: (m, p) => { stroke(xPts(m.x), ease(p), COL.blue, 2.8); if (Math.abs(m.x) > 1e-12){ const g0 = gam(0, m.x); text(0.8*g0[0] - 0.03, 0.8*g0[1], `x = ${f(m.x)}`, {color:COL.blue, op:seg(p, .6, 1), size:13.5, anchor:'end'}); } } },
+        { dur:1600,
+          info: m => ({ title:'Plot z<sub>L</sub> where they cross',
+            body:`<p>The r circle and the x arc cross at one point. That point is <b>z<sub>L</sub> = ${fc(m.r, m.x)}</b>. Label it <b>P</b>.</p><p>The distance OP, as a fraction of the chart's radius, is the size of the reflection coefficient |Γ<sub>L</sub>|.</p>`,
+            work:`Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1)<br>&nbsp;&nbsp;&nbsp;= ${fc(m.gu, m.gv)}<br>|Γ<sub>L</sub>| = <b>${f(m.mag)}</b>&nbsp;&nbsp;∠Γ<sub>L</sub> = ${f(deg(m.th), 1)}°` }),
+          draw: (m, p) => { const e = ease(seg(p, 0, .5)), pp = seg(p, .3, 1); if (pp > 0 && pp < 1) ring(m.gu, m.gv, 6 + 22*pp, COL.ink, 1 - pp); dot(m.gu, m.gv, 6*e, COL.ink); pointLabel(m.gu, m.gv, `P: z = ${fc(m.r, m.x)}`, COL.ink, seg(p, .4, .9)); },
+          rd: m => [`Plot P where r = ${f(m.r)} meets x = ${f(m.x)}`, `|Γ<sub>L</sub>| = ${f(m.mag)}, ∠Γ<sub>L</sub> = ${f(deg(m.th), 1)}°`] },
+        { dur:3000,
+          info: m => ({ title:'Draw the constant-VSWR circle',
+            body:`<p>Put the compass point on <b>O</b>, open it to <b>P</b>, and draw a full circle.</p><p>|Γ| stays the same everywhere on a lossless line. So moving along the line only moves you <b>around this circle</b>, and every impedance on the line sits on it.</p>`,
+            work:`<span class="c">Circle radius = OP = |Γ<sub>L</sub>| × (chart radius)</span><br>|Γ<sub>L</sub>| = ${f(m.mag)}` }),
+          draw: (m, p) => { vswrCircle(m.mag, m.th, p); dot(m.gu, m.gv, 6, COL.ink); } },
+        { dur:2400,
+          info: m => ({ title:'Read the VSWR',
+            body: isFinite(m.s) ? `<p>Follow the circle to where it crosses the <b>right half</b> of the horizontal axis. The r value there <b>is the VSWR</b>: about <b>${f(m.s, 2)}</b>.</p><p>The crossing on the left half gives 1/VSWR ≈ ${f(1/m.s, 2)}. That is the normalized impedance at a voltage minimum.</p>`
+              : `<p>|Γ| = 1, so the circle is the rim itself and the VSWR is infinite. All the power is reflected.</p>`,
+            work: isFinite(m.s) ? `VSWR = (1 + |Γ|)/(1 − |Γ|)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${f(1 + m.mag)}/${f(1 - m.mag)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b>${f(m.s, 2)}</b><br><span class="c">On a paper chart, expect a reading within about ±0.1 of this.</span>` : `VSWR = ∞` }),
+          draw: (m, p) => {
+            if (isFinite(m.s) && m.s < 60) stroke(rPts(m.s), ease(seg(p, 0, .6)), COL.green, 1.6, {'stroke-dasharray':'4 4', opacity:.8});
+            const e = ease(seg(p, .4, .8)); dot(m.mag, 0, 6*e, COL.green); if (m.mag > 0.02) dot(-m.mag, 0, 4.5*e, COL.green, .8);
+            const lo = seg(p, .6, 1);
+            if (isFinite(m.s)){ text(m.mag + 0.02, -0.075, `VSWR ≈ ${f(m.s, 2)}`, {color:COL.green, op:lo, size:14, anchor: m.mag > 0.75 ? 'end' : 'start'}); if (m.mag > 0.02) text(-m.mag, -0.075, `1/VSWR ≈ ${f(1/m.s, 2)}`, {color:COL.green, op:lo*.85, size:11.5}); }
+            else text(0.98, -0.075, 'VSWR = ∞', {color:COL.green, op:lo, size:14, anchor:'end'});
+          },
+          rd: m => ['VSWR circle meets the right axis', `VSWR = ${fS(m.s)}`] },
+        { dur:4200,
+          info: m => { const sum = m.w1 + 0.25; return { title:'Rotate 180° to get the admittance',
+            body:`<p>Moving λ/4 along the line turns z into y = 1/z. On the chart, λ/4 is <b>half a turn (180°)</b> around the VSWR circle.</p><p>In practice: draw a straight line from <b>P</b> through <b>O</b> to the other side of the circle. Where it lands, <b>P′</b>, is y<sub>L</sub>.</p>`,
+            work:`<span class="c">On the outer (WTG) scale:</span><br>P at ${f(m.w1)}λ<br>+ 0.25λ → ${f(sum)}λ${sum >= 0.5 ? ` − 0.5λ = ${f(m.w2)}λ` : ''}<br>P′ at <b>${f(m.w2)}λ</b><br><span class="c">(One full turn of the chart = 0.5λ.)</span>` }; },
+          draw: (m, p) => {
+            const pa = ease(seg(p, 0, .18)), pb = ease(seg(p, .18, .78)), pc = ease(seg(p, .78, 1));
+            radial(m.th, pa); if (pa >= 1) ringText(m.th, `${f(m.w1)}λ`, COL.purple);
+            arcCW(m.mag, m.th, PI, pb, COL.purple, 3.4);
+            if (pb > 0 && pb < 1){ movingDot(m.mag, m.th - PI*pb, COL.purple); text(0, 0.11, `${Math.round(180*pb)}°`, {color:COL.purple, size:13}); }
+            if (pc > 0){ stroke([[m.gu, m.gv], [m.yu, m.yv]], pc, COL.purple, 1.6, {'stroke-dasharray':'6 4'}); radial(m.th + PI, pc); if (pc >= 1) ringText(m.th + PI, `${f(m.w2)}λ`, COL.purple); }
+            dot(m.gu, m.gv, 6, COL.ink);
+            if (pb >= 1){ dot(m.yu, m.yv, 6.5, COL.purple); pointLabel(m.yu, m.yv, 'P′', COL.purple, 1, 0.07); }
+          },
+          rd: m => ['Read P on the WTG scale, add 0.25λ', `${f(m.w1)}λ → ${f(m.w2)}λ`] },
+        { dur:2600,
+          info: m => ({ title:'Read y<sub>L</sub> at P′',
+            body:`<p>Read P′ like any other point. It sits on the <b>${f(m.g)}</b> circle and the <b>${isNeg(m.b, 3) ? '−' : '+'}${f(Math.abs(m.b))}</b> arc. Because P′ is an admittance, call these <b>g</b> (conductance) and <b>b</b> (susceptance).</p>`,
+            work:`<span class="c">Check by algebra:</span><br>y<sub>L</sub> = 1/z<sub>L</sub> = 1/(${fc(m.r, m.x)})<br>&nbsp;&nbsp;&nbsp;= (${fc(m.r, -m.x)})/${f(m.r*m.r + m.x*m.x)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.g, m.b)}</b>` }),
+          draw: (m, p) => {
+            stroke(rPts(m.g), ease(seg(p, 0, .55)), COL.purple, 1.6, {'stroke-dasharray':'5 4', opacity:.75});
+            stroke(xPts(m.b), ease(seg(p, .3, .85)), COL.purple, 1.6, {'stroke-dasharray':'5 4', opacity:.75});
+            dot(m.yu, m.yv, 6.5, COL.purple); pointLabel(m.yu, m.yv, `P′: y = ${fc(m.g, m.b)}`, COL.purple, seg(p, .7, 1));
+          },
+          rd: m => ['Read P′, opposite P', `y<sub>L</sub> = ${fc(m.g, m.b)}`] },
+        stAnswer()],
+      answer: m => [
+        {tone:'y', k:'Normalized load admittance', v:`y<sub>L</sub> = ${fc(m.g, m.b, 2)}`, s:`Y<sub>L</sub> = y<sub>L</sub>/Z<sub>0</sub> = ${fc(1000*m.g/m.Z0, 1000*m.b/m.Z0, 2)} mS`},
+        {tone:'s1', k:'Voltage standing wave ratio', v:`VSWR ${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '= ∞'}`, s:`|Γ<sub>L</sub>| = ${f(m.mag, 2)}`}],
+      note: m => `<b>What to write in the exam:</b> z<sub>L</sub> = ${fc(m.r, m.x)} plotted at P. Draw the VSWR circle through P; it cuts the right half of the axis at VSWR ≈ ${isFinite(m.s) ? f(m.s, 1) : '∞'}. P′ is diametrically opposite P, so y<sub>L</sub> ≈ ${fc(m.g, m.b, 2)}.`,
+      keys: m => [[m.yu, m.yv, COL.purple], [m.mag, 0, COL.green]] },
+
+    // 2 ----------------------------------------------------------------
+    { id:'input-impedance', title:'Input impedance', desc:'Z<sub>in</sub> at a distance from the load', glyph:glyph('zin'),
+      fields:['Z0', 'RL', 'XL', 'l', 'lam'], defaults:{Z0:'50', RL:'100', XL:'50', l:'0.2', l_u:'lam', lam:''},
+      compute: v => {
+        const m = loadModel(v), L = lenIn(v, 'l', 'line length');
+        const l = L.lam, sweep = 2*TAU*mod(l, .5), thIn = m.th - sweep, Gin = polar(m.mag, thIn), t = Math.tan(TAU*l);
+        const zinF = cdiv([m.r, m.x + t], [1 - m.x*t, m.r*t]);
+        return Object.assign(m, {l, lText:L.text, lConv:L.conv, sweep, thIn, ui:Gin[0], vi:Gin[1], zin:fromG(Gin), zinF, t, w2:wtgA(thIn)});
       },
-      draw: (m, p) => {
-        const pa = ease(seg(p, 0, .18)), pb = ease(seg(p, .18, .78)), pc = ease(seg(p, .78, 1));
-        const radial = (th, q) => stroke([[0,0],[1.075*Math.cos(th), 1.075*Math.sin(th)]], q, COL.purple, 1.3, {'stroke-dasharray':'3 4', opacity:.85});
-        const wlab = (th, w) => text(1.2*Math.cos(th), 1.2*Math.sin(th), `${f(w)}λ`, {color:COL.purple, size:12.5, anchor: Math.cos(th) > .4 ? 'start' : Math.cos(th) < -.4 ? 'end' : 'middle'});
-        radial(m.th, pa); if (pa >= 1) wlab(m.th, m.w1);
-        stroke(circlePts(0, 0, m.mag, m.th, m.th - Math.PI, 180), pb, COL.purple, 3.4, {opacity:.9});
-        if (pb > 0 && pb < 1){
-          const a = m.th - Math.PI*pb;
-          dot(m.mag*Math.cos(a), m.mag*Math.sin(a), 6.5, COL.purple);
-          text(0, 0.11, `${Math.round(180*pb)}°`, {color:COL.purple, size:13});
+      problem: m => ({ lede:`A ${f(m.Z0)} Ω line, ${m.lText} long, ends in a ${fc(m.RL, m.XL, 2)} Ω load. Find the input impedance Z<sub>in</sub> at the other end.`, chips:[chipZ0(m), chipZL(m), `l = ${m.lText}`], find:'find Z<sub>in</sub>' }),
+      steps: () => [stIntro(), stNormalize(), stPlot(), stVswr(), stWtgP(),
+        { dur:3600,
+          info: m => ({ title:`Move ${m.lText} toward the generator`,
+            body:`<p>Going along the line toward the generator turns the point <b>clockwise</b> around the VSWR circle. Add the line length to P's reading on the outer scale.${m.l >= .5 ? ' The chart repeats every 0.5λ, so whole half-wavelengths drop out.' : ''}</p>`,
+            work:`${m.lConv ? m.lConv + '<br>' : ''}${f(m.w1)}λ + ${f(m.l)}λ = ${f(m.w1 + m.l)}λ${m.w1 + m.l >= .5 ? ` → ${f(m.w2)}λ <span class="c">(drop whole 0.5λ turns)</span>` : ''}<br>Q is at <b>${f(m.w2)}λ</b>` }),
+          draw: (m, p) => {
+            const q = ease(seg(p, 0, .85));
+            arcCW(m.mag, m.th, m.sweep, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(m.mag, m.th - m.sweep*q, COL.purple);
+            const e = seg(p, .85, 1);
+            if (e > 0){ radial(m.thIn, e, COL.purple); if (e >= 1) ringText(m.thIn, `${f(m.w2)}λ`, COL.purple); dot(m.ui, m.vi, 6.5, COL.purple); }
+            dot(m.gu, m.gv, 6, COL.ink);
+          },
+          rd: m => [`Move ${m.lText} toward the generator`, `${f(m.w1)}λ → ${f(m.w2)}λ`] },
+        { dur:2400,
+          info: m => ({ title:'Read z<sub>in</sub> at Q',
+            body:`<p>Read Q like any other point: it sits on the r = ${f(m.zin[0])} circle and the x = ${f(m.zin[1])} arc. Multiply by Z<sub>0</sub> to get ohms.</p>`,
+            work:`<span class="c">Check with the formula:</span><br>z<sub>in</sub> = (z<sub>L</sub> + j tan βl)/(1 + j z<sub>L</sub> tan βl)<br>tan βl = tan(${f(360*m.l, 1)}°) = ${Math.abs(m.t) > 1e6 ? '∞' : f(m.t)}<br>z<sub>in</sub> = <b>${fz(m.zinF)}</b><br>Z<sub>in</sub> = <b>${fc(m.zin[0]*m.Z0, m.zin[1]*m.Z0, 2)} Ω</b>` }),
+          draw: (m, p) => { faintRX(m.zin, p, COL.purple); dot(m.ui, m.vi, 6.5, COL.purple); pointLabel(m.ui, m.vi, `Q: z = ${fz(m.zin)}`, COL.purple, seg(p, .55, 1)); },
+          rd: m => ['Read Q', `z<sub>in</sub> = ${fz(m.zin)}`] },
+        stAnswer()],
+      answer: m => [
+        {tone:'y', k:'Input impedance', v:`Z<sub>in</sub> = ${fc(m.zin[0]*m.Z0, m.zin[1]*m.Z0, 2)} Ω`, s:`z<sub>in</sub> = ${fz(m.zin)}`},
+        {tone:'s1', k:'Standing wave on the line', v:`VSWR ${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '= ∞'}`, s:`|Γ| = ${f(m.mag, 2)} at every point`}],
+      keys: m => [[m.ui, m.vi, COL.purple]] },
+
+    // 3 ----------------------------------------------------------------
+    { id:'max-min', title:'Voltage max & min', desc:'Where V<sub>max</sub> and V<sub>min</sub> are, and Z there', glyph:glyph('mm'),
+      fields:['Z0', 'RL', 'XL'], defaults:{Z0:'50', RL:'30', XL:'40'},
+      compute: v => {
+        const m = loadModel(v);
+        if (m.mag < 1e-9) throw new Error('This load is matched (Z_L = Z₀): there is no standing wave, so there is no V max or V min.');
+        const mx = {kind:'max', d:m.dmax, a:0, r:m.s, Z:m.Z0*m.s, u:m.mag}, mn = {kind:'min', d:m.dmin, a:PI, r:1/m.s, Z:m.Z0/m.s, u:-m.mag};
+        const firstMax = m.dmax <= m.dmin;
+        return Object.assign(m, {o1: firstMax ? mx : mn, o2: firstMax ? mn : mx});
+      },
+      problem: m => ({ lede:`A ${f(m.Z0)} Ω line ends in a ${fc(m.RL, m.XL, 2)} Ω load. Find where the first voltage maximum and minimum are, and the line impedance at each.`, chips:[chipZ0(m), chipZL(m)], find:'find d<sub>max</sub> and d<sub>min</sub>' }),
+      steps: () => [stIntro(), stNormalize(), stPlot(), stVswr(), stWtgP(),
+        { dur:3200,
+          info: m => { const o = m.o1, target = o.kind === 'max' ? .25 : .5, wrap = target < m.w1; return { title:`Turn to the first voltage ${o.kind === 'max' ? 'maximum' : 'minimum'}`,
+            body:`<p>Move toward the generator (clockwise) from P until you hit the horizontal axis. ${o.kind === 'max' ? 'You reach the <b>right</b> half first. That is a voltage <b>maximum</b>, where the line looks like a pure resistance r = VSWR.' : 'You reach the <b>left</b> half first. That is a voltage <b>minimum</b>, where the line looks like a pure resistance r = 1/VSWR.'}</p>`,
+            work:`${o.kind === 'max' ? 'right' : 'left'} axis reads ${o.kind === 'max' ? '0.25λ' : '0.5λ'} on the WTG scale<br>d = ${f(target)}λ − ${f(m.w1)}λ${wrap ? ' + 0.5λ' : ''} = <b>${f(o.d)}λ</b>` }; },
+          draw: (m, p) => {
+            const o = m.o1, q = ease(seg(p, 0, .8));
+            arcCW(m.mag, m.th, 2*TAU*o.d, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(m.mag, m.th - 2*TAU*o.d*q, COL.purple);
+            const e = seg(p, .8, 1);
+            if (e > 0){ dot(o.u, 0, 6, COL.green); text(o.u + (o.kind === 'max' ? .02 : -.02), .075, `V ${o.kind} at ${f(o.d)}λ`, {color:COL.purple, size:13, op:e, anchor: o.kind === 'max' ? (m.mag > .7 ? 'end' : 'start') : (m.mag > .7 ? 'start' : 'end')}); }
+            dot(m.gu, m.gv, 6, COL.ink);
+          },
+          rd: m => [`First V<sub>${m.o1.kind}</sub> from the load`, `${f(m.o1.d)}λ`] },
+        { dur:2800,
+          info: m => ({ title:`λ/4 further: the first ${m.o2.kind === 'max' ? 'maximum' : 'minimum'}`,
+            body:`<p>Maxima and minima alternate every λ/4, which is half a turn of the chart. Keep turning to the other side of the axis.</p>`,
+            work:`${f(m.o1.d)}λ + 0.25λ = <b>${f(m.o2.d)}λ</b>` }),
+          draw: (m, p) => {
+            const o = m.o2, q = ease(seg(p, 0, .8));
+            arcCW(m.mag, m.o1.a, PI, q, COL.purple, 2.6, {opacity:.55});
+            if (q > 0 && q < 1) movingDot(m.mag, m.o1.a - PI*q, COL.purple);
+            const e = seg(p, .8, 1);
+            if (e > 0){ dot(o.u, 0, 6, COL.green); text(o.u + (o.kind === 'max' ? .02 : -.02), .075, `V ${o.kind} at ${f(o.d)}λ`, {color:COL.purple, size:13, op:e, anchor: o.kind === 'max' ? (m.mag > .7 ? 'end' : 'start') : (m.mag > .7 ? 'start' : 'end')}); }
+          },
+          rd: m => [`First V<sub>${m.o2.kind}</sub> from the load`, `${f(m.o2.d)}λ`] },
+        { dur:2000,
+          info: m => ({ title:'Impedance at the maximum and minimum',
+            body:`<p>At both points the line impedance is purely resistive. At V<sub>max</sub> it is largest (Z<sub>0</sub> × VSWR); at V<sub>min</sub> it is smallest (Z<sub>0</sub> / VSWR).</p>`,
+            work:`Z<sub>max</sub> = ${f(m.Z0)} × ${fS(m.s)} = <b>${f(m.Z0*m.s, 2)} Ω</b><br>Z<sub>min</sub> = ${f(m.Z0)} / ${fS(m.s)} = <b>${f(m.Z0/m.s, 2)} Ω</b>` }),
+          draw: (m, p) => {
+            const e = seg(p, 0, 1);
+            text(m.mag + .02, -.16, `Z = ${f(m.Z0*m.s, 1)} Ω`, {color:COL.green, size:12.5, op:e, anchor: m.mag > .7 ? 'end' : 'start'});
+            text(-m.mag - .02, -.16, `Z = ${f(m.Z0/m.s, 1)} Ω`, {color:COL.green, size:12.5, op:e, anchor: m.mag > .7 ? 'start' : 'end'});
+          },
+          rd: m => ['Impedance at V<sub>max</sub> / V<sub>min</sub>', `${f(m.Z0*m.s, 2)} Ω / ${f(m.Z0/m.s, 2)} Ω`] },
+        stAnswer()],
+      answer: m => [
+        {tone:'y', k:'First voltage maximum', v:`d<sub>max</sub> = ${f(m.dmax)}λ`, s:`Z = Z<sub>0</sub> × VSWR = ${f(m.Z0*m.s, 1)} Ω`},
+        {tone:'s1', k:'First voltage minimum', v:`d<sub>min</sub> = ${f(m.dmin)}λ`, s:`Z = Z<sub>0</sub> / VSWR = ${f(m.Z0/m.s, 1)} Ω`}],
+      note: m => `VSWR = ${fS(m.s)}. Maxima repeat every 0.5λ, and so do minima.`,
+      keys: m => [[m.mag, 0, COL.green], [-m.mag, 0, COL.green]] },
+
+    // 4 ----------------------------------------------------------------
+    { id:'load-from-vswr', title:'Load from measurements', desc:'Z<sub>L</sub> from the VSWR and the V<sub>min</sub> position', glyph:glyph('meas'),
+      fields:['Z0', 'S', 'dmin', 'lam'], defaults:{Z0:'50', S:'3', dmin:'0.15', dmin_u:'lam', lam:''},
+      compute: v => {
+        needNum(v.Z0, 'Z₀'); needNum(v.S, 'the VSWR');
+        if (v.Z0 <= 0) throw new Error('Z₀ must be greater than 0.');
+        if (v.S <= 1) throw new Error('The VSWR must be greater than 1 (a VSWR of 1 just means Z_L = Z₀).');
+        const D = lenIn(v, 'dmin', 'V min distance');
+        const mag = (v.S - 1)/(v.S + 1), thL = ang(polar(1, PI + 2*TAU*mod(D.lam, .5)));
+        const m = modelFromZ(v.Z0, fromG(polar(mag, thL)));
+        return Object.assign(m, {S:v.S, dm:D.lam, dText:D.text, dConv:D.conv, wl:mod(D.lam, .5), magS:mag});
+      },
+      problem: m => ({ lede:`A ${f(m.Z0)} Ω line shows a VSWR of ${f(m.S)}, and the first voltage minimum is ${m.dText} from the load. Find the load impedance Z<sub>L</sub>.`, chips:[chipZ0(m), `VSWR = ${f(m.S)}`, `d<sub>min</sub> = ${m.dText}`], find:'find Z<sub>L</sub>' }),
+      steps: () => [stIntro(),
+        { dur:2400,
+          info: m => ({ title:`Mark VSWR = ${f(m.S)} on the right axis`,
+            body:`<p>At a voltage maximum the line impedance is real and equal to VSWR × Z<sub>0</sub>, so the VSWR circle passes through <b>r = ${f(m.S)}</b> on the right half of the horizontal axis.</p>`,
+            work:`|Γ| = (VSWR − 1)/(VSWR + 1)<br>&nbsp;&nbsp;&nbsp;= ${f(m.S - 1)}/${f(m.S + 1)} = <b>${f(m.magS)}</b>` }),
+          draw: (m, p) => {
+            stroke(rPts(m.S), ease(seg(p, 0, .6)), COL.red, 1.8, {'stroke-dasharray':'5 4', opacity:.8});
+            dot(m.magS, 0, 6*ease(seg(p, .5, .9)), COL.green);
+            text(m.magS + .02, -.075, `r = VSWR = ${f(m.S)}`, {color:COL.green, size:13, op:seg(p, .6, 1), anchor: m.magS > .75 ? 'end' : 'start'});
+          },
+          rd: m => ['Mark the VSWR on the right axis', `r = ${f(m.S)}, |Γ| = ${f(m.magS)}`] },
+        { dur:2400,
+          info: m => ({ title:'Draw the VSWR circle', body:`<p>Compass on O, open it to that point, and draw the full circle. The load is somewhere on it; the position of V<sub>min</sub> tells you where.</p>`, work:'' }),
+          draw: (m, p) => { stroke(circlePts(0, 0, m.magS, 0, -TAU, 360), ease(p), COL.green, 2.8); dot(0, 0, 4.5, COL.ink); dot(m.magS, 0, 6, COL.green); } },
+        { dur:2000,
+          info: m => ({ title:'Mark the voltage minimum',
+            body:`<p>The voltage minimum is where the impedance is smallest and purely resistive: the <b>left</b> crossing, r = 1/VSWR = ${f(1/m.S)}. Both wavelength scales read 0 there.</p>`,
+            work:`r<sub>min</sub> = 1/${f(m.S)} = <b>${f(1/m.S)}</b>` }),
+          draw: (m, p) => { const e = ease(p); dot(-m.magS, 0, 6*e, COL.green); text(-m.magS, -.075, 'V min', {color:COL.green, size:13, op:e}); radial(PI, e, COL.ink); if (p >= 1) ringText(PI, '0λ', COL.ink); },
+          rd: m => ['V<sub>min</sub> on the left axis', `r = 1/VSWR = ${f(1/m.S)}`] },
+        { dur:3400,
+          info: m => ({ title:`Move ${m.dText} toward the load`,
+            body:`<p>The load is ${m.dText} from the minimum, on the load side. Turn <b>anticlockwise</b> (toward the load) by ${f(m.dm)}λ, using the wavelengths-toward-load scale.</p>`,
+            work:`${m.dConv ? m.dConv + '<br>' : ''}WTL reading: 0 + ${f(m.dm)}λ = <b>${f(m.wl)}λ</b>` }),
+          draw: (m, p) => {
+            const sweep = 2*TAU*m.wl, q = ease(seg(p, 0, .85));
+            arcCCW(m.magS, PI, sweep, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(m.magS, PI + sweep*q, COL.purple);
+            const e = seg(p, .85, 1);
+            if (e > 0){ radial(m.th, e, COL.purple); if (e >= 1) ringText(m.th, `WTL ${f(m.wl)}λ`, COL.purple); dot(m.gu, m.gv, 6.5, COL.ink); }
+          },
+          rd: m => [`Move ${m.dText} toward the load`, `WTL ${f(m.wl)}λ`] },
+        { dur:2400,
+          info: m => ({ title:'Read z<sub>L</sub>', body:`<p>P lands on the r = ${f(m.r)} circle and the x = ${f(m.x)} arc.</p>`, work:`z<sub>L</sub> = <b>${fc(m.r, m.x)}</b>` }),
+          draw: (m, p) => { faintRX([m.r, m.x], p, COL.ink); dot(m.gu, m.gv, 6.5, COL.ink); pointLabel(m.gu, m.gv, `P: z = ${fc(m.r, m.x)}`, COL.ink, seg(p, .5, 1)); },
+          rd: m => ['Read P', `z<sub>L</sub> = ${fc(m.r, m.x)}`] },
+        { dur:1400,
+          info: m => ({ title:'Denormalize', body:`<p>Multiply by Z<sub>0</sub> to turn z<sub>L</sub> back into ohms.</p>`, work:`Z<sub>L</sub> = ${f(m.Z0)} × (${fc(m.r, m.x)})<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.RL, m.XL, 2)} Ω</b>` }),
+          draw: (m) => { dot(m.gu, m.gv, 6.5, COL.ink); },
+          rd: m => ['Denormalize', `Z<sub>L</sub> = ${fc(m.RL, m.XL, 2)} Ω`] },
+        stAnswer()],
+      answer: m => [
+        {tone:'y', k:'Load impedance', v:`Z<sub>L</sub> = ${fc(m.RL, m.XL, 1)} Ω`, s:`z<sub>L</sub> = ${fc(m.r, m.x)}`},
+        {tone:'s1', k:'Reflection coefficient', v:`Γ<sub>L</sub> = ${f(m.magS, 3)} ∠${f(deg(m.th), 1)}°`, s:`VSWR = ${f(m.S)}`}],
+      keys: m => [[m.gu, m.gv, COL.ink]] },
+
+    // 5 ----------------------------------------------------------------
+    { id:'single-stub', title:'Single-stub matching', desc:'Stub position and length (two answers)', glyph:glyph('ss'),
+      fields:['Z0', 'RL', 'XL', 'stub'], defaults:{Z0:'50', RL:'60', XL:'-80', stub:'short'},
+      compute: v => {
+        const m = loadModel(v, {needY:true}); noMatchErr(m);
+        const rho = m.mag, thy = ang([m.yu, m.yv]), u = rho*rho, vv = rho*Math.sqrt(Math.max(0, 1 - rho*rho));
+        const a0 = v.stub === 'short' ? 0 : PI;
+        const sols = [ang([u, vv]), ang([u, -vv])].map(phi => {
+          const y = fromG(polar(rho, phi)), bs = -y[1], phit = ang(toG([0, bs]));
+          return {phi, d:cw(thy, phi), b:y[1], bs, phit, l:cw(a0, phit), w:wtgA(phi)};
+        }).sort((a, b) => a.d - b.d);
+        return Object.assign(m, {thy, wy:wtgA(thy), stub:v.stub, a0, w0:wtgA(a0), sols});
+      },
+      problem: m => ({ lede:`Match a ${fc(m.RL, m.XL, 2)} Ω load to a ${f(m.Z0)} Ω line with one ${m.stub}-circuited stub in shunt. Find where to put the stub and how long it must be.`, chips:[chipZ0(m), chipZL(m), `${m.stub}-circuited stub`], find:'find d and l' }),
+      steps: () => [stIntro(), stNormalize(), stPlot(), stVswr(),
+        stToY('A stub is connected in <b>shunt</b>, and shunt elements add admittances, so work with y instead of z.'),
+        { dur:2000,
+          info: () => ({ title:'Draw the g = 1 circle', body:`<p>A stub only adds susceptance (jb), never conductance. For a match, the line's admittance at the stub must already be <b>1 + jb</b>, so the stub has to sit on the <b>g = 1 circle</b>: the circle through the centre.</p>`, work:'' }),
+          draw: (m, p) => { stroke(rPts(1), ease(p), COL.match, 2.6); text(.5, .56, 'g = 1', {color:COL.match, size:13, op:seg(p, .6, 1)}); dot(m.yu, m.yv, 6.5, COL.purple); } },
+        { dur:3600,
+          info: m => { const S = m.sols[0], wrap = S.w < m.wy; return { title:'Move toward the generator to the g = 1 circle',
+            body:`<p>From P′ turn <b>clockwise</b> around the VSWR circle until you meet the g = 1 circle at <b>A</b>. Read both points on the outer scale. The difference is the stub's distance from the load.</p>`,
+            work:`P′ at ${f(m.wy)}λ, A at ${f(S.w)}λ<br>d₁ = ${f(S.w)} − ${f(m.wy)}${wrap ? ' + 0.5' : ''} = <b>${f(S.d)}λ</b>` }; },
+          draw: (m, p) => {
+            const S = m.sols[0], e0 = seg(p, 0, .15);
+            radial(m.thy, e0, COL.purple); if (e0 >= 1) ringText(m.thy, `${f(m.wy)}λ`, COL.purple);
+            const q = ease(seg(p, .15, .85));
+            arcCW(m.mag, m.thy, 2*TAU*S.d, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(m.mag, m.thy - 2*TAU*S.d*q, COL.purple);
+            const e = seg(p, .85, 1);
+            if (e > 0){ const [u, v] = polar(m.mag, S.phi); radial(S.phi, e, COL.match); if (e >= 1) ringText(S.phi, `${f(S.w)}λ`, COL.match); dot(u, v, 6.5, COL.match); pointLabel(u, v, `A: y = ${fc(1, S.b)}`, COL.match, e, .05, [1, 0]); }
+            dot(m.yu, m.yv, 6.5, COL.purple);
+          },
+          rd: m => ['Stub position, solution 1', `d₁ = ${f(m.sols[0].d)}λ`] },
+        { dur:3600,
+          info: m => { const S = m.sols[0], sh = m.stub === 'short'; return { title:'Read A and size the stub',
+            body:`<p>At A the line admittance is <b>y = ${fc(1, S.b)}</b>. The stub must cancel the susceptance, so it needs <b>y<sub>stub</sub> = ${fj(S.bs)}</b>. Start at the ${sh ? '<b>short-circuit</b> point (y = ∞, right end)' : '<b>open-circuit</b> point (y = 0, left end)'} and turn clockwise around the rim until you reach ${fj(S.bs)}. That distance is the stub length.</p>`,
+            work:`stub starts at ${f(m.w0)}λ; ${fj(S.bs)} is at ${f(wtgA(S.phit))}λ<br>l₁ = <b>${f(S.l)}λ</b>` }; },
+          draw: (m, p) => {
+            const S = m.sols[0], sh = m.stub === 'short', [u, v] = polar(m.mag, S.phi);
+            dot(u, v, 6.5, COL.match);
+            const st = polar(1, m.a0); dot(st[0], st[1], 5.5, COL.ink);
+            text(sh ? .96 : -.96, .09, sh ? 'short (y = ∞)' : 'open (y = 0)', {anchor: sh ? 'end' : 'start', size:12, op:seg(p, .1, .35)});
+            rimArc(m.a0, 2*TAU*S.l, ease(seg(p, .25, .9)), COL.match);
+            const e = seg(p, .9, 1);
+            if (e > 0){ const [tu, tv] = polar(1, S.phit); dot(tu, tv, 5.5, COL.match); ringText(S.phit, `l₁ = ${f(S.l)}λ`, COL.match, e); }
+          },
+          rd: m => ['Stub length, solution 1', `${fj(m.sols[0].bs)} → l₁ = ${f(m.sols[0].l)}λ`] },
+        { dur:3200,
+          info: m => { const T = m.sols[1]; return { title:'The second solution',
+            body:`<p>Keep turning: the VSWR circle meets the g = 1 circle again at <b>B</b>, where y = ${fc(1, T.b)}. A stub there needs ${fj(T.bs)}.</p>`,
+            work:`d₂ = <b>${f(T.d)}λ</b><br>l₂ = <b>${f(T.l)}λ</b>` }; },
+          draw: (m, p) => {
+            const S = m.sols[0], T = m.sols[1], q = ease(seg(p, 0, .6));
+            arcCW(m.mag, S.phi, 2*TAU*(T.d - S.d), q, COL.purple, 2.4, {opacity:.5});
+            const e = seg(p, .55, 1);
+            if (e > 0){ const [u, v] = polar(m.mag, T.phi); dot(u, v, 6, COL.match); pointLabel(u, v, `B: y = ${fc(1, T.b)}`, COL.match, e, .05, [-1, 0]); rimArc(m.a0, 2*TAU*T.l, ease(e), COL.match, true, .955); if (e >= 1){ const [tu, tv] = polar(.955, T.phit); dot(tu, tv, 5, COL.match); } }
+          },
+          rd: m => ['Solution 2', `d₂ = ${f(m.sols[1].d)}λ, l₂ = ${f(m.sols[1].l)}λ`] },
+        stAnswer()],
+      answer: m => { const [S, T] = m.sols; return [
+        {tone:'y', k:'Solution 1', v:`d = ${f(S.d)}λ<br>l = ${f(S.l)}λ`, s:`stub gives ${fj(S.bs)}`},
+        {tone:'s1', k:'Solution 2', v:`d = ${f(T.d)}λ<br>l = ${f(T.l)}λ`, s:`stub gives ${fj(T.bs)}`}]; },
+      note: m => `d is measured from the load to the stub. Both answers work; the shorter one is usually preferred because it is less sensitive to frequency. The stub is ${m.stub}-circuited.`,
+      keys: m => m.sols.map(S => [...polar(m.mag, S.phi), COL.match]) },
+
+    // 6 ----------------------------------------------------------------
+    { id:'quarter-wave', title:'Quarter-wave transformer', desc:'Where to put it and its Z<sub>0</sub>′', glyph:glyph('qw'),
+      fields:['Z0', 'RL', 'XL'], defaults:{Z0:'50', RL:'100', XL:'50'},
+      compute: v => {
+        const m = loadModel(v); noMatchErr(m);
+        const mx = {kind:'max', d:m.dmax, a:0, r:m.s, u:m.mag}, mn = {kind:'min', d:m.dmin, a:PI, r:1/m.s, u:-m.mag};
+        [mx, mn].forEach(o => { o.R = m.Z0*o.r; o.Zq = Math.sqrt(m.Z0*o.R); });
+        const firstMax = m.dmax <= m.dmin;
+        return Object.assign(m, {o1: firstMax ? mx : mn, o2: firstMax ? mn : mx});
+      },
+      problem: m => ({ lede:`Match a ${fc(m.RL, m.XL, 2)} Ω load to a ${f(m.Z0)} Ω line with a quarter-wave transformer. Find where to put it and its characteristic impedance.`, chips:[chipZ0(m), chipZL(m)], find:'find d and Z<sub>0</sub>′' }),
+      steps: () => [stIntro(), stNormalize(), stPlot(), stVswr(),
+        { dur:3200,
+          info: m => { const o = m.o1; return { title:'Turn to the horizontal axis',
+            body:`<p>A quarter-wave transformer only matches a <b>real</b> impedance. Turn clockwise from P to the first point where the line looks purely resistive: the ${o.kind === 'max' ? '<b>right</b> half (a voltage maximum)' : '<b>left</b> half (a voltage minimum)'}.</p>`,
+            work:`d = <b>${f(o.d)}λ</b> from the load<br>r there = ${o.kind === 'max' ? 'VSWR' : '1/VSWR'} = ${f(o.r)}` }; },
+          draw: (m, p) => {
+            const o = m.o1, q = ease(seg(p, 0, .8));
+            arcCW(m.mag, m.th, 2*TAU*o.d, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(m.mag, m.th - 2*TAU*o.d*q, COL.purple);
+            const e = seg(p, .8, 1);
+            if (e > 0){ dot(o.u, 0, 6.5, COL.purple); text(o.u + (o.u > 0 ? .02 : -.02), .075, `d = ${f(o.d)}λ`, {color:COL.purple, size:13, op:e, anchor: (o.u > 0) === (m.mag <= .7) ? 'start' : 'end'}); }
+            dot(m.gu, m.gv, 6, COL.ink);
+          },
+          rd: m => ['Turn to the real axis', `d = ${f(m.o1.d)}λ, r = ${f(m.o1.r)}`] },
+        { dur:1800,
+          info: m => ({ title:'The line is resistive here', body:`<p>At this point the line impedance is real: R = Z<sub>0</sub> × r. This is where the transformer goes.</p>`, work:`R = ${f(m.Z0)} × ${f(m.o1.r)} = <b>${f(m.o1.R, 2)} Ω</b>` }),
+          draw: (m, p) => { const o = m.o1; text(o.u + (o.u > 0 ? .02 : -.02), -.17, `R = ${f(o.R, 1)} Ω`, {color:COL.purple, size:12.5, op:seg(p, 0, .6), anchor: (o.u > 0) === (m.mag <= .7) ? 'start' : 'end'}); },
+          rd: m => ['Resistance there', `R = ${f(m.o1.R, 2)} Ω`] },
+        { dur:2600,
+          info: m => ({ title:'Size the λ/4 section',
+            body:`<p>A λ/4 section of impedance Z<sub>0</sub>′ turns R into Z<sub>0</sub>′²/R. Make that equal Z<sub>0</sub> and the line is matched: the point jumps to the centre.</p>`,
+            work:`Z<sub>0</sub>′ = √(Z<sub>0</sub> · R) = √(${f(m.Z0)} × ${f(m.o1.R, 2)})<br>&nbsp;&nbsp;&nbsp;&nbsp;= <b>${f(m.o1.Zq, 2)} Ω</b>` }),
+          draw: (m, p) => {
+            const o = m.o1; curveArrow([o.u, 0], [0, 0], o.u > 0 ? .5 : -.5, ease(seg(p, 0, .7)), COL.match);
+            const e = seg(p, .6, 1); if (e > 0){ dot(0, 0, 6, COL.match); text(o.u/2, -Math.abs(o.u)/4 - .07, `λ/4 of ${f(o.Zq, 1)} Ω`, {color:COL.match, size:12.5, op:e}); }
+          },
+          rd: m => ['Transformer impedance', `Z<sub>0</sub>′ = ${f(m.o1.Zq, 2)} Ω`] },
+        { dur:2800,
+          info: m => { const o = m.o2; return { title:'The other position',
+            body:`<p>λ/4 further along, the line is resistive again, at the ${o.kind === 'max' ? 'right crossing (a voltage maximum)' : 'left crossing (a voltage minimum)'}. A transformer there works too.</p>`,
+            work:`d = ${f(o.d)}λ, R = ${f(o.R, 2)} Ω<br>Z<sub>0</sub>′ = √(${f(m.Z0)} × ${f(o.R, 2)}) = <b>${f(o.Zq, 2)} Ω</b>` }; },
+          draw: (m, p) => {
+            const o = m.o2, q = ease(seg(p, 0, .8));
+            arcCW(m.mag, m.o1.a, PI, q, COL.purple, 2.4, {opacity:.5});
+            if (q > 0 && q < 1) movingDot(m.mag, m.o1.a - PI*q, COL.purple);
+            const e = seg(p, .8, 1);
+            if (e > 0){ dot(o.u, 0, 6, COL.purple); text(o.u + (o.u > 0 ? .02 : -.02), .075, `d = ${f(o.d)}λ`, {color:COL.purple, size:13, op:e, anchor: (o.u > 0) === (m.mag <= .7) ? 'start' : 'end'}); }
+          },
+          rd: m => ['Other option', `d = ${f(m.o2.d)}λ, Z<sub>0</sub>′ = ${f(m.o2.Zq, 2)} Ω`] },
+        stAnswer()],
+      answer: m => [
+        {tone:'y', k:'Option 1 (nearest the load)', v:`d = ${f(m.o1.d)}λ<br>Z<sub>0</sub>′ = ${f(m.o1.Zq, 1)} Ω`, s:`line is ${f(m.o1.R, 1)} Ω there (V ${m.o1.kind})`},
+        {tone:'s1', k:'Option 2', v:`d = ${f(m.o2.d)}λ<br>Z<sub>0</sub>′ = ${f(m.o2.Zq, 1)} Ω`, s:`line is ${f(m.o2.R, 1)} Ω there (V ${m.o2.kind})`}],
+      note: () => 'd is measured from the load to the start of the transformer. The transformer itself is 0.25λ long.',
+      keys: m => [[m.o1.u, 0, COL.purple], [0, 0, COL.match]] },
+
+    // 7 ----------------------------------------------------------------
+    { id:'stub-length', title:'Stub reactance & length', desc:'Z<sub>in</sub> of a short or open stub, or its length', glyph:glyph('sx'),
+      fields:['Z0', 'stub', 'find', 'lst', 'X', 'lam'], defaults:{Z0:'50', stub:'short', find:'zin', lst:'0.1', lst_u:'lam', X:'100', lam:''},
+      compute: v => {
+        needNum(v.Z0, 'Z₀'); if (v.Z0 <= 0) throw new Error('Z₀ must be greater than 0.');
+        const sh = v.stub === 'short', a0 = sh ? PI : 0, m = {Z0:v.Z0, stub:v.stub, find:v.find, a0, w0:wtgA(a0)};
+        if (v.find === 'zin'){
+          const L = lenIn(v, 'lst', 'stub length'), t = Math.tan(TAU*L.lam);
+          let x = sh ? t : (Math.abs(t) < 1e-12 ? -Infinity : -1/t); if (Math.abs(x) > 1e9) x = Infinity;
+          Object.assign(m, {l:L.lam, lText:L.text, lConv:L.conv, sweep:2*TAU*mod(L.lam, .5), x});
+          m.aE = a0 - m.sweep;
+        } else {
+          needNum(v.X, 'the reactance');
+          const x = v.X/v.Z0, aE = ang(toG([0, x])), l = cw(a0, aE);
+          Object.assign(m, {x, aE, l, lText:`${f(l)}λ`, lConv:null, sweep:2*TAU*l});
         }
-        if (pc > 0){
-          stroke([[m.gu, m.gv],[m.yu, m.yv]], pc, COL.purple, 1.6, {'stroke-dasharray':'6 4'});
-          radial(m.th + Math.PI, pc);
-          if (pc >= 1) wlab(m.th + Math.PI, m.w2);
-        }
-        dot(m.gu, m.gv, 6, COL.ink);
-        if (pb >= 1){ dot(m.yu, m.yv, 6.5, COL.purple); pointLabel(m.yu, m.yv, 'P′', COL.purple, 1, 0.07); }
-      } },
-    { dot:'8', dur:2600,
-      info: m => ({
-        title:'Read y<sub>L</sub> at P′',
-        body:`<p>Read P′ like any other point. It sits on the <b>${f(m.g)}</b> circle and the <b>${m.b < 0 ? '−' : '+'}${f(Math.abs(m.b))}</b> arc. Because P′ is an admittance, call these <b>g</b> (conductance) and <b>b</b> (susceptance).</p>`,
-        work:`<span class="c">Check by algebra:</span><br>y<sub>L</sub> = 1/z<sub>L</sub> = 1/(${fc(m.r, m.x)})<br>&nbsp;&nbsp;&nbsp;= (${fc(m.r, -m.x)})/${f(m.r*m.r + m.x*m.x)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.g, m.b)}</b>` }),
-      draw: (m, p) => {
-        stroke(rPts(m.g), ease(seg(p, 0, .55)), COL.purple, 1.6, {'stroke-dasharray':'5 4', opacity:.75});
-        stroke(xPts(m.b), ease(seg(p, .3, .85)), COL.purple, 1.6, {'stroke-dasharray':'5 4', opacity:.75});
-        dot(m.yu, m.yv, 6.5, COL.purple);
-        pointLabel(m.yu, m.yv, `P′: y = ${fc(m.g, m.b)}`, COL.purple, seg(p, .7, 1));
-      } },
-    { dot:'✓', dur:1600,
-      info: m => ({
-        title:'Answer',
-        body:`<div class="answer">
-            <div class="ans y"><div class="k">Normalized load admittance</div><div class="v">y<sub>L</sub> = ${fc(m.g, m.b, 2)}</div><div class="s">Y<sub>L</sub> = y<sub>L</sub>/Z<sub>0</sub> = ${fc(1000*m.g/m.Z0, 1000*m.b/m.Z0, 2)} mS</div></div>
-            <div class="ans s1"><div class="k">Voltage standing wave ratio</div><div class="v">VSWR ${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '= ∞'}</div><div class="s">|Γ<sub>L</sub>| = ${f(m.mag, 2)}</div></div>
-          </div>
-          <p><b>What to write in the exam:</b> z<sub>L</sub> = ${fc(m.r, m.x)} plotted at P. Draw the VSWR circle through P; it cuts the right half of the axis at VSWR ≈ ${isFinite(m.s) ? f(m.s, 1) : '∞'}. P′ is diametrically opposite P, so y<sub>L</sub> ≈ ${fc(m.g, m.b, 2)}.</p>`,
-        work:'' }),
-      draw: (m, p) => {
-        const q = seg(p, 0, 1);
-        if (q < 1){ ring(m.yu, m.yv, 7 + 20*q, COL.purple, 1 - q); if (isFinite(m.s)) ring(m.mag, 0, 7 + 20*q, COL.green, 1 - q); }
-      } }
+        m.X = isFinite(m.x) ? m.x*m.Z0 : m.x; m.wE = wtgA(m.aE); m.xChart = fromG(polar(1, m.aE))[1];
+        return Object.assign(m, {mag:1, th:m.aE, s:Infinity, gu:Math.cos(m.aE), gv:Math.sin(m.aE), dmax:cw(m.aE, 0), dmin:cw(m.aE, PI)});
+      },
+      problem: m => m.find === 'zin'
+        ? { lede:`A ${m.stub}-circuited ${f(m.Z0)} Ω stub is ${m.lText} long. Find its input impedance.`, chips:[chipZ0(m), `${m.stub}-circuited`, `l = ${m.lText}`], find:'find Z<sub>in</sub>' }
+        : { lede:`Find the length of a ${m.stub}-circuited ${f(m.Z0)} Ω stub whose input impedance is ${fj(m.X, 2)} Ω.`, chips:[chipZ0(m), `${m.stub}-circuited`, `X<sub>in</sub> = ${f(m.X, 2)} Ω`], find:'find the length' },
+      steps: m => {
+        const sh = m.stub === 'short';
+        const start = { dur:2000,
+          info: m => ({ title:`Start at the ${sh ? 'short' : 'open'} circuit`,
+            body:`<p>${sh ? 'A short circuit is z = 0: the <b>left</b> end of the horizontal axis.' : 'An open circuit is z = ∞: the <b>right</b> end of the horizontal axis.'} A lossless stub reflects everything (|Γ| = 1), so moving along it keeps you on the <b>rim</b> of the chart.</p>`,
+            work:`WTG reading at the ${sh ? 'short' : 'open'}: <b>${f(m.w0)}λ</b>` }),
+          draw: (m, p) => { const e = ease(p), [u, v] = polar(1, m.a0); dot(u, v, 6.5*e, COL.ink); text(u + (sh ? .03 : -.03), v - .075, sh ? 'short (z = 0)' : 'open (z = ∞)', {anchor: sh ? 'start' : 'end', op:e, size:13}); radial(m.a0, e, COL.ink); },
+          rd: m => ['Start point', `${sh ? 'short' : 'open'} circuit at ${f(m.w0)}λ`] };
+        const moveTo = (title, body, work, rd) => ({ dur:3000, info: m => ({title, body, work}),
+          draw: (m, p) => {
+            const q = ease(seg(p, 0, .85)); rimArc(m.a0, m.sweep, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(.982, m.a0 - m.sweep*q, COL.purple);
+            const e = seg(p, .85, 1);
+            if (e > 0){ const [u, v] = polar(1, m.aE); dot(u, v, 6.5, COL.purple); radial(m.aE, e, COL.purple); ringText(m.aE, `${f(m.wE)}λ`, COL.purple, e); }
+            const [su, sv] = polar(1, m.a0); dot(su, sv, 6, COL.ink);
+          }, rd });
+        if (m.find === 'zin') return [stIntro(), start,
+          moveTo(`Move ${m.lText} toward the generator`, `<p>Turn <b>clockwise</b> around the rim by ${f(m.l)}λ.${m.l >= .5 ? ' The chart repeats every 0.5λ.' : ''}</p>`,
+            `${m.lConv ? m.lConv + '<br>' : ''}${f(m.w0)}λ + ${f(m.l)}λ = ${f(m.w0 + m.l)}λ${m.w0 + m.l >= .5 ? ` → ${f(m.wE)}λ` : ''}`,
+            m => [`Move ${m.lText} along the rim`, `${f(m.w0)}λ → ${f(m.wE)}λ`]),
+          { dur:2200,
+            info: m => ({ title:'Read the input reactance',
+              body:`<p>The end point is on the rim, so the stub's input impedance is a pure reactance. Read the x arc through it${isFinite(m.x) ? (m.x > 0 ? ': it is inductive' : m.x < 0 ? ': it is capacitive' : '') : ''}.</p>`,
+              work:`chart: z<sub>in</sub> = ${fj(m.xChart)}<br><span class="c">formula: ${sh ? 'jZ₀ tan βl' : '−jZ₀ cot βl'} → x = ${isFinite(m.x) ? f(m.x) : '∞'}</span><br>Z<sub>in</sub> = <b>${fj(m.X, 2)} Ω</b>` }),
+            draw: (m, p) => { const [u, v] = polar(1, m.aE); if (isFinite(m.x)) stroke(xPts(m.x), ease(seg(p, 0, .7)), COL.blue, 2.2, {opacity:.85}); dot(u, v, 6.5, COL.purple); pointLabel(u, v, `z = ${fj(m.x)}`, COL.purple, seg(p, .55, 1), .1); },
+            rd: m => ['Read the reactance', `Z<sub>in</sub> = ${fj(m.X, 2)} Ω`] },
+          stAnswer()];
+        return [stIntro(), start,
+          { dur:2400,
+            info: m => ({ title:`Find x = ${f(m.x)} on the rim`, body:`<p>Normalize the reactance, x = X/Z<sub>0</sub>, then follow the ${fj(m.x)} arc out to the rim.</p>`, work:`x = ${f(m.X)}/${f(m.Z0)} = <b>${f(m.x)}</b><br>that point reads ${f(m.wE)}λ` }),
+            draw: (m, p) => { stroke(xPts(m.x), ease(seg(p, 0, .7)), COL.blue, 2.4); const e = seg(p, .7, 1); if (e > 0){ const [u, v] = polar(1, m.aE); dot(u, v, 6.5, COL.blue); radial(m.aE, e, COL.blue); ringText(m.aE, `${f(m.wE)}λ`, COL.blue, e); } },
+            rd: m => ['Target on the rim', `x = ${f(m.x)} at ${f(m.wE)}λ`] },
+          moveTo('Measure the stub length', `<p>Turn clockwise from the ${sh ? 'short' : 'open'} circuit to the target. The distance on the outer scale is the stub length.</p>`,
+            `l = ${f(m.wE)}λ − ${f(m.w0)}λ${m.wE < m.w0 ? ' + 0.5λ' : ''} = <b>${f(m.l)}λ</b>`,
+            m => ['Stub length', `l = ${f(m.l)}λ`]),
+          stAnswer()];
+      },
+      answer: m => m.find === 'zin'
+        ? [{tone:'y', k:'Input impedance', v:`Z<sub>in</sub> = ${fj(m.X, 2)} Ω`, s:`${!isFinite(m.x) ? 'acts as an open circuit' : m.x > 0 ? 'inductive' : m.x < 0 ? 'capacitive' : 'acts as a short circuit'}, z<sub>in</sub> = ${fj(m.x)}`}]
+        : [{tone:'y', k:'Stub length', v:`l = ${f(m.l)}λ`, s:`gives Z<sub>in</sub> = ${fj(m.X, 2)} Ω; adding 0.5λ gives the same`}],
+      extras:false,
+      keys: m => [[...polar(1, m.aE), COL.purple]] },
+
+    // 8 ----------------------------------------------------------------
+    { id:'double-stub', title:'Double-stub matching', desc:'Two stub lengths for a fixed spacing', glyph:glyph('ds'),
+      fields:['Z0', 'RL', 'XL', 'stub', 'd0', 'dsp'], defaults:{Z0:'50', RL:'60', XL:'-80', stub:'short', d0:'0', dsp:'0.125'},
+      compute: v => {
+        const m = loadModel(v, {needY:true}); noMatchErr(m);
+        const d0 = needNum(v.d0, 'the stub 1 distance'), dsp = needNum(v.dsp, 'the stub spacing');
+        if (d0 < 0) throw new Error('The stub 1 distance can’t be negative.');
+        if (!(dsp > 0 && dsp < .5)) throw new Error('The stub spacing must be between 0 and 0.5λ (λ/8 = 0.125 and 3λ/8 = 0.375 are common).');
+        const thy = ang([m.yu, m.yv]), G1 = polar(m.mag, thy - 2*TAU*d0), y1 = fromG(G1), g1 = y1[0], b1 = y1[1];
+        const gmax = 1/Math.pow(Math.sin(TAU*dsp), 2), cR = polar(.5, 2*TAU*dsp);
+        const pts = circleIntersect([g1/(1 + g1), 0], 1/(1 + g1), cR, .5);
+        if (!pts.length) throw new Error(`No solution: at stub 1, g = ${f(g1)} is in the forbidden region (g > 1/sin²βd = ${f(gmax)}). Move stub 1 (change its distance from the load) or change the spacing.`);
+        const a0 = v.stub === 'short' ? 0 : PI;
+        const sols = pts.map(Q => {
+          const yQ = fromG(Q), bs1 = yQ[1] - b1, G2 = rot(Q, -2*TAU*dsp), y2 = fromG(G2), bs2 = -y2[1];
+          return {Q, yQ, bs1, G2, y2, bs2, l1:stubLen(bs1, a0), l2:stubLen(bs2, a0)};
+        }).sort((a, b) => (a.l1 + a.l2) - (b.l1 + b.l2));
+        return Object.assign(m, {thy, d0, dsp, G1, g1, b1, gmax, cR, stub:v.stub, a0, sols});
+      },
+      problem: m => ({ lede:`Match a ${fc(m.RL, m.XL, 2)} Ω load to a ${f(m.Z0)} Ω line with two ${m.stub}-circuited shunt stubs ${f(m.dsp)}λ apart, the first ${m.d0 > 0 ? f(m.d0) + 'λ from the load' : 'at the load'}. Find both stub lengths.`, chips:[chipZ0(m), chipZL(m), `spacing ${f(m.dsp)}λ`], find:'find l₁ and l₂' }),
+      steps: m => [stIntro(), stNormalize(), stPlot(), stVswr(),
+        stToY('Both stubs are in <b>shunt</b>, so work with admittances.'),
+        { dur: m.d0 > 0 ? 2800 : 1400,
+          info: m => ({ title: m.d0 > 0 ? `Move ${f(m.d0)}λ to stub 1` : 'Stub 1 is at the load',
+            body: m.d0 > 0 ? `<p>Turn clockwise by ${f(m.d0)}λ along the VSWR circle to reach the first stub. Read y₁ there.</p>` : `<p>The first stub sits right at the load, so y₁ = y<sub>L</sub>.</p>`,
+            work:`y₁ = <b>${fc(m.g1, m.b1)}</b>` }),
+          draw: (m, p) => {
+            if (m.d0 > 0){ const q = ease(seg(p, 0, .8)); arcCW(m.mag, m.thy, 2*TAU*m.d0, q, COL.purple, 2.6, {opacity:.7}); if (q > 0 && q < 1) movingDot(m.mag, m.thy - 2*TAU*m.d0*q, COL.purple); const e = seg(p, .8, 1); if (e > 0){ dot(m.G1[0], m.G1[1], 6.5, COL.purple); pointLabel(m.G1[0], m.G1[1], `y₁ = ${fc(m.g1, m.b1)}`, COL.purple, e); } }
+            else if (p < 1) ring(m.G1[0], m.G1[1], 7 + 18*p, COL.purple, 1 - p);
+          },
+          rd: m => ['Admittance at stub 1', `y₁ = ${fc(m.g1, m.b1)}`] },
+        { dur:2800,
+          info: m => ({ title:'Rotate the g = 1 circle toward the load',
+            body:`<p>Stub 2 needs g = 1 at its own position. Seen from stub 1, which is ${f(m.dsp)}λ closer to the load, that circle is turned <b>anticlockwise</b> by ${f(m.dsp)}λ (${f(720*m.dsp, 1)}°). Draw the g = 1 circle and its rotated copy.</p>`,
+            work:`rotation = 720° × ${f(m.dsp)} = <b>${f(720*m.dsp, 1)}°</b><br><span class="c">Forbidden region: g > 1/sin²(βd) = ${f(m.gmax)}. Here g₁ = ${f(m.g1)}, so a match is possible.</span>` }),
+          draw: (m, p) => {
+            stroke(rPts(1), ease(seg(p, 0, .5)), COL.match, 2.2, {opacity:.9});
+            const ac = ang(m.cR); stroke(circlePts(m.cR[0], m.cR[1], .5, ac + PI, ac + PI - TAU, 240), ease(seg(p, .35, 1)), COL.match, 2.2, {'stroke-dasharray':'6 4'});
+            const e = seg(p, .6, 1); text(.5, .56, 'g = 1', {color:COL.match, size:12.5, op:e}); text(m.cR[0], m.cR[1], 'rotated', {color:COL.match, size:12, op:e});
+          },
+          rd: m => ['Rotate the g = 1 circle', `${f(720*m.dsp, 1)}° toward the load`] },
+        { dur:3200,
+          info: m => { const S = m.sols[0]; return { title:'Stub 1: slide along the constant-g circle',
+            body:`<p>Stub 1 adds susceptance only, so y₁ slides along its own <b>g = ${f(m.g1)}</b> circle until it meets the rotated circle at <b>Q</b>.</p>`,
+            work:`y at Q = ${fz(S.yQ)}<br>stub 1 adds j(${f(S.yQ[1])} − ${f(m.b1)}) = <b>${fj(S.bs1)}</b><br>→ l₁ = <b>${f(S.l1)}λ</b>` }; },
+          draw: (m, p) => {
+            const S = m.sols[0];
+            stroke(rPts(m.g1), ease(seg(p, 0, .4)), COL.red, 1.6, {'stroke-dasharray':'5 4', opacity:.7});
+            stroke(gPath(m.g1, m.G1, S.Q), ease(seg(p, .3, .9)), COL.purple, 3.2);
+            const e = seg(p, .85, 1); if (e > 0){ dot(S.Q[0], S.Q[1], 6.5, COL.purple); pointLabel(S.Q[0], S.Q[1], 'Q', COL.purple, e, .07); }
+            dot(m.G1[0], m.G1[1], 6, COL.purple);
+          },
+          rd: m => ['Stub 1', `${fj(m.sols[0].bs1)} → l₁ = ${f(m.sols[0].l1)}λ`] },
+        { dur:3000,
+          info: m => ({ title:`Move ${f(m.dsp)}λ to stub 2`,
+            body:`<p>Turn clockwise by ${f(m.dsp)}λ around Q's own VSWR circle. Q lands exactly on the g = 1 circle, at <b>R</b>.</p>`,
+            work:`y₂ = <b>${fz(m.sols[0].y2)}</b>` }),
+          draw: (m, p) => {
+            const S = m.sols[0], rq = Math.hypot(S.Q[0], S.Q[1]);
+            stroke(circlePts(0, 0, rq, 0, -TAU, 220), ease(seg(p, 0, .3)), COL.green, 1.2, {'stroke-dasharray':'3 4', opacity:.6});
+            const q = ease(seg(p, .2, .85)); arcCW(rq, ang(S.Q), 2*TAU*m.dsp, q, COL.purple);
+            if (q > 0 && q < 1) movingDot(rq, ang(S.Q) - 2*TAU*m.dsp*q, COL.purple);
+            const e = seg(p, .85, 1); if (e > 0){ dot(S.G2[0], S.G2[1], 6.5, COL.match); pointLabel(S.G2[0], S.G2[1], `R: y = ${fz(S.y2)}`, COL.match, e); }
+          },
+          rd: m => ['Admittance at stub 2', `y₂ = ${fz(m.sols[0].y2)}`] },
+        { dur:3000,
+          info: m => { const S = m.sols[0], sh = m.stub === 'short'; return { title:'Stub 2 cancels the rest',
+            body:`<p>Stub 2 adds <b>${fj(S.bs2)}</b>, which leaves y = 1: matched. Both stub lengths come off the rim, starting from the ${sh ? 'short-circuit point (right end)' : 'open-circuit point (left end)'}.</p>`,
+            work:`stub 1: ${fj(S.bs1)} → l₁ = <b>${f(S.l1)}λ</b><br>stub 2: ${fj(S.bs2)} → l₂ = <b>${f(S.l2)}λ</b>` }; },
+          draw: (m, p) => {
+            const S = m.sols[0];
+            curveArrow(S.G2, [0, 0], .3, ease(seg(p, 0, .5)), COL.match);
+            const e = seg(p, .4, 1);
+            if (e > 0){
+              dot(0, 0, 6, COL.match);
+              rimArc(m.a0, 2*TAU*S.l1, ease(e), COL.purple, false, .982); rimArc(m.a0, 2*TAU*S.l2, ease(e), COL.match, true, .952);
+              if (e >= 1){ ringText(m.a0 - 2*TAU*S.l1, `l₁ = ${f(S.l1)}λ`, COL.purple); ringText(m.a0 - 2*TAU*S.l2, `l₂ = ${f(S.l2)}λ`, COL.match); }
+            }
+          },
+          rd: m => ['Stub 2', `${fj(m.sols[0].bs2)} → l₂ = ${f(m.sols[0].l2)}λ`] },
+        ...(m.sols.length > 1 ? [{ dur:3000,
+          info: m => { const T = m.sols[1]; return { title:'The second solution',
+            body:`<p>The g = ${f(m.g1)} circle cuts the rotated circle a second time, at Q′. The same steps from there give another pair of stubs.</p>`,
+            work:`stub 1: ${fj(T.bs1)} → l₁ = <b>${f(T.l1)}λ</b><br>stub 2: ${fj(T.bs2)} → l₂ = <b>${f(T.l2)}λ</b>` }; },
+          draw: (m, p) => {
+            const T = m.sols[1], rq = Math.hypot(T.Q[0], T.Q[1]);
+            stroke(gPath(m.g1, m.G1, T.Q), ease(seg(p, 0, .5)), COL.purple, 2.4, {'stroke-dasharray':'6 4', opacity:.7});
+            const e = seg(p, .45, 1);
+            if (e > 0){ dot(T.Q[0], T.Q[1], 5.5, COL.purple); pointLabel(T.Q[0], T.Q[1], 'Q′', COL.purple, e, .07); arcCW(rq, ang(T.Q), 2*TAU*m.dsp, ease(e), COL.purple, 2.2, {'stroke-dasharray':'6 4', opacity:.6}); if (e >= 1){ dot(T.G2[0], T.G2[1], 5.5, COL.match); pointLabel(T.G2[0], T.G2[1], 'R′', COL.match, 1, .07); } }
+          },
+          rd: m => ['Solution 2', `l₁ = ${f(m.sols[1].l1)}λ, l₂ = ${f(m.sols[1].l2)}λ`] }] : []),
+        stAnswer()],
+      answer: m => m.sols.map((S, i) => ({tone: i ? 's1' : 'y', k:`Solution ${i + 1}`, v:`l₁ = ${f(S.l1)}λ<br>l₂ = ${f(S.l2)}λ`, s:`stubs give ${fj(S.bs1, 2)} and ${fj(S.bs2, 2)}`})),
+      note: m => `Stub 1 is ${m.d0 > 0 ? f(m.d0) + 'λ from the load' : 'at the load'}; stub 2 is ${f(m.dsp)}λ further toward the generator. Both are ${m.stub}-circuited.`,
+      keys: m => [[0, 0, COL.match]] }
   ];
-  const LAST = steps.length - 1;
 
-  // ---------- state & UI ----------
+  const FIELDS = {
+    Z0:{label:'Z<sub>0</sub> (Ω)'}, RL:{label:'R<sub>L</sub> (Ω)'}, XL:{label:'X<sub>L</sub> (Ω)'}, S:{label:'VSWR'},
+    l:{label:'Line length', type:'len'},
+    dmin:{label:'First V<sub>min</sub> from the load', type:'len'},
+    lst:{label:'Stub length', type:'len', showIf: v => v.find === 'zin'},
+    X:{label:'Wanted X<sub>in</sub> (Ω)', showIf: v => v.find === 'len'},
+    lam:{label:'Wavelength λ (cm)', showIf: (v, md) => md.fields.some(k => FIELDS[k].type === 'len' && v[k + '_u'] === 'cm' && (!FIELDS[k].showIf || FIELDS[k].showIf(v, md)))},
+    stub:{label:'Stub end', type:'select', options:[['short', 'Short-circuited'], ['open', 'Open-circuited']]},
+    find:{label:'Find', type:'select', options:[['zin', 'Input impedance from length'], ['len', 'Length from reactance']]},
+    d0:{label:'Stub 1 from the load (λ)'}, dsp:{label:'Stub spacing (λ)'}
+  };
+  MODES.forEach(md => { md.vals = Object.assign({}, md.defaults); });
+
+  // ---------- walkthrough engine ----------
+  let MODE = MODES[0], M = null, STEPS = [], LAST = 0;
   let idx = 0, prog = 0, running = false, auto = false, started = false, holdUntil = 0, speed = 1, dirty = true, lastT = performance.now();
-  const $ = id => document.getElementById(id);
-  const dotsEl = $('dots');
-  steps.forEach((s, i) => {
-    const b = document.createElement('button');
-    b.className = 'dot'; b.textContent = s.dot; b.title = i === 0 ? 'The chart' : i === LAST ? 'Answer' : 'Step ' + i;
-    b.setAttribute('aria-label', b.title);
-    b.addEventListener('click', () => goTo(i));
-    dotsEl.appendChild(b);
-  });
-
   let shownIdx = -1;
+  const dotsEl = $('dots');
+
+  function rebuildDots(){
+    dotsEl.innerHTML = '';
+    STEPS.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.className = 'dot'; b.textContent = i === 0 ? '◎' : i === LAST ? '✓' : String(i);
+      b.title = i === 0 ? 'The chart' : i === LAST ? 'Answer' : 'Step ' + i;
+      b.setAttribute('aria-label', b.title);
+      b.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(b);
+    });
+  }
   function updatePanel(){
     if (shownIdx === idx) return;
     shownIdx = idx;
-    const inf = steps[idx].info(M);
+    const inf = STEPS[idx].info(M);
     $('stepno').textContent = idx === 0 ? 'Before you start' : idx === LAST ? 'Result' : `Step ${idx} of ${LAST - 1}`;
     $('stitle').innerHTML = inf.title;
     $('sbody').innerHTML = inf.body;
@@ -588,13 +1188,14 @@
     $('pfill').style.width = ((idx + prog)/(LAST + 1)*100).toFixed(2) + '%';
   }
   function render(){
+    VIEW = WALK;
     drawGrid(idx === 0 ? prog : 1);
     ov.innerHTML = '';
-    for (let j = 1; j < idx; j++) steps[j].draw(M, 1);
-    if (idx > 0) steps[idx].draw(M, prog);
+    for (let j = 1; j < idx; j++) STEPS[j].draw(M, 1);
+    if (idx > 0) STEPS[idx].draw(M, prog);
     updatePanel(); updateButtons();
   }
-  function goTo(i, p=0, run=true){ started = true; idx = clamp(i, 0, LAST); prog = p; running = run && p < 1; auto = false; dirty = true; }
+  function goTo(i, p = 0, run = true){ started = true; idx = clamp(i, 0, LAST); prog = p; running = run && p < 1; auto = false; dirty = true; }
   function next(){
     started = true;
     if (prog < 1){ prog = 1; running = false; }
@@ -614,11 +1215,10 @@
   }
   function restart(){ goTo(0, 0, true); }
   function playFromStart(){ goTo(0, 0, true); auto = true; }
-
   function tick(t){
     const dt = Math.min(64, t - lastT); lastT = t;
     if (running){
-      prog += dt*speed/steps[idx].dur;
+      prog += dt*speed/STEPS[idx].dur;
       if (prog >= 1){ prog = 1; running = false; holdUntil = t + 1100/speed; }
       dirty = true;
     } else if (auto && prog >= 1){
@@ -642,18 +1242,237 @@
     else if (e.key === 'r' || e.key === 'R'){ restart(); }
   });
   $('hStart').addEventListener('click', () => { $('lab').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); playFromStart(); });
-  $('hTry').addEventListener('click', () => {
-    const box = $('tryBox'); box.open = true;
-    box.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'center'});
-    setTimeout(() => $('iR').focus({preventScroll:true}), reduceMotion ? 0 : 450);
-  });
+  $('hPick').addEventListener('click', () => { $('modes').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); });
 
-  // start drawing the chart the first time it scrolls into view
   if ('IntersectionObserver' in window){
     new IntersectionObserver((ents, obs) => {
       if (ents.some(e => e.isIntersecting)){ if (!started){ started = true; running = true; dirty = true; } obs.disconnect(); }
     }, {threshold:0.3}).observe($('stage'));
   } else { started = true; running = true; }
+
+  // ---------- question-type picker and inputs ----------
+  const modeGrid = $('modeGrid'), fieldsEl = $('fields');
+  MODES.forEach(md => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'mode-card'; b.dataset.mode = md.id; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = `${md.glyph}<b>${md.title}</b><span>${md.desc}</span>`;
+    b.addEventListener('click', () => selectMode(md.id));
+    modeGrid.appendChild(b);
+  });
+  function markCards(){ modeGrid.querySelectorAll('.mode-card').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === MODE.id ? 'true' : 'false')); }
+  function numInput(key){
+    const i = document.createElement('input');
+    i.type = 'number'; i.step = 'any'; i.id = 'f_' + key; i.value = MODE.vals[key] ?? '';
+    i.addEventListener('input', () => { MODE.vals[key] = i.value; });
+    return i;
+  }
+  function buildFields(){
+    fieldsEl.innerHTML = '';
+    MODE.fields.forEach(key => {
+      const F = FIELDS[key], lab = document.createElement('label');
+      lab.className = 'field'; lab.dataset.key = key;
+      lab.innerHTML = `<span>${F.label}</span>`;
+      if (F.type === 'select'){
+        const s = document.createElement('select'); s.id = 'f_' + key;
+        F.options.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; s.appendChild(o); });
+        s.value = MODE.vals[key];
+        s.addEventListener('change', () => { MODE.vals[key] = s.value; refreshVisibility(); });
+        lab.appendChild(s);
+      } else if (F.type === 'len'){
+        const row = document.createElement('span'); row.className = 'len';
+        const u = document.createElement('select'); u.id = 'f_' + key + '_u'; u.setAttribute('aria-label', 'unit');
+        [['lam', 'λ'], ['cm', 'cm']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; u.appendChild(o); });
+        u.value = MODE.vals[key + '_u'] || 'lam';
+        u.addEventListener('change', () => { MODE.vals[key + '_u'] = u.value; refreshVisibility(); });
+        row.append(numInput(key), u); lab.appendChild(row);
+      } else lab.appendChild(numInput(key));
+      fieldsEl.appendChild(lab);
+    });
+    refreshVisibility();
+  }
+  function refreshVisibility(){
+    fieldsEl.querySelectorAll('.field').forEach(l => { const F = FIELDS[l.dataset.key]; l.hidden = F.showIf ? !F.showIf(MODE.vals, MODE) : false; });
+  }
+  function readVals(){
+    const v = {};
+    MODE.fields.forEach(k => {
+      const F = FIELDS[k], raw = MODE.vals[k];
+      v[k] = F.type === 'select' ? raw : (raw === '' || raw == null ? NaN : parseFloat(raw));
+      if (F.type === 'len') v[k + '_u'] = MODE.vals[k + '_u'] || 'lam';
+    });
+    return v;
+  }
+  function showErr(msg){ $('err').textContent = msg; }
+  function applyModel(m){
+    M = m; STEPS = MODE.steps(m); LAST = STEPS.length - 1;
+    rebuildDots(); shownIdx = -1; lastGridP = -1;
+    idx = 0; prog = 0; running = started; auto = false; dirty = true;
+    setProblem(); updateFull();
+    waveT0 = performance.now(); if (reduceMotion) drawWave(waveT0);
+  }
+  function selectMode(id, opts = {}){
+    const md = MODES.find(x => x.id === id); if (!md) return;
+    MODE = md; markCards(); buildFields(); showErr('');
+    let m;
+    try { m = MODE.compute(readVals()); }
+    catch (e){ MODE.vals = Object.assign({}, MODE.defaults); buildFields(); m = MODE.compute(readVals()); }
+    applyModel(m);
+    if (!opts.init){
+      try { history.replaceState(null, '', '#' + md.id); } catch (e) {}
+      const card = modeGrid.querySelector(`[data-mode="${md.id}"]`);
+      if (card && modeGrid.scrollWidth > modeGrid.clientWidth) modeGrid.scrollTo({left: card.offsetLeft - 16, behavior: reduceMotion ? 'auto' : 'smooth'});
+    }
+  }
+  $('form').addEventListener('submit', e => {
+    e.preventDefault();
+    let m;
+    try { m = MODE.compute(readVals()); } catch (err){ showErr(err.message); return; }
+    showErr(''); started = true; applyModel(m);
+    $('lab').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
+    playFromStart();
+  });
+  window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (h && h !== MODE.id && MODES.some(x => x.id === h)) selectMode(h); });
+
+  // ---------- complete chart ----------
+  const FX = 410, FY = 430, FR = 330;
+  const fGrid = $('fGrid'), fSol = $('fSol'), fsvg = $('full');
+  const fp = (u, v) => [FX + FR*u, FY - FR*v];
+  const INK = '#1b1b1f';
+  function fel(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+  function fpath(pts){ let d = ''; pts.forEach((q, i) => { const [X, Y] = fp(q[0], q[1]); d += (i ? 'L' : 'M') + X.toFixed(1) + ' ' + Y.toFixed(1); }); return d; }
+  function rArc(r, X){
+    const c = r/(1+r), rho = 1/(1+r);
+    let a0 = Math.PI, a1 = -Math.PI;
+    if (isFinite(X)){ const g = gam(r, X); const aX = Math.atan2(g[1], g[0] - c); a0 = aX; a1 = 2*Math.PI - aX; }
+    const n = Math.max(24, Math.round(Math.abs(a1 - a0)*rho*120));
+    return circlePts(c, 0, rho, a0, a1, n);
+  }
+  function xArc(x, Rl){
+    const ax = Math.abs(x), sg = Math.sign(x), g0 = gam(0, ax);
+    let a0 = Math.atan2(g0[1] - 1/ax, g0[0] - 1);
+    while (a0 < Math.PI/2) a0 += 2*Math.PI;
+    while (a0 > 1.5*Math.PI) a0 -= 2*Math.PI;
+    let a1 = 1.5*Math.PI;
+    if (isFinite(Rl)){ const g = gam(Rl, ax); a1 = Math.atan2(g[1] - 1/ax, g[0] - 1); while (a1 < a0) a1 += 2*Math.PI; while (a1 > 1.5*Math.PI + 1e-9) a1 -= 2*Math.PI; }
+    const rho = 1/ax, n = Math.max(16, Math.min(400, Math.round((a1 - a0)*rho*120)));
+    return circlePts(1, 1/ax, rho, a0, a1, n).map(q => [q[0], sg*q[1]]);
+  }
+  const fpolar = (k, deg) => { const a = deg*Math.PI/180; return [FX + FR*k*Math.cos(a), FY - FR*k*Math.sin(a)]; };
+  function ftext(x, y, str, o, parent){
+    const t = fel('text', {x:x.toFixed(1), y:y.toFixed(1), 'text-anchor':o.anchor || 'middle', 'dominant-baseline':'middle', fill:o.color || INK,
+      'font-size':o.size || 8, 'font-weight':o.weight || 500, 'font-family':FONT}, parent);
+    if (o.rot != null) t.setAttribute('transform', `rotate(${o.rot.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})`);
+    if (o.cls) t.setAttribute('class', o.cls);
+    if (o.style) t.setAttribute('style', o.style);
+    if (o.html) t.innerHTML = str; else t.textContent = str;
+    return t;
+  }
+  const tangent = deg => { let r = 90 - deg; r = ((r + 180) % 360 + 360) % 360 - 180; if (r > 90) r -= 180; if (r < -90) r += 180; return r; };
+  const num = v => String(v).replace('-', '−');
+
+  // radially scaled rulers: each maps a value to |Γ|
+  const SCALES = {
+    vswr:{name:'VSWR', side:1, toG:s => s === Infinity ? 1 : (s - 1)/(s + 1),
+      ticks:[...Array.from({length:10}, (_, i) => 1 + i*0.1), 2.2, 2.4, 2.6, 2.8, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 15, 20, 40],
+      labels:[1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 4, 5, 6, 8, 10, 20, Infinity]},
+    rl:{name:'Return loss (dB)', side:1, toG:d => d === Infinity ? 0 : Math.pow(10, -d/20),
+      ticks:[...Array.from({length:21}, (_, i) => i*0.5), 11, 12, 13, 14, 15, 16, 18, 20, 25, 30],
+      labels:[0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30]},
+    g:{name:'Refl. coeff. |Γ|', side:1, toG:v => v,
+      ticks:Array.from({length:51}, (_, i) => i*0.02), labels:Array.from({length:11}, (_, i) => +(i*0.1).toFixed(1))},
+    dbs:{name:'SWR (dB)', side:-1, toG:d => { const sv = Math.pow(10, d/20); return (sv - 1)/(sv + 1); },
+      ticks:[...Array.from({length:21}, (_, i) => i*0.5), 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40],
+      labels:[0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 30, 40]},
+    loss:{name:'Refl. loss (dB)', side:-1, toG:L => Math.sqrt(Math.max(0, 1 - Math.pow(10, -L/10))),
+      ticks:[0, .05, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 4, 5, 6, 7, 8, 10, 15],
+      labels:[0, .1, .2, .4, .6, 1, 1.5, 2, 3, 4, 6, 10, 15]},
+    pw:{name:'Power refl. |Γ|²', side:-1, toG:P => Math.sqrt(P),
+      ticks:Array.from({length:21}, (_, i) => i*0.05), labels:Array.from({length:11}, (_, i) => +(i*0.1).toFixed(1))}
+  };
+  const ROWS = [{y:874, left:'dbs', right:'vswr'}, {y:916, left:'loss', right:'rl'}, {y:958, left:'pw', right:'g'}];
+
+  function buildFullGrid(){
+    fGrid.innerHTML = '';
+    fel('rect', {x:0, y:0, width:820, height:990, fill:'#ffffff'}, fGrid);
+    // title + ring key
+    ftext(18, 28, 'Complete Smith chart', {anchor:'start', size:19, weight:800}, fGrid);
+    const key = ['Outer ring: wavelengths toward generator (clockwise)', 'Middle ring: wavelengths toward load (anticlockwise)', 'Inner ring: angle of reflection coefficient (°)'];
+    key.forEach((k, i) => ftext(804, 20 + i*14, k, {anchor:'end', size:9.5, weight:500, color:'#444'}, fGrid));
+
+    // dense impedance grid
+    const BANDS = [[0,.2,.01],[.2,.5,.02],[.5,1,.05],[1,2,.1],[2,5,.2],[5,10,1],[10,20,2],[20,50,10]];
+    const NICE = [.2,.5,1,2,5,10,20,50], DELTA = 0.008;
+    const snap = v => { let b = null; NICE.forEach(n => { if (n <= v + 1e-9) b = n; }); return b; };
+    const wt = v => NICE.some(n => Math.abs(n - v) < 1e-9) ? '0.95' : ((v < 1 ? Math.abs(v*10 - Math.round(v*10)) : Math.abs(v - Math.round(v))) < 1e-6 ? '0.55' : '0.28');
+    const groups = {'0.95':'', '0.55':'', '0.28':''};
+    BANDS.forEach(([a, b, st]) => {
+      for (let k = 1; a + k*st < b - 1e-9; k++){
+        const v = +(a + k*st).toFixed(4);
+        const lr = 2*st/DELTA - (1 + v)*(1 + v);
+        if (lr > 0){ const xl = snap(Math.sqrt(lr)); if (xl) groups[wt(v)] += fpath(rArc(v, xl)); }
+        const lx = 2*st/DELTA - v*v;
+        if (lx > 0){ const rl = snap(Math.sqrt(lx) - 1); if (rl) groups[wt(v)] += fpath(xArc(v, rl)) + fpath(xArc(-v, rl)); }
+      }
+    });
+    NICE.forEach(v => { groups['0.95'] += fpath(rArc(v, Infinity)) + fpath(xArc(v, Infinity)) + fpath(xArc(-v, Infinity)); });
+    groups['0.95'] += fpath([[-1, 0], [1, 0]]);
+    for (const w in groups) fel('path', {d:groups[w], fill:'none', stroke:INK, 'stroke-width':w}, fGrid);
+
+    // rings
+    [1, 1.045, 1.09, 1.135].forEach(k => fel('circle', {cx:FX, cy:FY, r:FR*k, fill:'none', stroke:INK, 'stroke-width':k === 1 ? 1.6 : 0.8}, fGrid));
+    let td = '';
+    const tick = (k, deg, len) => { const [x1, y1] = fpolar(k, deg), [x2, y2] = fpolar(k + len, deg); td += `M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`; };
+    for (let i = -179; i <= 180; i++){
+      tick(1, i, i % 10 === 0 ? 0.016 : i % 5 === 0 ? 0.011 : 0.006);
+      if (i % 10 === 0){ const [x, y] = fpolar(1.031, i); ftext(x, y, i === 180 ? '±180' : num(i), {size:7, rot:tangent(i)}, fGrid); }
+    }
+    for (let j = 0; j < 250; j++){
+      const w = j*0.002, big = j % 5 === 0;
+      const aL = 180 + 720*w, aG = 180 - 720*w;
+      tick(1.045, aL, big ? 0.012 : 0.006);
+      tick(1.09, aG, big ? 0.012 : 0.006);
+      if (big){
+        const lab = j === 0 ? '0.00' : w.toFixed(2);
+        let [x, y] = fpolar(1.075, aL); ftext(x, y, lab, {size:6.8, rot:tangent(aL)}, fGrid);
+        [x, y] = fpolar(1.12, aG); ftext(x, y, lab, {size:6.8, rot:tangent(aG)}, fGrid);
+      }
+    }
+    fel('path', {d:td, stroke:INK, 'stroke-width':0.6, fill:'none'}, fGrid);
+
+    // r labels along the axis, x labels inside the rim
+    const RLAB = [.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.2,1.4,1.6,1.8,2,3,4,5,10,20,50];
+    RLAB.forEach(v => { const [x, y] = fp(gam(v, 0)[0], 0); ftext(x - 2.5, y - 4, String(v), {anchor:'start', size:7, rot:-90, weight:600}, fGrid); });
+    ftext(fp(-1, 0)[0] + 4, FY - 5, '0', {anchor:'start', size:7.5, weight:600}, fGrid);
+    const XLAB = [.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.2,1.4,1.6,1.8,2,3,4,5,10,20];
+    XLAB.forEach(v => [v, -v].forEach(xx => {
+      const g0 = gam(0, xx), [x, y] = fp(0.972*g0[0], 0.972*g0[1]);
+      const deg = Math.atan2(g0[1], g0[0])*180/Math.PI;
+      ftext(x, y, (xx > 0 ? '+' : '−') + v, {size:6.8, weight:600, rot:tangent(deg)}, fGrid);
+    }));
+
+    // radially scaled rulers
+    ftext(FX, 846, 'Radially scaled parameters (distance from centre = |Γ| × chart radius)', {size:9.5, weight:700}, fGrid);
+    let rd = '';
+    ROWS.forEach(row => {
+      rd += `M${FX - FR} ${row.y}L${FX + FR} ${row.y}M${FX} ${row.y - 9}L${FX} ${row.y + 4}`;
+      [row.left, row.right].forEach(key => {
+        const sc = SCALES[key];
+        sc.ticks.forEach(v => { const x = FX + sc.side*FR*sc.toG(v); if (isFinite(x)) rd += `M${x.toFixed(1)} ${row.y}L${x.toFixed(1)} ${row.y - 4}`; });
+        let lastX = null;
+        sc.labels.forEach(v => {
+          const x = FX + sc.side*FR*sc.toG(v);
+          if (lastX !== null && Math.abs(x - lastX) < 13) return;
+          lastX = x;
+          rd += `M${x.toFixed(1)} ${row.y}L${x.toFixed(1)} ${row.y - 7}`;
+          ftext(x, row.y - 13, v === Infinity ? '∞' : String(v), {size:7.5, weight:600}, fGrid);
+        });
+        ftext(sc.side > 0 ? FX + FR : FX - FR, row.y + 12, sc.name, {anchor:sc.side > 0 ? 'end' : 'start', size:8.5, weight:700, color:'#333'}, fGrid);
+      });
+    });
+    fel('path', {d:rd, stroke:INK, 'stroke-width':0.8, fill:'none'}, fGrid);
+    ftext(FX - 8, 980, '← measure toward load side', {anchor:'end', size:8, color:'#555'}, fGrid);
+    ftext(FX + 8, 980, 'measure toward generator side →', {anchor:'start', size:8, color:'#555'}, fGrid);
+  }
 
   // ---------- hero: standing wave ----------
   const cv = $('wave'), ctx = cv.getContext('2d');
@@ -737,265 +1556,48 @@
   else window.addEventListener('resize', () => { sizeWave(); drawWave(performance.now()); });
   if ('IntersectionObserver' in window) new IntersectionObserver(ents => { waveVisible = ents[0].isIntersecting; }).observe(cv);
 
-  // ---------- problem text ----------
-  function setProblem(m){
-    $('lede').innerHTML = `A ${f(m.Z0)} Ω line ends in a ${fc(m.RL, m.XL)} Ω load. Watch the chart find the load admittance y<sub>L</sub> and the VSWR, one construction line at a time.`;
-    $('chips').innerHTML = `<span class="chip">Z<sub>0</sub> = ${f(m.Z0)} Ω</span><span class="chip">Z<sub>L</sub> = ${fc(m.RL, m.XL)} Ω</span><span class="chip find">find y<sub>L</sub> and VSWR</span>`;
-    waveCaption();
-    if (typeof updateFull === 'function') updateFull();
-  }
-  $('form').addEventListener('submit', e => {
-    e.preventDefault();
-    const Z0 = parseFloat($('iZ0').value), R = parseFloat($('iR').value), X = parseFloat($('iX').value);
-    const err = $('err');
-    if (![Z0, R, X].every(isFinite)) { err.textContent = 'Enter a number in all three boxes.'; return; }
-    if (Z0 <= 0) { err.textContent = 'Z₀ must be greater than 0.'; return; }
-    if (R < 0) { err.textContent = 'R must be 0 or more for a passive load.'; return; }
-    if (R === 0 && X === 0) { err.textContent = 'A short circuit has infinite admittance. Try another load.'; return; }
-    err.textContent = '';
-    M = compute(Z0, R, X); setProblem(M); shownIdx = -1; lastGridP = -1;
-    waveT0 = performance.now(); if (reduceMotion) drawWave(waveT0);
-    playFromStart();
-  });
-
-
-  // ---------- complete chart ----------
-  const FX = 410, FY = 430, FR = 330;
-  const fGrid = $('fGrid'), fSol = $('fSol'), fsvg = $('full');
-  const fp = (u, v) => [FX + FR*u, FY - FR*v];
-  const INK = '#1b1b1f';
-  function fel(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
-  function fpath(pts){ let d = ''; pts.forEach((q, i) => { const [X, Y] = fp(q[0], q[1]); d += (i ? 'L' : 'M') + X.toFixed(1) + ' ' + Y.toFixed(1); }); return d; }
-  function rArc(r, X){
-    const c = r/(1+r), rho = 1/(1+r);
-    let a0 = Math.PI, a1 = -Math.PI;
-    if (isFinite(X)){ const g = gam(r, X); const aX = Math.atan2(g[1], g[0] - c); a0 = aX; a1 = 2*Math.PI - aX; }
-    const n = Math.max(24, Math.round(Math.abs(a1 - a0)*rho*120));
-    return circlePts(c, 0, rho, a0, a1, n);
-  }
-  function xArc(x, Rl){
-    const ax = Math.abs(x), sg = Math.sign(x), g0 = gam(0, ax);
-    let a0 = Math.atan2(g0[1] - 1/ax, g0[0] - 1);
-    while (a0 < Math.PI/2) a0 += 2*Math.PI;
-    while (a0 > 1.5*Math.PI) a0 -= 2*Math.PI;
-    let a1 = 1.5*Math.PI;
-    if (isFinite(Rl)){ const g = gam(Rl, ax); a1 = Math.atan2(g[1] - 1/ax, g[0] - 1); while (a1 < a0) a1 += 2*Math.PI; while (a1 > 1.5*Math.PI + 1e-9) a1 -= 2*Math.PI; }
-    const rho = 1/ax, n = Math.max(16, Math.min(400, Math.round((a1 - a0)*rho*120)));
-    return circlePts(1, 1/ax, rho, a0, a1, n).map(q => [q[0], sg*q[1]]);
-  }
-  const polar = (k, deg) => { const a = deg*Math.PI/180; return [FX + FR*k*Math.cos(a), FY - FR*k*Math.sin(a)]; };
-  function ftext(x, y, str, o, parent){
-    const t = fel('text', {x:x.toFixed(1), y:y.toFixed(1), 'text-anchor':o.anchor || 'middle', 'dominant-baseline':'middle', fill:o.color || INK,
-      'font-size':o.size || 8, 'font-weight':o.weight || 500, 'font-family':FONT}, parent);
-    if (o.rot != null) t.setAttribute('transform', `rotate(${o.rot.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})`);
-    if (o.cls) t.setAttribute('class', o.cls);
-    if (o.style) t.setAttribute('style', o.style);
-    if (o.html) t.innerHTML = str; else t.textContent = str;
-    return t;
-  }
-  const tangent = deg => { let r = 90 - deg; r = ((r + 180) % 360 + 360) % 360 - 180; if (r > 90) r -= 180; if (r < -90) r += 180; return r; };
-  const num = v => String(v).replace('-', '−');
-
-  // radially scaled rulers: each maps a value to |Γ|
-  const SCALES = {
-    vswr:{name:'VSWR', side:1, toG:s => s === Infinity ? 1 : (s - 1)/(s + 1),
-      ticks:[...Array.from({length:10}, (_, i) => 1 + i*0.1), 2.2, 2.4, 2.6, 2.8, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 15, 20, 40],
-      labels:[1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 4, 5, 6, 8, 10, 20, Infinity]},
-    rl:{name:'Return loss (dB)', side:1, toG:d => d === Infinity ? 0 : Math.pow(10, -d/20),
-      ticks:[...Array.from({length:21}, (_, i) => i*0.5), 11, 12, 13, 14, 15, 16, 18, 20, 25, 30],
-      labels:[0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30]},
-    g:{name:'Refl. coeff. |Γ|', side:1, toG:v => v,
-      ticks:Array.from({length:51}, (_, i) => i*0.02), labels:Array.from({length:11}, (_, i) => +(i*0.1).toFixed(1))},
-    dbs:{name:'SWR (dB)', side:-1, toG:d => { const sv = Math.pow(10, d/20); return (sv - 1)/(sv + 1); },
-      ticks:[...Array.from({length:21}, (_, i) => i*0.5), 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40],
-      labels:[0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 30, 40]},
-    loss:{name:'Refl. loss (dB)', side:-1, toG:L => Math.sqrt(Math.max(0, 1 - Math.pow(10, -L/10))),
-      ticks:[0, .05, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 4, 5, 6, 7, 8, 10, 15],
-      labels:[0, .1, .2, .4, .6, 1, 1.5, 2, 3, 4, 6, 10, 15]},
-    pw:{name:'Power refl. |Γ|²', side:-1, toG:P => Math.sqrt(P),
-      ticks:Array.from({length:21}, (_, i) => i*0.05), labels:Array.from({length:11}, (_, i) => +(i*0.1).toFixed(1))}
-  };
-  const ROWS = [{y:874, left:'dbs', right:'vswr'}, {y:916, left:'loss', right:'rl'}, {y:958, left:'pw', right:'g'}];
-
-  function buildFullGrid(){
-    fGrid.innerHTML = '';
-    fel('rect', {x:0, y:0, width:820, height:990, fill:'#ffffff'}, fGrid);
-    // title + ring key
-    ftext(18, 28, 'Complete Smith chart', {anchor:'start', size:19, weight:800}, fGrid);
-    const key = ['Outer ring: wavelengths toward generator (clockwise)', 'Middle ring: wavelengths toward load (anticlockwise)', 'Inner ring: angle of reflection coefficient (°)'];
-    key.forEach((k, i) => ftext(804, 20 + i*14, k, {anchor:'end', size:9.5, weight:500, color:'#444'}, fGrid));
-
-    // dense impedance grid
-    const BANDS = [[0,.2,.01],[.2,.5,.02],[.5,1,.05],[1,2,.1],[2,5,.2],[5,10,1],[10,20,2],[20,50,10]];
-    const NICE = [.2,.5,1,2,5,10,20,50], DELTA = 0.008;
-    const snap = v => { let b = null; NICE.forEach(n => { if (n <= v + 1e-9) b = n; }); return b; };
-    const wt = v => NICE.some(n => Math.abs(n - v) < 1e-9) ? '0.95' : ((v < 1 ? Math.abs(v*10 - Math.round(v*10)) : Math.abs(v - Math.round(v))) < 1e-6 ? '0.55' : '0.28');
-    const groups = {'0.95':'', '0.55':'', '0.28':''};
-    BANDS.forEach(([a, b, st]) => {
-      for (let k = 1; a + k*st < b - 1e-9; k++){
-        const v = +(a + k*st).toFixed(4);
-        const lr = 2*st/DELTA - (1 + v)*(1 + v);
-        if (lr > 0){ const xl = snap(Math.sqrt(lr)); if (xl) groups[wt(v)] += fpath(rArc(v, xl)); }
-        const lx = 2*st/DELTA - v*v;
-        if (lx > 0){ const rl = snap(Math.sqrt(lx) - 1); if (rl) groups[wt(v)] += fpath(xArc(v, rl)) + fpath(xArc(-v, rl)); }
-      }
-    });
-    NICE.forEach(v => { groups['0.95'] += fpath(rArc(v, Infinity)) + fpath(xArc(v, Infinity)) + fpath(xArc(-v, Infinity)); });
-    groups['0.95'] += fpath([[-1, 0], [1, 0]]);
-    for (const w in groups) fel('path', {d:groups[w], fill:'none', stroke:INK, 'stroke-width':w}, fGrid);
-
-    // rings
-    [1, 1.045, 1.09, 1.135].forEach(k => fel('circle', {cx:FX, cy:FY, r:FR*k, fill:'none', stroke:INK, 'stroke-width':k === 1 ? 1.6 : 0.8}, fGrid));
-    let td = '';
-    const tick = (k, deg, len) => { const [x1, y1] = polar(k, deg), [x2, y2] = polar(k + len, deg); td += `M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`; };
-    for (let i = -179; i <= 180; i++){
-      tick(1, i, i % 10 === 0 ? 0.016 : i % 5 === 0 ? 0.011 : 0.006);
-      if (i % 10 === 0){ const [x, y] = polar(1.031, i); ftext(x, y, i === 180 ? '±180' : num(i), {size:7, rot:tangent(i)}, fGrid); }
-    }
-    for (let j = 0; j < 250; j++){
-      const w = j*0.002, big = j % 5 === 0;
-      const aL = 180 + 720*w, aG = 180 - 720*w;
-      tick(1.045, aL, big ? 0.012 : 0.006);
-      tick(1.09, aG, big ? 0.012 : 0.006);
-      if (big){
-        const lab = j === 0 ? '0.00' : w.toFixed(2);
-        let [x, y] = polar(1.075, aL); ftext(x, y, lab, {size:6.8, rot:tangent(aL)}, fGrid);
-        [x, y] = polar(1.12, aG); ftext(x, y, lab, {size:6.8, rot:tangent(aG)}, fGrid);
-      }
-    }
-    fel('path', {d:td, stroke:INK, 'stroke-width':0.6, fill:'none'}, fGrid);
-
-    // r labels along the axis, x labels inside the rim
-    const RLAB = [.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.2,1.4,1.6,1.8,2,3,4,5,10,20,50];
-    RLAB.forEach(v => { const [x, y] = fp(gam(v, 0)[0], 0); ftext(x - 2.5, y - 4, String(v), {anchor:'start', size:7, rot:-90, weight:600}, fGrid); });
-    ftext(fp(-1, 0)[0] + 4, FY - 5, '0', {anchor:'start', size:7.5, weight:600}, fGrid);
-    const XLAB = [.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.2,1.4,1.6,1.8,2,3,4,5,10,20];
-    XLAB.forEach(v => [v, -v].forEach(xx => {
-      const g0 = gam(0, xx), [x, y] = fp(0.972*g0[0], 0.972*g0[1]);
-      const deg = Math.atan2(g0[1], g0[0])*180/Math.PI;
-      ftext(x, y, (xx > 0 ? '+' : '−') + v, {size:6.8, weight:600, rot:tangent(deg)}, fGrid);
-    }));
-
-    // radially scaled rulers
-    ftext(FX, 846, 'Radially scaled parameters (distance from centre = |Γ| × chart radius)', {size:9.5, weight:700}, fGrid);
-    let rd = '';
-    ROWS.forEach(row => {
-      rd += `M${FX - FR} ${row.y}L${FX + FR} ${row.y}M${FX} ${row.y - 9}L${FX} ${row.y + 4}`;
-      [row.left, row.right].forEach(key => {
-        const sc = SCALES[key];
-        sc.ticks.forEach(v => { const x = FX + sc.side*FR*sc.toG(v); if (isFinite(x)) rd += `M${x.toFixed(1)} ${row.y}L${x.toFixed(1)} ${row.y - 4}`; });
-        let lastX = null;
-        sc.labels.forEach(v => {
-          const x = FX + sc.side*FR*sc.toG(v);
-          if (lastX !== null && Math.abs(x - lastX) < 13) return;
-          lastX = x;
-          rd += `M${x.toFixed(1)} ${row.y}L${x.toFixed(1)} ${row.y - 7}`;
-          ftext(x, row.y - 13, v === Infinity ? '∞' : String(v), {size:7.5, weight:600}, fGrid);
-        });
-        ftext(sc.side > 0 ? FX + FR : FX - FR, row.y + 12, sc.name, {anchor:sc.side > 0 ? 'end' : 'start', size:8.5, weight:700, color:'#333'}, fGrid);
-      });
-    });
-    fel('path', {d:rd, stroke:INK, 'stroke-width':0.8, fill:'none'}, fGrid);
-    ftext(FX - 8, 980, '← measure toward load side', {anchor:'end', size:8, color:'#555'}, fGrid);
-    ftext(FX + 8, 980, 'measure toward generator side →', {anchor:'start', size:8, color:'#555'}, fGrid);
-  }
-
-  function drawFullSol(){
-    const m = M, g = Math.min(m.mag, 1), thDeg = m.th*180/Math.PI;
-    fSol.innerHTML = '';
-    const sd = (pts, color, w, d, extra={}) => fel('path', Object.assign({d:fpath(pts), fill:'none', stroke:color, 'stroke-width':w, 'stroke-linecap':'round', pathLength:1, class:'sd', style:`--d:${d}s`}, extra), fSol);
-    const dash = (d0, color, w, d, da='6 4') => fel('path', {d:d0, fill:'none', stroke:color, 'stroke-width':w, 'stroke-dasharray':da, class:'fd', style:`--d:${d}s`}, fSol);
-    const fdot = (x, y, r, color, d) => fel('circle', {cx:x.toFixed(1), cy:y.toFixed(1), r, fill:color, stroke:'#fff', 'stroke-width':1.6, class:'fd', style:`--d:${d}s`}, fSol);
-    const lab = (x, y, str, color, d, o={}) => ftext(x, y, str, Object.assign({size:12.5, weight:750, color, cls:'halo fd', style:`--d:${d}s`, html:true}, o), fSol);
-    const sub = t => `<tspan dy="3" font-size="9">${t}</tspan><tspan dy="-3">`;
-    const outLab = (u, v, k=0.09) => { const mm = Math.hypot(u, v); const dx = mm < 1e-6 ? .6 : u/mm, dy = mm < 1e-6 ? .8 : v/mm; const [x, y] = fp(u + dx*k, v + dy*k); return {x, y, anchor: dx > .35 ? 'start' : dx < -.35 ? 'end' : 'middle'}; };
-
-    ftext(18, 48, `Z<tspan dy="2" font-size="8">0</tspan><tspan dy="-2"> = ${f(m.Z0)} Ω,  Z</tspan><tspan dy="2" font-size="8">L</tspan><tspan dy="-2"> = ${fc(m.RL, m.XL)} Ω, solved</tspan>`, {anchor:'start', size:11, weight:600, color:'#5b3fd6', html:true}, fSol);
-
-    sd(rPts(m.r), COL.red, 1.8, 0.0, {opacity:.85});
-    sd(xPts(m.x), COL.blue, 1.8, 0.35, {opacity:.85});
-    const [Px, Py] = fp(m.gu, m.gv);
-    fdot(Px, Py, 5.5, COL.ink, 0.8);
-    let L = outLab(m.gu, m.gv); lab(L.x, L.y, `P: z${sub('L')} = ${fc(m.r, m.x)}</tspan>`, COL.ink, 0.9, {anchor:L.anchor});
-    if (g > 0.003) sd(circlePts(0, 0, g, m.th, m.th - 2*Math.PI, 360), COL.green, 2.4, 1.1);
-
-    // VSWR (Vmax) and Vmin points on the real axis
-    const [Sx] = fp(g, 0), [Nx] = fp(-g, 0);
-    fdot(Sx, FY, 5, COL.green, 1.9);
-    lab(Sx + 6, FY + 13, isFinite(m.s) ? `VSWR = ${f(m.s, 2)}` : 'VSWR = ∞', COL.green, 2.0, {anchor:'start', size:12});
-    if (g > 0.02){
-      fdot(Nx, FY, 4.5, COL.green, 1.9);
-      lab(Nx, FY + 13, `V min: 1/VSWR = ${f(1/m.s, 2)}`, COL.green, 2.0, {size:11});
-    }
-
-    // diameter P → O → P′, extended to the rings
-    const [a1x, a1y] = polar(1.135, thDeg), [a2x, a2y] = polar(1.135, thDeg + 180);
-    dash(`M${a1x.toFixed(1)} ${a1y.toFixed(1)}L${a2x.toFixed(1)} ${a2y.toFixed(1)}`, COL.purple, 1.5, 2.2);
-    fdot(FX, FY, 3.5, COL.ink, 2.2);
-    const [Yx, Yy] = fp(m.yu, m.yv);
-    fdot(Yx, Yy, 6, COL.purple, 2.5);
-    L = outLab(m.yu, m.yv); lab(L.x, L.y, `P′: y${sub('L')} = ${fc(m.g, m.b)}</tspan>`, COL.purple, 2.6, {anchor:L.anchor});
-    // admittance check lines
-    sd(rPts(m.g), COL.purple, 1.1, 2.8, {opacity:.55});
-    sd(xPts(m.b), COL.purple, 1.1, 2.9, {opacity:.55});
-
-    // ring readings
-    const ringLab = (deg, lines, color, d) => {
-      const [x, y] = polar(1.175, deg), up = Math.sin(deg*Math.PI/180) > 0;
-      const anchor = Math.cos(deg*Math.PI/180) > .45 ? 'start' : Math.cos(deg*Math.PI/180) < -.45 ? 'end' : 'middle';
-      lines.forEach((t, i) => lab(x, y + (up ? -(lines.length - 1 - i)*14 : i*14), t, color, d, {anchor, size:11.5}));
-    };
-    ringLab(thDeg, [`WTG ${f(m.w1)}λ`, `∠Γ = ${f(thDeg, 1)}°`], COL.ink, 3.0);
-    ringLab(thDeg + 180, [`WTG ${f(m.w2)}λ`], COL.purple, 3.0);
-
-    // distance from the load to the first voltage minimum, along the WTG ring
-    if (g > 0.02){
-      const sweep = (((thDeg - 180) % 360) + 360) % 360;
-      const pts = []; for (let i = 0; i <= 120; i++){ const a = (thDeg - sweep*i/120)*Math.PI/180; pts.push([1.158*Math.cos(a), 1.158*Math.sin(a)]); }
-      sd(pts, COL.green, 2.6, 3.3);
-      const mid = thDeg - sweep/2;
-      ringLab(mid, ['first V min', `${f(m.dmin)}λ from load`], COL.green, 3.6);
-    }
-
-    // compass transfer down to the rulers
-    const yEnd = ROWS[ROWS.length - 1].y + 4;
-    dash(`M${Sx.toFixed(1)} ${FY}L${Sx.toFixed(1)} ${yEnd}`, COL.green, 1.3, 3.9, '4 4');
-    if (g > 0.02) dash(`M${Nx.toFixed(1)} ${FY}L${Nx.toFixed(1)} ${yEnd}`, COL.green, 1.3, 3.9, '4 4');
+  // ---------- complete solution on the full chart ----------
+  const plainChips = pr => pr.chips.map(c => c.replace(/<sub>0<\/sub>/g, '₀').replace(/<[^>]+>/g, '')).join(', ');
+  function rulerTransfer(){
+    const g = Math.min(M.mag, 1);
+    if (!(g > 0.02 && g < 1 - 1e-9)) return null;
+    const Sx = FX + FR*g, Nx = FX - FR*g, yEnd = ROWS[ROWS.length - 1].y + 4;
+    [Sx, Nx].forEach(x => el('path', {d:`M${x.toFixed(1)} ${FY}L${x.toFixed(1)} ${yEnd}`, fill:'none', stroke:COL.green, 'stroke-width':1.3, 'stroke-dasharray':'4 4'}));
     const vals = {
-      vswr: isFinite(m.s) ? f(m.s, 2) : '∞', rl: g > 0 ? f(-20*Math.log10(g), 2) + ' dB' : '∞', g: f(g, 3),
-      dbs: isFinite(m.s) ? f(20*Math.log10(m.s), 1) + ' dB' : '∞', loss: g < 1 ? f(-10*Math.log10(1 - g*g), 2) + ' dB' : '∞', pw: f(g*g, 3)
+      vswr:fS(M.s), rl:f(-20*Math.log10(g), 2) + ' dB', g:f(g, 3),
+      dbs: isFinite(M.s) ? f(20*Math.log10(M.s), 1) + ' dB' : '∞', loss:f(-10*Math.log10(1 - g*g), 2) + ' dB', pw:f(g*g, 3)
     };
-    ROWS.forEach((row, i) => {
-      fdot(Sx, row.y, 3.6, COL.green, 4.1 + i*0.1);
-      lab(Sx + 6, row.y + 11, vals[row.right], COL.green, 4.2 + i*0.1, {anchor:'start', size:10.5});
-      if (g > 0.02){ fdot(Nx, row.y, 3.6, COL.green, 4.1 + i*0.1); lab(Nx - 6, row.y + 11, vals[row.left], COL.green, 4.2 + i*0.1, {anchor:'end', size:10.5}); }
+    ROWS.forEach(row => {
+      el('circle', {cx:Sx.toFixed(1), cy:row.y, r:3.6, fill:COL.green, stroke:'#fff', 'stroke-width':1.5});
+      ftext(Sx + 6, row.y + 11, vals[row.right], {anchor:'start', size:10.5, weight:750, color:COL.green, cls:'halo'}, FULL.g);
+      el('circle', {cx:Nx.toFixed(1), cy:row.y, r:3.6, fill:COL.green, stroke:'#fff', 'stroke-width':1.5});
+      ftext(Nx - 6, row.y + 11, vals[row.left], {anchor:'end', size:10.5, weight:750, color:COL.green, cls:'halo'}, FULL.g);
     });
     return vals;
   }
-
-  function fillReadings(vals){
-    const m = M;
-    $('solSub').innerHTML = `Z<sub>0</sub> = ${f(m.Z0)} Ω, Z<sub>L</sub> = ${fc(m.RL, m.XL)} Ω`;
-    const items = [
-      ['Normalize the load', `z<sub>L</sub> = ${fc(m.r, m.x)}`],
-      [`Plot P where r = ${f(m.r)} meets x = ${f(m.x)}`, 'point P'],
-      ['Measure OP on the |Γ| ruler', `|Γ<sub>L</sub>| = ${f(m.mag, 3)}`],
-      ['VSWR circle meets the right axis', `VSWR = ${vals.vswr}`],
-      ['Read the inner ring through P', `∠Γ<sub>L</sub> = ${f(m.th*180/Math.PI, 1)}°`],
-      ['Read P on the WTG ring, add 0.25λ', `${f(m.w1)}λ → ${f(m.w2)}λ`],
-      ['Read P′, diametrically opposite P', `y<sub>L</sub> = ${fc(m.g, m.b)}`]
-    ];
-    $('readings').innerHTML = items.map(([k, v]) => `<li><span class="rk">${k}</span><span class="rv">${v}</span></li>`).join('');
-    $('extras').innerHTML = `
-      <div>First V<sub>min</sub> from the load<b>${f(m.dmin)}λ</b></div>
-      <div>First V<sub>max</sub> from the load<b>${f(m.dmax)}λ</b></div>
-      <div>Return loss<b>${vals.rl}</b></div>
-      <div>SWR in dB<b>${vals.dbs}</b></div>`;
-    $('finalAns').innerHTML = `
-      <div class="ans y"><div class="k">Normalized load admittance</div><div class="v">y<sub>L</sub> = ${fc(m.g, m.b, 2)}</div><div class="s">Y<sub>L</sub> = ${fc(1000*m.g/m.Z0, 1000*m.b/m.Z0, 2)} mS</div></div>
-      <div class="ans s1"><div class="k">Voltage standing wave ratio</div><div class="v">VSWR ${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '= ∞'}</div><div class="s">|Γ<sub>L</sub>| = ${f(m.mag, 2)}</div></div>`;
+  function renderFull(){
+    VIEW = FULL; fSol.innerHTML = '';
+    ftext(18, 47, MODE.title, {anchor:'start', size:11.5, weight:700, color:'#5b3fd6'}, fSol);
+    ftext(18, 62, plainChips(MODE.problem(M)), {anchor:'start', size:10, weight:600, color:'#5b3fd6'}, fSol);
+    for (let j = 1; j < STEPS.length; j++){ FULL.g = el('g', {class:'fd', style:`--d:${((j - 1)*0.28).toFixed(2)}s`}, fSol); STEPS[j].draw(M, 1); }
+    FULL.g = el('g', {class:'fd', style:`--d:${((STEPS.length - 1)*0.28).toFixed(2)}s`}, fSol);
+    const vals = rulerTransfer();
+    VIEW = WALK;
+    return vals;
   }
-  function updateFull(){ fillReadings(drawFullSol()); }
+  function fillReadings(vals){
+    $('solSub').innerHTML = MODE.problem(M).chips.join(', ');
+    $('readings').innerHTML = STEPS.filter(s => s.rd).map(s => { const [k, v] = s.rd(M); return `<li><span class="rk">${k}</span><span class="rv">${v}</span></li>`; }).join('');
+    const showExtras = MODE.extras !== false && !!vals && isFinite(M.s);
+    $('extras').innerHTML = showExtras ? `
+      <div>First V<sub>min</sub> from the load<b>${f(M.dmin)}λ</b></div>
+      <div>First V<sub>max</sub> from the load<b>${f(M.dmax)}λ</b></div>
+      <div>Return loss<b>${vals.rl}</b></div>
+      <div>SWR in dB<b>${vals.dbs}</b></div>` : '';
+    $('extras').hidden = !showExtras;
+    $('finalAns').innerHTML = cardsHTML(MODE.answer(M));
+  }
+  function updateFull(){ fillReadings(renderFull()); }
 
   document.querySelectorAll('[data-zoom]').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('[data-zoom]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
@@ -1007,19 +1609,35 @@
     clone.querySelectorAll('.halo').forEach(t => { t.setAttribute('stroke', '#fff'); t.setAttribute('stroke-width', '4'); t.setAttribute('paint-order', 'stroke'); t.setAttribute('stroke-linejoin', 'round'); });
     clone.querySelectorAll('[class]').forEach(e => { e.removeAttribute('class'); e.removeAttribute('style'); });
     const blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)], {type:'image/svg+xml'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'smith-chart-solution.svg';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `smith-chart-${MODE.id}.svg`;
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   });
   if ('IntersectionObserver' in window){
     new IntersectionObserver((ents, obs) => { if (ents.some(e => e.isIntersecting)){ $('complete').classList.add('in-view'); obs.disconnect(); } }, {threshold:0.12}).observe($('complete'));
   } else $('complete').classList.add('in-view');
 
+  // ---------- problem text ----------
+  function setProblem(){
+    const pr = MODE.problem(M);
+    $('lede').innerHTML = pr.lede;
+    $('chips').innerHTML = pr.chips.map(c => `<span class="chip">${c}</span>`).join('') + `<span class="chip find">${pr.find}</span>`;
+    waveCaption();
+  }
+
+  // ---------- start ----------
   buildGrid();
-  M = compute(50, 25, -50);
   buildFullGrid();
-  setProblem(M);
   sizeWave();
-  window.__smith = {get state(){ return {idx, prog, running, auto, M}; }, goTo, next, back, steps:steps.length};
+  const initId = location.hash.slice(1);
+  selectMode(MODES.some(x => x.id === initId) ? initId : MODES[0].id, {init:true});
+  window.__smith = {
+    get state(){ return {idx, prog, running, auto, mode:MODE.id, steps:STEPS.length}; },
+    get M(){ return M; },
+    goTo, next, back, selectMode,
+    solve(id, vals){ selectMode(id); Object.assign(MODE.vals, vals); buildFields(); const m = MODE.compute(readVals()); started = true; applyModel(m); return m; },
+    tryCompute(id, vals){ const md = MODES.find(x => x.id === id), saved = MODE, old = md.vals; MODE = md; md.vals = Object.assign({}, md.defaults, vals); let out; try { out = {ok:true, m:md.compute(readVals())}; } catch (e){ out = {ok:false, err:e.message}; } md.vals = old; MODE = saved; return out; },
+    modes: MODES.map(x => x.id)
+  };
   requestAnimationFrame(t => { lastT = t; tick(t); });
   requestAnimationFrame(t => { if (reduceMotion) drawWave(t); else waveLoop(t); });
 })();
