@@ -2,8 +2,8 @@
 (() => {
   'use strict';
   const NS = 'http://www.w3.org/2000/svg';
-  const FONT = 'Bricolage Grotesque, system-ui, sans-serif';
-  const COL = {red:'#e0367a', blue:'#0f8fb3', green:'#e58a00', purple:'#6c3cf0', ink:'#221b45', match:'#13906a'};
+  const FONT = 'IBM Plex Sans, system-ui, sans-serif';
+  const COL = {red:'#C8372D', blue:'#1F5FA8', green:'#C27606', purple:'#6E45A8', ink:'#1A1C19', match:'#2E7D4A'};
   const PI = Math.PI, TAU = 2*Math.PI;
   const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   const $ = id => document.getElementById(id);
@@ -160,12 +160,12 @@
   let gridPieces = null, lastGridP = -1;
   function buildGrid(){
     const pcs = [];
-    pcs.push({pts:rPts(0), color:'#2a2350', w:1.9});
-    pcs.push({pts:xPts(0), color:'#8a83a8', w:1});
-    R_MIN.forEach(r => pcs.push({pts:rPts(r), color:'#e8e5f3', w:0.7}));
-    R_MAJ.forEach(r => pcs.push({pts:rPts(r), color:'#bdb6d8', w:1}));
-    R_MIN.forEach(x => { pcs.push({pts:xPts(x), color:'#e8e5f3', w:0.7}); pcs.push({pts:xPts(-x), color:'#e8e5f3', w:0.7}); });
-    R_MAJ.forEach(x => { pcs.push({pts:xPts(x), color:'#bdb6d8', w:1}); pcs.push({pts:xPts(-x), color:'#bdb6d8', w:1}); });
+    pcs.push({pts:rPts(0), color:'#2E322D', w:1.9});
+    pcs.push({pts:xPts(0), color:'#8C8F87', w:1});
+    R_MIN.forEach(r => pcs.push({pts:rPts(r), color:'#E7E6DF', w:0.7}));
+    R_MAJ.forEach(r => pcs.push({pts:rPts(r), color:'#BDBCB2', w:1}));
+    R_MIN.forEach(x => { pcs.push({pts:xPts(x), color:'#E7E6DF', w:0.7}); pcs.push({pts:xPts(-x), color:'#E7E6DF', w:0.7}); });
+    R_MAJ.forEach(x => { pcs.push({pts:xPts(x), color:'#BDBCB2', w:1}); pcs.push({pts:xPts(-x), color:'#BDBCB2', w:1}); });
     gridPieces = pcs;
   }
   function drawGrid(p){
@@ -178,21 +178,21 @@
     if (lp > 0){
       const ringG = el('g', {opacity:lp}, gridG);
       const [cx, cy] = px(0, 0);
-      el('circle', {cx, cy, r:WALK.R*1.075, fill:'none', stroke:'#d6d1ea', 'stroke-width':1}, ringG);
+      el('circle', {cx, cy, r:WALK.R*1.075, fill:'none', stroke:'#D5D4CC', 'stroke-width':1}, ringG);
       for (let i = 0; i < 50; i++){
         const th = (180 - 720*i*0.01)*Math.PI/180;
         const big = i % 5 === 0, r2 = big ? 1.055 : 1.03;
         const [x1, y1] = px(Math.cos(th), Math.sin(th)), [x2, y2] = px(r2*Math.cos(th), r2*Math.sin(th));
-        el('line', {x1, y1, x2, y2, stroke: big ? '#8a83a8' : '#c4bedb', 'stroke-width': big ? 1.2 : 0.8}, ringG);
-        if (big) text(1.13*Math.cos(th), 1.13*Math.sin(th), i === 0 ? '0' : (i/100).toFixed(2), {size:10, weight:500, color:'#8a83a8', halo:false}, ringG);
+        el('line', {x1, y1, x2, y2, stroke: big ? '#8C8F87' : '#C6C5BC', 'stroke-width': big ? 1.2 : 0.8}, ringG);
+        if (big) text(1.13*Math.cos(th), 1.13*Math.sin(th), i === 0 ? '0' : (i/100).toFixed(2), {size:10, weight:500, color:'#8C8F87', halo:false}, ringG);
       }
-      R_MAJ.forEach(r => { const u = gam(r, 0)[0]; text(u + 0.012, 0.032, f(r), {size:10, weight:600, color:'#756e95', anchor:'start'}, ringG); });
-      text(-0.985, 0.032, '0', {size:10, weight:600, color:'#756e95', anchor:'start'}, ringG);
+      R_MAJ.forEach(r => { const u = gam(r, 0)[0]; text(u + 0.012, 0.032, f(r), {size:10, weight:600, color:'#6B6E66', anchor:'start'}, ringG); });
+      text(-0.985, 0.032, '0', {size:10, weight:600, color:'#6B6E66', anchor:'start'}, ringG);
       R_MAJ.forEach(x => [x, -x].forEach(xx => {
         const g0 = gam(0, xx);
-        text(0.915*g0[0], 0.915*g0[1], (xx > 0 ? '+j' : '−j') + f(Math.abs(xx)), {size:10, weight:600, color:'#756e95'}, ringG);
+        text(0.915*g0[0], 0.915*g0[1], (xx > 0 ? '+j' : '−j') + f(Math.abs(xx)), {size:10, weight:600, color:'#6B6E66'}, ringG);
       }));
-      const t = el('text', {x:12, y:590, 'font-size':11, fill:'#8a83a8', 'font-family':FONT}, ringG);
+      const t = el('text', {x:12, y:590, 'font-size':11, fill:'#8C8F87', 'font-family':FONT}, ringG);
       t.textContent = 'Outer scale: wavelengths toward generator (clockwise)';
     }
   }
@@ -573,12 +573,12 @@
     const A = (H/2 - 58)/Math.max(1e-6, ...envs, ...vals.map(q => Math.hypot(q.inc[0], q.inc[1]) + 1e-9));
     const re = c => c[0]*Math.cos(phi) - c[1]*Math.sin(phi);
     ctx.clearRect(0, 0, W, H);
-    ctx.font = '600 11.5px Bricolage Grotesque, system-ui, sans-serif';
+    ctx.font = '600 11.5px IBM Plex Sans, system-ui, sans-serif';
 
     // axis & distance ticks
     ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(L, mid); ctx.lineTo(R, mid); ctx.stroke();
-    ctx.fillStyle = 'rgba(214,206,255,.6)'; ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(150,163,178,.6)'; ctx.textAlign = 'center';
     const step = D > 2 ? .5 : .25, names = {0:'0', .25:'λ/4', .5:'λ/2', .75:'3λ/4', 1:'λ', 1.25:'5λ/4', 1.5:'3λ/2', 1.75:'7λ/4', 2:'2λ', 2.5:'5λ/2', 3:'3λ'};
     for (let d = 0; d <= D + 1e-9; d += step){ const x = xOf(d); ctx.beginPath(); ctx.moveTo(x, H - 24); ctx.lineTo(x, H - 18); ctx.stroke(); ctx.fillText(names[+d.toFixed(2)] || `${f(d, 2)}λ`, x, H - 7); }
     ctx.textAlign = 'left'; ctx.fillText(S.dir, L, 14);
@@ -586,26 +586,26 @@
     // spans (e.g. the λ/4 section)
     S.spans.forEach(sp => {
       const x1 = xOf(sp.b), x2 = xOf(sp.a);
-      ctx.fillStyle = 'rgba(65,217,232,.10)'; ctx.fillRect(x1, 44, x2 - x1, H - 76);
-      ctx.fillStyle = '#9fe9f2'; ctx.textAlign = 'center'; ctx.fillText(sp.t, (x1 + x2)/2, H - 38);
+      ctx.fillStyle = 'rgba(124,198,190,.10)'; ctx.fillRect(x1, 44, x2 - x1, H - 76);
+      ctx.fillStyle = '#A9D2CE'; ctx.textAlign = 'center'; ctx.fillText(sp.t, (x1 + x2)/2, H - 38);
     });
 
     ctx.save();
     ctx.beginPath(); ctx.rect(R - (R - L + 6)*reveal, 0, (R - L + 6)*reveal + 2, H); ctx.clip();
     const grad = ctx.createLinearGradient(0, 40, 0, H - 30);
-    grad.addColorStop(0, 'rgba(255,79,163,.30)'); grad.addColorStop(.5, 'rgba(112,71,255,.06)'); grad.addColorStop(1, 'rgba(255,79,163,.30)');
+    grad.addColorStop(0, 'rgba(138,180,240,.30)'); grad.addColorStop(.5, 'rgba(138,180,240,.06)'); grad.addColorStop(1, 'rgba(138,180,240,.30)');
     ctx.beginPath();
     ds.forEach((d, i) => { const x = xOf(d), y = mid - A*envs[i]; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
     for (let i = N; i >= 0; i--) ctx.lineTo(xOf(ds[i]), mid + A*envs[i]);
     ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
     const curve = (fn, color, w, glow) => {
       ctx.beginPath(); ds.forEach((d, i) => { const x = xOf(d), y = mid - A*fn(i); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-      ctx.strokeStyle = color; ctx.lineWidth = w; ctx.shadowBlur = glow || 0; ctx.shadowColor = color; ctx.stroke(); ctx.shadowBlur = 0;
+      ctx.strokeStyle = color; ctx.lineWidth = w; ctx.shadowBlur = 0; ctx.shadowColor = color; ctx.stroke(); ctx.shadowBlur = 0;
     };
-    curve(i => envs[i], '#ff4fa3', 1.8, 8);
-    curve(i => -envs[i], '#ff4fa3', 1.8, 8);
-    curve(i => re(vals[i].inc), 'rgba(65,217,232,.75)', 1.5);
-    curve(i => re(vals[i].ref), 'rgba(255,184,77,.8)', 1.5);
+    curve(i => envs[i], '#8AB4F0', 1.8, 8);
+    curve(i => -envs[i], '#8AB4F0', 1.8, 8);
+    curve(i => re(vals[i].inc), 'rgba(124,198,190,.75)', 1.5);
+    curve(i => re(vals[i].ref), 'rgba(226,184,111,.8)', 1.5);
     curve(i => re(vals[i].v), '#ffffff', 2.6, 14);
     ctx.restore();
 
@@ -613,7 +613,7 @@
     S.segs.forEach((s, k) => {
       if (k === 0 || Math.hypot(s.G[0], s.G[1]) > 1e-9) return;
       const x1 = xOf(D), x2 = xOf(s.d);
-      if (x2 - x1 > 120){ ctx.fillStyle = '#9fe9f2'; ctx.textAlign = 'center'; ctx.fillText('matched: VSWR 1', (x1 + x2)/2, H - 38); }
+      if (x2 - x1 > 120){ ctx.fillStyle = '#A9D2CE'; ctx.textAlign = 'center'; ctx.fillText('matched: VSWR 1', (x1 + x2)/2, H - 38); }
     });
     // the question's own positions
     if (reveal > .9){
@@ -623,9 +623,9 @@
         const x = xOf(k.d);
         row = x - lastX < 170 ? 1 - row : 0; lastX = x;
         const ty = 30 + row*15;
-        ctx.strokeStyle = 'rgba(255,210,154,.75)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.2;
+        ctx.strokeStyle = 'rgba(235,211,162,.75)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.2;
         ctx.beginPath(); ctx.moveTo(x, ty + 6); ctx.lineTo(x, H - 26); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = '#ffd29a'; ctx.beginPath(); ctx.arc(x, mid, 3.5, 0, 2*Math.PI); ctx.fill();
+        ctx.fillStyle = '#EBD3A2'; ctx.beginPath(); ctx.arc(x, mid, 3.5, 0, 2*Math.PI); ctx.fill();
         const tw = ctx.measureText(k.t).width; let tx = x - tw/2; tx = Math.max(L - 20, Math.min(W - 8 - tw, tx));
         ctx.textAlign = 'left'; ctx.fillText(k.t, tx, ty);
       });
@@ -634,11 +634,11 @@
     if (!S.end) return;
     const lx = R + 10, ly = mid - 22, bw = S.end === 'ZL' ? 38 : 48;
     const lg = ctx.createLinearGradient(lx, ly, lx + bw, ly + 44);
-    lg.addColorStop(0, '#7047ff'); lg.addColorStop(1, '#ff4fa3');
+    lg.addColorStop(0, '#E2B86F'); lg.addColorStop(1, '#8AB4F0');
     ctx.fillStyle = lg; ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(lx, ly, bw, 44, 9); else ctx.rect(lx, ly, bw, 44);
     ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.font = '700 12.5px Bricolage Grotesque, system-ui, sans-serif';
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.font = '700 12.5px IBM Plex Sans, system-ui, sans-serif';
     ctx.fillText(S.end, lx + bw/2, mid + 5);
     ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(R, mid); ctx.lineTo(lx, mid); ctx.stroke();
   }
@@ -669,8 +669,8 @@
   }
   function renderFull(){
     VIEW = FULL; fSol.innerHTML = '';
-    ftext(18, 47, MODE.title, {anchor:'start', size:11.5, weight:700, color:'#5b3fd6'}, fSol);
-    ftext(18, 62, plainChips(MODE.problem(M)), {anchor:'start', size:10, weight:600, color:'#5b3fd6'}, fSol);
+    ftext(18, 47, MODE.title, {anchor:'start', size:11.5, weight:700, color:'#1F5FA8'}, fSol);
+    ftext(18, 62, plainChips(MODE.problem(M)), {anchor:'start', size:10, weight:600, color:'#1F5FA8'}, fSol);
     for (let j = 1; j < STEPS.length; j++){ FULL.g = el('g', {class:'fd', style:`--d:${((j - 1)*0.28).toFixed(2)}s`}, fSol); STEPS[j].draw(M, 1); }
     FULL.g = el('g', {class:'fd', style:`--d:${((STEPS.length - 1)*0.28).toFixed(2)}s`}, fSol);
     const vals = rulerTransfer();

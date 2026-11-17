@@ -8,8 +8,8 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
   const seg = (p, a, b) => clamp((p - a)/(b - a));
-  const FONT = 'Bricolage Grotesque, system-ui, sans-serif', MONO = 'IBM Plex Mono, ui-monospace, monospace';
-  const C = {white:'#ffffff', pink:'#ff4fa3', cyan:'#41d9e8', amber:'#ffb84d', violet:'#9b7bff', green:'#4fe3a6', muted:'rgba(214,206,255,.62)', faint:'rgba(255,255,255,.14)'};
+  const FONT = 'IBM Plex Sans, system-ui, sans-serif', MONO = 'IBM Plex Mono, ui-monospace, monospace';
+  const C = {white:'#ffffff', pink:'#8AB4F0', cyan:'#7CC6BE', amber:'#E2B86F', violet:'#B6A2DE', green:'#8FC79A', muted:'rgba(150,163,178,.62)', faint:'rgba(255,255,255,.14)'};
 
   // ---------- number formatting ----------
   const SUP = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
@@ -45,7 +45,7 @@
     text(str, x, y, o = {}){
       ctx.save(); ctx.globalAlpha *= (o.a ?? 1); G.font(o.size || 12.5, o.weight || 600, o.mono);
       ctx.textAlign = o.align || 'left'; ctx.textBaseline = o.base || 'alphabetic'; ctx.fillStyle = o.color || C.white;
-      if (o.halo){ ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(15,10,43,.85)'; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y); }
+      if (o.halo){ ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(15,20,26,.85)'; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y); }
       ctx.fillText(str, x, y); ctx.restore();
     },
     line(x1, y1, x2, y2, color, w = 1.5, o = {}){
@@ -55,7 +55,7 @@
     path(pts, color, w = 2, o = {}){
       if (pts.length < 2) return;
       ctx.save(); ctx.globalAlpha *= (o.a ?? 1); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-      if (o.glow){ ctx.shadowBlur = o.glow; ctx.shadowColor = color; }
+      if (o.glow){ ctx.shadowBlur = 0; ctx.shadowColor = color; }
       if (o.dash) ctx.setLineDash(o.dash);
       ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); ctx.restore();
     },
@@ -63,7 +63,7 @@
     circle(x, y, r, o = {}){
       ctx.save(); ctx.globalAlpha *= (o.a ?? 1); ctx.beginPath(); ctx.arc(x, y, Math.max(0, r), o.a0 ?? 0, o.a1 ?? TAU, !!o.ccw);
       if (o.fill){ ctx.fillStyle = o.fill; ctx.fill(); }
-      if (o.stroke){ ctx.strokeStyle = o.stroke; ctx.lineWidth = o.w || 1.5; if (o.dash) ctx.setLineDash(o.dash); if (o.glow){ ctx.shadowBlur = o.glow; ctx.shadowColor = o.stroke; } ctx.stroke(); }
+      if (o.stroke){ ctx.strokeStyle = o.stroke; ctx.lineWidth = o.w || 1.5; if (o.dash) ctx.setLineDash(o.dash); if (o.glow){ ctx.shadowBlur = 0; ctx.shadowColor = o.stroke; } ctx.stroke(); }
       ctx.restore();
     },
     arrow(x1, y1, x2, y2, color, w = 1.8, o = {}){

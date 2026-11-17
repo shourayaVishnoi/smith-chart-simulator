@@ -117,7 +117,7 @@
         else if (r.kind === 'point'){ const [x, y] = r.f(env); PL.dot(ctx, M, x, y, {color:r.color, r:6, label:`(${MX.fmt(x, 4)}, ${MX.fmt(y, 4)})`, color2:r.color}); }
         else if (r.kind === 'implicit'){
           const segs = implicitSegs(r.f, env);
-          ctx.save(); ctx.strokeStyle = r.color; ctx.lineWidth = 2.6; ctx.shadowBlur = 6; ctx.shadowColor = r.color; ctx.beginPath();
+          ctx.save(); ctx.strokeStyle = r.color; ctx.lineWidth = 2.6; ctx.shadowBlur = 0; ctx.beginPath();
           segs.forEach(([p, q]) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); }); ctx.stroke(); ctx.restore();
         }
       } catch (e) { /* skip a row that fails to evaluate */ }
@@ -133,7 +133,7 @@
     });
     for (let i = 0; i < explicit.length; i++) for (let j = i + 1; j < explicit.length; j++){ const A = explicit[i].f, B = explicit[j].f; zeros(x => A(x) - B(x), 500).forEach(x => keyPts.push({x, y:A(x), what:'intersection'})); }
     keyPts = keyPts.filter(k => isFinite(k.y) && k.y >= view.yr[0] && k.y <= view.yr[1]);
-    keyPts.forEach(k => PL.dot(ctx, M, k.x, k.y, {color:'rgba(220,214,255,.85)', r:3.6, ring:false}));
+    keyPts.forEach(k => PL.dot(ctx, M, k.x, k.y, {color:'rgba(213,220,228,.85)', r:3.6, ring:false}));
     // hover: snap to a key point, otherwise trace the nearest explicit curve
     if (hover){
       let best = null, bd = 14;
@@ -220,16 +220,16 @@ window.FORMULA_PAGE = (G) => {
       scene: (m, S) => {
         const {ctx, M} = frame(m, S);
         PL.fn(ctx, M, m.f, {color:'#fff', width:2.6, glow:8, alpha:S.vis('curve')});
-        const vb = S.vis('bracket'); if (vb > 0){ ctx.save(); ctx.globalAlpha = vb*.22; ctx.fillStyle = '#41d9e8'; ctx.fillRect(M.X(m.lo), M.box.y, M.X(m.hi) - M.X(m.lo), M.box.h); ctx.restore(); }
+        const vb = S.vis('bracket'); if (vb > 0){ ctx.save(); ctx.globalAlpha = vb*.22; ctx.fillStyle = '#7CC6BE'; ctx.fillRect(M.X(m.lo), M.box.y, M.X(m.hi) - M.X(m.lo), M.box.h); ctx.restore(); }
         const vi = S.vis('iter');
         if (vi > 0){
           const shown = Math.max(1, Math.round(vi*Math.min(m.iters.length, 8)));
           m.iters.slice(0, shown).forEach((s, k) => {
-            if (m.method === 'newton'){ const next = m.iters[k + 1]; PL.dot(ctx, M, s.x, s.fx, {color:'#ffb84d', r:4}); if (next){ PL.line(ctx, M, [[s.x, s.fx], [next.x, 0]], {color:'#ffb84d', width:1.6, dash:[5, 4]}); PL.line(ctx, M, [[next.x, 0], [next.x, next.fx]], {color:'rgba(255,184,77,.5)', width:1.2, dash:[2, 3]}); } PL.label(ctx, M.X(s.x), M.Y(0) + 16 + 13*(k % 2), `x${k}`, {color:'#ffd29a', size:11, align:'center'}); }
-            else { const y = M.box.y + 14 + k*12; ctx.save(); ctx.strokeStyle = '#41d9e8'; ctx.globalAlpha = .9; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M.X(s.a), y); ctx.lineTo(M.X(s.b), y); ctx.stroke(); ctx.restore(); PL.dot(ctx, M, s.m, 0, {color:'#ffb84d', r:3.2}); }
+            if (m.method === 'newton'){ const next = m.iters[k + 1]; PL.dot(ctx, M, s.x, s.fx, {color:'#E2B86F', r:4}); if (next){ PL.line(ctx, M, [[s.x, s.fx], [next.x, 0]], {color:'#E2B86F', width:1.6, dash:[5, 4]}); PL.line(ctx, M, [[next.x, 0], [next.x, next.fx]], {color:'rgba(226,184,111,.5)', width:1.2, dash:[2, 3]}); } PL.label(ctx, M.X(s.x), M.Y(0) + 16 + 13*(k % 2), `x${k}`, {color:'#EBD3A2', size:11, align:'center'}); }
+            else { const y = M.box.y + 14 + k*12; ctx.save(); ctx.strokeStyle = '#7CC6BE'; ctx.globalAlpha = .9; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M.X(s.a), y); ctx.lineTo(M.X(s.b), y); ctx.stroke(); ctx.restore(); PL.dot(ctx, M, s.m, 0, {color:'#E2B86F', r:3.2}); }
           });
         }
-        const vr = S.vis('roots'); m.roots.forEach(r => PL.dot(ctx, M, r, 0, {color:'#ff4fa3', r:6, alpha:vr, label: vr > .9 ? MX.fmt(r, 6) : '', dy:-12}));
+        const vr = S.vis('roots'); m.roots.forEach(r => PL.dot(ctx, M, r, 0, {color:'#8AB4F0', r:6, alpha:vr, label: vr > .9 ? MX.fmt(r, 6) : '', dy:-12}));
       } },
 
     { id:'intersect', title:'Where two curves meet', desc:'Solve f(x) = g(x) and get the points', glyph:glyph('int'),
@@ -250,11 +250,11 @@ window.FORMULA_PAGE = (G) => {
       answer: m => [{tone:'y', k:`${m.pts.length} meeting point${m.pts.length > 1 ? 's' : ''}`, v: m.pts.slice(0, 6).map(([x, y]) => `(${MX.fmt(x, 5)}, ${MX.fmt(y, 5)})`).join('<br>') + (m.pts.length > 6 ? '<br>…' : ''), s:`on [${f4(m.a)}, ${f4(m.b)}]`}],
       scene: (m, S) => {
         const {ctx, M} = frame(m, S), vc = S.vis('curves');
-        PL.fn(ctx, M, m.F.f, {color:'#ff4fa3', width:2.6, glow:8, alpha:vc}); PL.fn(ctx, M, m.Gg.f, {color:'#41d9e8', width:2.6, glow:8, alpha:vc});
-        PL.fn(ctx, M, m.h, {color:'#ffb84d', width:1.6, dash:[6, 4], alpha:S.vis('h')*.85});
-        const vx = S.vis('xs'); m.xs.forEach(x => PL.dot(ctx, M, x, 0, {color:'#ffb84d', r:4.5, alpha:vx}));
+        PL.fn(ctx, M, m.F.f, {color:'#8AB4F0', width:2.6, glow:8, alpha:vc}); PL.fn(ctx, M, m.Gg.f, {color:'#7CC6BE', width:2.6, glow:8, alpha:vc});
+        PL.fn(ctx, M, m.h, {color:'#E2B86F', width:1.6, dash:[6, 4], alpha:S.vis('h')*.85});
+        const vx = S.vis('xs'); m.xs.forEach(x => PL.dot(ctx, M, x, 0, {color:'#E2B86F', r:4.5, alpha:vx}));
         const vp = S.vis('pts'); m.pts.forEach(([x, y], k) => { PL.vline(ctx, M, x, {color:'rgba(255,255,255,.35)', alpha:vp}); PL.dot(ctx, M, x, y, {color:'#fff', r:6, alpha:vp, label: k < 4 ? `(${MX.fmt(x, 4)}, ${MX.fmt(y, 4)})` : ''}); });
-        PL.label(ctx, M.box.x + 8, M.box.y + 18, 'f(x)', {color:'#ff4fa3', alpha:vc}); PL.label(ctx, M.box.x + 48, M.box.y + 18, 'g(x)', {color:'#41d9e8', alpha:vc}); PL.label(ctx, M.box.x + 90, M.box.y + 18, 'h = f − g', {color:'#ffb84d', alpha:S.vis('h')});
+        PL.label(ctx, M.box.x + 8, M.box.y + 18, 'f(x)', {color:'#8AB4F0', alpha:vc}); PL.label(ctx, M.box.x + 48, M.box.y + 18, 'g(x)', {color:'#7CC6BE', alpha:vc}); PL.label(ctx, M.box.x + 90, M.box.y + 18, 'h = f − g', {color:'#E2B86F', alpha:S.vis('h')});
       } },
 
     { id:'area', title:'Area under a curve', desc:'Riemann sums, trapezoid and Simpson vs the exact integral', glyph:glyph('area'),
@@ -282,10 +282,10 @@ window.FORMULA_PAGE = (G) => {
       answer: m => [{tone:'y', k:'Definite integral', v:`${MX.fmt(m.exact, 8)}`, s:`total area counting all parts as positive: ${MX.fmt(m.absA, 6)}`}, {tone:'s1', k:`With n = ${m.n}`, v:`trapezoid ${MX.fmt(m.T, 6)}${m.Sm != null ? `<br>Simpson ${MX.fmt(m.Sm, 6)}` : ''}`, s:`midpoint ${MX.fmt(m.Mid, 6)}`}],
       scene: (m, S) => {
         const {ctx, M} = frame(m, S), pts = []; for (let i = 0; i <= 300; i++){ const x = m.a + (m.b - m.a)*i/300; pts.push([x, m.f(x)]); }
-        PL.area(ctx, M, pts, {color:'#ff4fa3', alpha:.22*S.vis('shade')});
+        PL.area(ctx, M, pts, {color:'#8AB4F0', alpha:.22*S.vis('shade')});
         const vs = S.vis('strips'); if (vs > 0) m.xs.forEach(x => PL.vline(ctx, M, x, {color:'rgba(255,255,255,.4)', alpha:vs, dash:[3, 3]}));
         const vr = S.vis('rects');
-        if (vr > 0){ const k = Math.max(1, Math.round(vr*m.n)); for (let i = 0; i < k; i++){ const x0 = m.xs[i], x1 = m.xs[i + 1], ym = m.f((x0 + x1)/2); ctx.save(); ctx.globalAlpha = .35; ctx.fillStyle = '#41d9e8'; const y0 = M.Y(0), y1 = M.Y(ym); ctx.fillRect(M.X(x0), Math.min(y0, y1), M.X(x1) - M.X(x0), Math.abs(y1 - y0)); ctx.globalAlpha = .9; ctx.strokeStyle = '#ffb84d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(M.X(x0), M.Y(m.ys[i])); ctx.lineTo(M.X(x1), M.Y(m.ys[i + 1])); ctx.stroke(); ctx.restore(); } PL.label(ctx, M.box.x + 8, M.box.y + 18, 'midpoint rectangles', {color:'#41d9e8'}); PL.label(ctx, M.box.x + 170, M.box.y + 18, 'trapezoid tops', {color:'#ffb84d'}); }
+        if (vr > 0){ const k = Math.max(1, Math.round(vr*m.n)); for (let i = 0; i < k; i++){ const x0 = m.xs[i], x1 = m.xs[i + 1], ym = m.f((x0 + x1)/2); ctx.save(); ctx.globalAlpha = .35; ctx.fillStyle = '#7CC6BE'; const y0 = M.Y(0), y1 = M.Y(ym); ctx.fillRect(M.X(x0), Math.min(y0, y1), M.X(x1) - M.X(x0), Math.abs(y1 - y0)); ctx.globalAlpha = .9; ctx.strokeStyle = '#E2B86F'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(M.X(x0), M.Y(m.ys[i])); ctx.lineTo(M.X(x1), M.Y(m.ys[i + 1])); ctx.stroke(); ctx.restore(); } PL.label(ctx, M.box.x + 8, M.box.y + 18, 'midpoint rectangles', {color:'#7CC6BE'}); PL.label(ctx, M.box.x + 170, M.box.y + 18, 'trapezoid tops', {color:'#E2B86F'}); }
         PL.fn(ctx, M, m.f, {color:'#fff', width:2.6, glow:8, alpha:S.vis('curve')});
       } },
 
@@ -316,10 +316,10 @@ window.FORMULA_PAGE = (G) => {
         const bw = S.W - 84, bh = S.H - 72, ys = (m.xr[1] - m.xr[0])*bh/bw; m.yr = [m.y0 - ys/2, m.y0 + ys/2];
         const {ctx, M} = frame(m, S);
         PL.fn(ctx, M, m.f, {color:'#fff', width:2.6, glow:8, alpha:S.vis('curve')});
-        const vs = S.vis('secants'); if (vs > 0){ const k = Math.max(1, Math.round(vs*m.sec.length)); m.sec.slice(0, k).forEach((s, i) => { PL.fn(ctx, M, x => m.y0 + s.m*(x - m.x0), {color:'#41d9e8', width:1.4, alpha:.35 + .15*i}); PL.dot(ctx, M, m.x0 + s.h, m.f(m.x0 + s.h), {color:'#41d9e8', r:3.5}); }); }
-        PL.fn(ctx, M, x => m.y0 + m.slope*(x - m.x0), {color:'#ff4fa3', width:2.4, alpha:S.vis('tangent')});
-        const vn = S.vis('normal'); if (vn > 0){ if (Math.abs(m.slope) < 1e-12) PL.vline(ctx, M, m.x0, {color:'#ffb84d', alpha:vn, dash:[]}); else PL.fn(ctx, M, x => m.y0 - (x - m.x0)/m.slope, {color:'#ffb84d', width:2, dash:[7, 5], alpha:vn}); }
-        PL.dot(ctx, M, m.x0, m.y0, {color:'#ffd29a', r:6, alpha:S.vis('pt'), label:`(${MX.fmt(m.x0, 4)}, ${MX.fmt(m.y0, 4)})`});
+        const vs = S.vis('secants'); if (vs > 0){ const k = Math.max(1, Math.round(vs*m.sec.length)); m.sec.slice(0, k).forEach((s, i) => { PL.fn(ctx, M, x => m.y0 + s.m*(x - m.x0), {color:'#7CC6BE', width:1.4, alpha:.35 + .15*i}); PL.dot(ctx, M, m.x0 + s.h, m.f(m.x0 + s.h), {color:'#7CC6BE', r:3.5}); }); }
+        PL.fn(ctx, M, x => m.y0 + m.slope*(x - m.x0), {color:'#8AB4F0', width:2.4, alpha:S.vis('tangent')});
+        const vn = S.vis('normal'); if (vn > 0){ if (Math.abs(m.slope) < 1e-12) PL.vline(ctx, M, m.x0, {color:'#E2B86F', alpha:vn, dash:[]}); else PL.fn(ctx, M, x => m.y0 - (x - m.x0)/m.slope, {color:'#E2B86F', width:2, dash:[7, 5], alpha:vn}); }
+        PL.dot(ctx, M, m.x0, m.y0, {color:'#EBD3A2', r:6, alpha:S.vis('pt'), label:`(${MX.fmt(m.x0, 4)}, ${MX.fmt(m.y0, 4)})`});
       } }
   ];
   const FIELDS = {

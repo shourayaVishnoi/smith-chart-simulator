@@ -95,7 +95,7 @@ window.CKT = (() => {
     }
     $('ckRead').innerHTML = lines.join('<br>');
   }
-  const COL = {C:'#ff4fa3', R:'#41d9e8', L:'#ffb84d'};
+  const COL = {C:'#8AB4F0', R:'#7CC6BE', L:'#E2B86F'};
   function draw(){
     if (!data){ data = compute(); readout(data); }
     const W = canvas._w, Hh = canvas._h; ctx.clearRect(0, 0, W, Hh);
@@ -116,12 +116,12 @@ window.CKT = (() => {
     const mb = {x:58, y:by, w:half, h:bh}, pb = {x:58 + half + 54, y:by, w:half, h:bh};
     const mags = d.mag.filter(isFinite), lo = Math.max(-100, Math.min(...mags)), hi = Math.max(...mags);
     const M2 = PL.frame(ctx, mb, {xr:d.fr, yr:[Math.floor((lo - 5)/10)*10, Math.max(5, Math.ceil((hi + 5)/10)*10)], xlog:true, mode:'box', xlabel:'f (Hz)', ylabel:'dB', title:'Gain'});
-    PL.hline(ctx, M2, -3, {color:'rgba(255,255,255,.3)'}); PL.vline(ctx, M2, d.fc, {color:'rgba(255,184,77,.55)'});
+    PL.hline(ctx, M2, -3, {color:'rgba(255,255,255,.3)'}); PL.vline(ctx, M2, d.fc, {color:'rgba(226,184,111,.55)'});
     PL.line(ctx, M2, d.fs.map((f, k) => [f, d.mag[k]]), {color:COL[S.out], width:2.4, glow:6});
     const M3 = PL.frame(ctx, pb, {xr:d.fr, yr:[-180, 180], xlog:true, mode:'box', xlabel:'f (Hz)', ylabel:'deg', title:'Phase'});
-    PL.hline(ctx, M3, 0, {color:'rgba(255,255,255,.25)', dash:[]}); PL.vline(ctx, M3, d.fc, {color:'rgba(255,184,77,.55)'});
+    PL.hline(ctx, M3, 0, {color:'rgba(255,255,255,.25)', dash:[]}); PL.vline(ctx, M3, d.fc, {color:'rgba(226,184,111,.55)'});
     PL.line(ctx, M3, d.fs.map((f, k) => [f, d.ph[k]]), {color:COL[S.out], width:2.4, glow:6});
-    PL.label(ctx, M2.X(d.fc) + 5, mb.y + 14, S.ckt === 'RLC' ? 'f₀' : 'f_c'.replace('_c', 'c'), {color:'#ffb84d', size:11});
+    PL.label(ctx, M2.X(d.fc) + 5, mb.y + 14, S.ckt === 'RLC' ? 'f₀' : 'f_c'.replace('_c', 'c'), {color:'#E2B86F', size:11});
   }
   let last = performance.now();
   function loop(t){
@@ -152,7 +152,7 @@ window.FORMULA_PAGE = (G) => {
     if (alpha <= 0) return;
     const a = Math.atan2(y2 - y1, x2 - x1), L = Math.hypot(x2 - x1, y2 - y1), hl = Math.min(12, L*.35);
     ctx.save(); ctx.globalAlpha = alpha; ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round';
-    if (glow){ ctx.shadowBlur = glow; ctx.shadowColor = color; }
+    /* no glow in the calm theme */
     ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(a)*hl*.6, y2 - Math.sin(a)*hl*.6); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - hl*Math.cos(a - .38), y2 - hl*Math.sin(a - .38)); ctx.lineTo(x2 - hl*Math.cos(a + .38), y2 - hl*Math.sin(a + .38)); ctx.closePath(); ctx.fill(); ctx.restore();
   }
@@ -173,8 +173,8 @@ window.FORMULA_PAGE = (G) => {
     [[b1, top], [b2, bot]].forEach(([bx, sp]) => {
       const pts = tline(m, sp.f, m.T, ts), M = PL.frame(ctx, bx, {xr, yr:PL.range(pts.map(p => p[1]).concat([0, sp.final, sp.start]), .12), mode:'box', zeroLine:true, xlabel:`t (${tu})`, ylabel:sp.label});
       PL.hline(ctx, M, sp.final, {color:'rgba(255,255,255,.4)', alpha:S.vis('final')});
-      if (S.vis('final') > .5) PL.label(ctx, M.box.x + M.box.w - 6, M.Y(sp.final) - 6, `final ${sp.fmt(sp.final)}`, {color:'#e9e4ff', size:11, align:'right', alpha:S.vis('final')});
-      const vt = S.vis('tau'); if (vt > 0) for (let n = 1; n <= 5; n++){ const x = n*m.tau; if (x <= m.T){ PL.vline(ctx, M, x*ts, {color:'rgba(255,184,77,.5)', alpha:vt}); if (sp === top) PL.label(ctx, M.X(x*ts) + 3, M.box.y + 13, `${n}τ`, {color:'#ffb84d', size:11, alpha:vt}); } }
+      if (S.vis('final') > .5) PL.label(ctx, M.box.x + M.box.w - 6, M.Y(sp.final) - 6, `final ${sp.fmt(sp.final)}`, {color:'#D5DCE4', size:11, align:'right', alpha:S.vis('final')});
+      const vt = S.vis('tau'); if (vt > 0) for (let n = 1; n <= 5; n++){ const x = n*m.tau; if (x <= m.T){ PL.vline(ctx, M, x*ts, {color:'rgba(226,184,111,.5)', alpha:vt}); if (sp === top) PL.label(ctx, M.X(x*ts) + 3, M.box.y + 13, `${n}τ`, {color:'#E2B86F', size:11, alpha:vt}); } }
       PL.line(ctx, M, upto(pts, k), {color:sp.color, width:2.8, glow:8});
       const vq = S.vis('query'); if (vq > 0) PL.dot(ctx, M, m.t*ts, sp.f(m.t), {color:'#fff', r:6, alpha:vq, label:sp.fmt(sp.f(m.t))});
     });
@@ -201,8 +201,8 @@ window.FORMULA_PAGE = (G) => {
         answerStep()],
       answer: m => [{tone:'y', k:`v<sub>C</sub> at ${si(m.t, 's')}`, v:si(m.vt, 'V'), s:`i = ${si(m.it, 'A')}`}, {tone:'s1', k:'Time constant', v:si(m.tau, 's'), s:`5τ = ${si(5*m.tau, 's')}`}],
       scene: (m, S) => firstOrderScene(m, S,
-        {f:m.vc, final:m.Vs, start:m.V0, label:'v_C (V)'.replace('_C', 'C'), color:'#ff4fa3', fmt:v => si(v, 'V', 3)},
-        {f:m.ic, final:0, start:(m.Vs - m.V0)/m.R, label:'i (A)', color:'#41d9e8', fmt:v => si(v, 'A', 3)}) },
+        {f:m.vc, final:m.Vs, start:m.V0, label:'v_C (V)'.replace('_C', 'C'), color:'#8AB4F0', fmt:v => si(v, 'V', 3)},
+        {f:m.ic, final:0, start:(m.Vs - m.V0)/m.R, label:'i (A)', color:'#7CC6BE', fmt:v => si(v, 'A', 3)}) },
 
     { id:'rl', title:'RL current rise and decay', desc:'Inductor current and voltage after a switch, with τ = L/R', glyph:glyph('rl'),
       fields:['R', 'L', 'Vs', 'I0', 't'], defaults:{R:'100', R_u:'Ω', L:'50', L_u:'mH', Vs:'10', I0:'0', I0_u:'mA', t:'1', t_u:'ms'},
@@ -225,8 +225,8 @@ window.FORMULA_PAGE = (G) => {
         answerStep()],
       answer: m => [{tone:'y', k:`i at ${si(m.t, 's')}`, v:si(m.it, 'A'), s:`v<sub>L</sub> = ${si(m.vt, 'V')}`}, {tone:'s1', k:'Time constant', v:si(m.tau, 's'), s:`final current ${si(m.If, 'A')}`}],
       scene: (m, S) => firstOrderScene(m, S,
-        {f:m.il, final:m.If, start:m.I0, label:'i (A)', color:'#41d9e8', fmt:v => si(v, 'A', 3)},
-        {f:m.vl, final:0, start:m.Vs - m.R*m.I0, label:'vL (V)', color:'#ffb84d', fmt:v => si(v, 'V', 3)}) },
+        {f:m.il, final:m.If, start:m.I0, label:'i (A)', color:'#7CC6BE', fmt:v => si(v, 'A', 3)},
+        {f:m.vl, final:0, start:m.Vs - m.R*m.I0, label:'vL (V)', color:'#E2B86F', fmt:v => si(v, 'V', 3)}) },
 
     { id:'rlc', title:'Series RLC step response', desc:'Damping, ζ, natural frequency, overshoot and settling', glyph:glyph('rlc'),
       fields:['R', 'L', 'C', 'Vs'], defaults:{R:'40', R_u:'Ω', L:'10', L_u:'mH', C:'1', C_u:'µF', Vs:'5'},
@@ -262,16 +262,16 @@ window.FORMULA_PAGE = (G) => {
         PL.hline(ctx, M, m.Vs, {color:'rgba(255,255,255,.4)'});
         const vs = S.vis('specs');
         if (vs > 0){
-          ctx.save(); ctx.globalAlpha = .14*vs; ctx.fillStyle = '#4fe3a6'; const y1 = M.Y(m.Vs*1.02), y2 = M.Y(m.Vs*.98); ctx.fillRect(bx.x, Math.min(y1, y2), bx.w, Math.abs(y2 - y1)); ctx.restore();
-          PL.vline(ctx, M, m.ts2*ts, {color:'#4fe3a6', alpha:vs}); PL.label(ctx, M.X(m.ts2*ts) + 4, bx.y + 14, `t_s (2%)`.replace('_s', 's'), {color:'#4fe3a6', size:11, alpha:vs});
+          ctx.save(); ctx.globalAlpha = .14*vs; ctx.fillStyle = '#8FC79A'; const y1 = M.Y(m.Vs*1.02), y2 = M.Y(m.Vs*.98); ctx.fillRect(bx.x, Math.min(y1, y2), bx.w, Math.abs(y2 - y1)); ctx.restore();
+          PL.vline(ctx, M, m.ts2*ts, {color:'#8FC79A', alpha:vs}); PL.label(ctx, M.X(m.ts2*ts) + 4, bx.y + 14, `t_s (2%)`.replace('_s', 's'), {color:'#8FC79A', size:11, alpha:vs});
           if (m.kind === 'under'){
             const env = t => m.Vs*Math.sqrt(1 + (m.P.alpha/m.P.wd)**2)*Math.exp(-m.P.alpha*t);
-            PL.line(ctx, M, tline(m, t => m.Vs + env(t), m.T, ts), {color:'rgba(155,123,255,.7)', width:1.4, dash:[5, 4], alpha:vs});
-            PL.line(ctx, M, tline(m, t => m.Vs - env(t), m.T, ts), {color:'rgba(155,123,255,.7)', width:1.4, dash:[5, 4], alpha:vs});
-            PL.dot(ctx, M, m.P.tp*ts, m.Vs*(1 + m.P.Mp), {color:'#ffb84d', r:6, alpha:vs, label:`peak ${si(m.Vs*(1 + m.P.Mp), 'V', 3)} (+${n4(100*m.P.Mp, 3)}%)`});
+            PL.line(ctx, M, tline(m, t => m.Vs + env(t), m.T, ts), {color:'rgba(182,162,222,.7)', width:1.4, dash:[5, 4], alpha:vs});
+            PL.line(ctx, M, tline(m, t => m.Vs - env(t), m.T, ts), {color:'rgba(182,162,222,.7)', width:1.4, dash:[5, 4], alpha:vs});
+            PL.dot(ctx, M, m.P.tp*ts, m.Vs*(1 + m.P.Mp), {color:'#E2B86F', r:6, alpha:vs, label:`peak ${si(m.Vs*(1 + m.P.Mp), 'V', 3)} (+${n4(100*m.P.Mp, 3)}%)`});
           }
         }
-        PL.line(ctx, M, upto(pts, S.vis('curve')), {color:'#ff4fa3', width:2.8, glow:8});
+        PL.line(ctx, M, upto(pts, S.vis('curve')), {color:'#8AB4F0', width:2.8, glow:8});
       } },
 
     { id:'resonance', title:'Resonance, Q and bandwidth', desc:'Series or parallel RLC: f₀, Q, half-power frequencies', glyph:glyph('res'),
@@ -301,11 +301,11 @@ window.FORMULA_PAGE = (G) => {
         const M = PL.frame(ctx, bx, {xr, yr:[0, 1.12], xlog:!lin, mode:'box', xlabel:'f (Hz)', ylabel: m.ser ? '|I| / Imax' : '|Z| / R'});
         const pts = (lin ? MX.linspace(xr[0], xr[1], 800) : MX.logspace(Math.log10(xr[0]), Math.log10(xr[1]), 600)).map(f => [f, m.resp(f)]);
         const vb = S.vis('band');
-        if (vb > 0){ ctx.save(); ctx.globalAlpha = .16*vb; ctx.fillStyle = '#41d9e8'; ctx.fillRect(M.X(m.f1), bx.y, M.X(m.f2) - M.X(m.f1), bx.h); ctx.restore();
-          PL.hline(ctx, M, Math.SQRT1_2, {color:'rgba(65,217,232,.7)', alpha:vb}); PL.label(ctx, bx.x + 6, M.Y(Math.SQRT1_2) - 6, '1/√2 (−3 dB)', {color:'#41d9e8', size:11, alpha:vb});
-          [[m.f1, 'f₁', 'right', -6], [m.f2, 'f₂', 'left', 6]].forEach(([f, l, al, dx]) => { PL.dot(ctx, M, f, Math.SQRT1_2, {color:'#41d9e8', r:5, alpha:vb}); PL.label(ctx, M.X(f) + dx, M.Y(Math.SQRT1_2) + 18, l, {color:'#41d9e8', align:al, alpha:vb}); }); }
-        PL.line(ctx, M, upto(pts, S.vis('curve')), {color:'#ff4fa3', width:2.8, glow:8});
-        const vf = S.vis('f0'); if (vf > 0){ PL.vline(ctx, M, m.f0, {color:'rgba(255,184,77,.7)', alpha:vf}); PL.dot(ctx, M, m.f0, 1, {color:'#ffb84d', r:6, alpha:vf, label:`f₀ = ${si(m.f0, 'Hz', 3)}`}); }
+        if (vb > 0){ ctx.save(); ctx.globalAlpha = .16*vb; ctx.fillStyle = '#7CC6BE'; ctx.fillRect(M.X(m.f1), bx.y, M.X(m.f2) - M.X(m.f1), bx.h); ctx.restore();
+          PL.hline(ctx, M, Math.SQRT1_2, {color:'rgba(124,198,190,.7)', alpha:vb}); PL.label(ctx, bx.x + 6, M.Y(Math.SQRT1_2) - 6, '1/√2 (−3 dB)', {color:'#7CC6BE', size:11, alpha:vb});
+          [[m.f1, 'f₁', 'right', -6], [m.f2, 'f₂', 'left', 6]].forEach(([f, l, al, dx]) => { PL.dot(ctx, M, f, Math.SQRT1_2, {color:'#7CC6BE', r:5, alpha:vb}); PL.label(ctx, M.X(f) + dx, M.Y(Math.SQRT1_2) + 18, l, {color:'#7CC6BE', align:al, alpha:vb}); }); }
+        PL.line(ctx, M, upto(pts, S.vis('curve')), {color:'#8AB4F0', width:2.8, glow:8});
+        const vf = S.vis('f0'); if (vf > 0){ PL.vline(ctx, M, m.f0, {color:'rgba(226,184,111,.7)', alpha:vf}); PL.dot(ctx, M, m.f0, 1, {color:'#E2B86F', r:6, alpha:vf, label:`f₀ = ${si(m.f0, 'Hz', 3)}`}); }
       } },
 
     { id:'ac', title:'AC series RLC phasors', desc:'Impedance, current, element voltages, power factor and power', glyph:glyph('ac'),
@@ -335,11 +335,11 @@ window.FORMULA_PAGE = (G) => {
         G.line(cx - 20, cy, half - 10, cy, 'rgba(255,255,255,.25)', 1); G.line(cx, 46, cx, H - 30, 'rgba(255,255,255,.25)', 1);
         if (vz > 0){
           const k = G.ease(vz), ex = cx + m.VR*sc*k, eL = cy - m.VL*sc*k, eC = cy + m.VC*sc*k;
-          arrow(ctx, cx, cy, cx + Math.min(half - 150, 60 + m.I*0), cy, '#e9e4ff', 2, .6); G.text('I', cx + Math.min(half - 150, 60) + 4, cy - 8, {color:'#e9e4ff', size:12});
-          arrow(ctx, cx, cy, ex, cy, '#41d9e8', 3, 1, 6); G.text(`VR ${si(m.VR, 'V', 3)}`, ex - 4, cy + 20, {color:'#41d9e8', align:'right', size:12, halo:true});
-          arrow(ctx, ex, cy, ex, eL, '#ffb84d', 3, 1, 6); G.text(`VL ${si(m.VL, 'V', 3)}`, ex + 10, (cy + eL)/2, {color:'#ffb84d', size:12, halo:true});
-          arrow(ctx, ex, eL, ex, eL + m.VC*sc*k, '#9b7bff', 3, 1, 6); G.text(`VC ${si(m.VC, 'V', 3)}`, ex - 10, eL + m.VC*sc*k*.5, {color:'#9b7bff', size:12, halo:true, align:'right'});
-          arrow(ctx, cx, cy, ex, cy - (m.VL - m.VC)*sc*k, '#ff4fa3', 3.4, 1, 10); G.text(`V ${si(m.Vs, 'V', 3)}`, (cx + ex)/2 - 10, cy - (m.VL - m.VC)*sc*k/2 - 10, {color:'#ff4fa3', size:12.5, halo:true, align:'right'});
+          arrow(ctx, cx, cy, cx + Math.min(half - 150, 60 + m.I*0), cy, '#D5DCE4', 2, .6); G.text('I', cx + Math.min(half - 150, 60) + 4, cy - 8, {color:'#D5DCE4', size:12});
+          arrow(ctx, cx, cy, ex, cy, '#7CC6BE', 3, 1, 6); G.text(`VR ${si(m.VR, 'V', 3)}`, ex - 4, cy + 20, {color:'#7CC6BE', align:'right', size:12, halo:true});
+          arrow(ctx, ex, cy, ex, eL, '#E2B86F', 3, 1, 6); G.text(`VL ${si(m.VL, 'V', 3)}`, ex + 10, (cy + eL)/2, {color:'#E2B86F', size:12, halo:true});
+          arrow(ctx, ex, eL, ex, eL + m.VC*sc*k, '#B6A2DE', 3, 1, 6); G.text(`VC ${si(m.VC, 'V', 3)}`, ex - 10, eL + m.VC*sc*k*.5, {color:'#B6A2DE', size:12, halo:true, align:'right'});
+          arrow(ctx, cx, cy, ex, cy - (m.VL - m.VC)*sc*k, '#8AB4F0', 3.4, 1, 10); G.text(`V ${si(m.Vs, 'V', 3)}`, (cx + ex)/2 - 10, cy - (m.VL - m.VC)*sc*k/2 - 10, {color:'#8AB4F0', size:12.5, halo:true, align:'right'});
           void eC;
         }
         // impedance triangle on the right
@@ -347,13 +347,13 @@ window.FORMULA_PAGE = (G) => {
         G.text('Impedance triangle', rx, 30, {size:13, weight:700});
         if (vzT > 0){
           const k = G.ease(vzT), x2 = rx + m.R*zs*k, y2 = by - m.X*zs*k;
-          arrow(ctx, rx, by, x2, by, '#41d9e8', 2.6, 1); G.text(`R ${si(m.R, 'Ω', 3)}`, (rx + x2)/2, by + (m.X > 0 ? 18 : -10), {color:'#41d9e8', align:'center', size:12, halo:true});
-          arrow(ctx, x2, by, x2, y2, '#ffb84d', 2.6, 1); G.text(`X ${si(m.X, 'Ω', 3)}`, x2 + 8, (by + y2)/2, {color:'#ffb84d', size:12, halo:true});
-          arrow(ctx, rx, by, x2, y2, '#ff4fa3', 3, 1, 8); G.text(`|Z| ${si(m.Z, 'Ω', 3)}`, (rx + x2)/2 - 8, (by + y2)/2 + (m.X >= 0 ? -8 : 18), {color:'#ff4fa3', size:12.5, halo:true, align:'right'});
+          arrow(ctx, rx, by, x2, by, '#7CC6BE', 2.6, 1); G.text(`R ${si(m.R, 'Ω', 3)}`, (rx + x2)/2, by + (m.X > 0 ? 18 : -10), {color:'#7CC6BE', align:'center', size:12, halo:true});
+          arrow(ctx, x2, by, x2, y2, '#E2B86F', 2.6, 1); G.text(`X ${si(m.X, 'Ω', 3)}`, x2 + 8, (by + y2)/2, {color:'#E2B86F', size:12, halo:true});
+          arrow(ctx, rx, by, x2, y2, '#8AB4F0', 3, 1, 8); G.text(`|Z| ${si(m.Z, 'Ω', 3)}`, (rx + x2)/2 - 8, (by + y2)/2 + (m.X >= 0 ? -8 : 18), {color:'#8AB4F0', size:12.5, halo:true, align:'right'});
           G.text(`θ = ${n4(m.th*180/Math.PI, 3)}°`, rx + 26, by + (m.X > 0 ? -8 : 18), {color:'#fff', size:12, halo:true});
           void maxZ;
         }
-        const vp = S.vis('pw'); if (vp > 0){ G.text(`pf ${n4(m.pf, 3)} ${m.X > 0 ? 'lagging' : m.X < 0 ? 'leading' : ''}   P = ${si(m.P, 'W', 3)}`, rx, H - 26, {color:'#4fe3a6', size:13, a:vp, weight:700}); }
+        const vp = S.vis('pw'); if (vp > 0){ G.text(`pf ${n4(m.pf, 3)} ${m.X > 0 ? 'lagging' : m.X < 0 ? 'leading' : ''}   P = ${si(m.P, 'W', 3)}`, rx, H - 26, {color:'#8FC79A', size:13, a:vp, weight:700}); }
       } },
 
     { id:'filter', title:'First-order RC filter', desc:'Cut-off frequency, gain in dB and phase on a Bode plot', glyph:glyph('filt'),
@@ -377,16 +377,16 @@ window.FORMULA_PAGE = (G) => {
         const H = fs.map(m.Hf), mag = H.map(h => 20*Math.log10(Math.hypot(h[0], h[1]))), ph = H.map(h => Math.atan2(h[1], h[0])*180/Math.PI);
         const M1 = PL.frame(ctx, b1, {xr, yr:[Math.max(-80, Math.floor(Math.min(...mag)/10)*10 - 5), 5], xlog:true, mode:'box', ylabel:'gain (dB)'});
         const M2 = PL.frame(ctx, b2, {xr, yr: m.low ? [-100, 10] : [-10, 100], xlog:true, mode:'box', ylabel:'phase (°)', xlabel:'f (Hz)'});
-        const vf = S.vis('fc'); [M1, M2].forEach(M => PL.vline(ctx, M, m.fc, {color:'rgba(255,184,77,.7)', alpha:vf}));
-        PL.hline(ctx, M1, -3, {color:'rgba(255,255,255,.3)', alpha:vf}); if (vf > 0) PL.label(ctx, M1.X(m.fc) + 5, b1.y + 14, `fc = ${si(m.fc, 'Hz', 3)}`, {color:'#ffb84d', size:11, alpha:vf});
+        const vf = S.vis('fc'); [M1, M2].forEach(M => PL.vline(ctx, M, m.fc, {color:'rgba(226,184,111,.7)', alpha:vf}));
+        PL.hline(ctx, M1, -3, {color:'rgba(255,255,255,.3)', alpha:vf}); if (vf > 0) PL.label(ctx, M1.X(m.fc) + 5, b1.y + 14, `fc = ${si(m.fc, 'Hz', 3)}`, {color:'#E2B86F', size:11, alpha:vf});
         const va = S.vis('asym');
         if (va > 0){
-          PL.line(ctx, M1, fs.map(f => [f, m.low ? (f < m.fc ? 0 : -20*Math.log10(f/m.fc)) : (f > m.fc ? 0 : 20*Math.log10(f/m.fc))]), {color:'#9b7bff', width:1.6, dash:[6, 4], alpha:va});
-          PL.line(ctx, M2, fs.map(f => { const r = Math.log10(f/m.fc), p = r < -1 ? 0 : r > 1 ? -90 : -45*(r + 1); return [f, m.low ? p : p + 90]; }), {color:'#9b7bff', width:1.6, dash:[6, 4], alpha:va});
+          PL.line(ctx, M1, fs.map(f => [f, m.low ? (f < m.fc ? 0 : -20*Math.log10(f/m.fc)) : (f > m.fc ? 0 : 20*Math.log10(f/m.fc))]), {color:'#B6A2DE', width:1.6, dash:[6, 4], alpha:va});
+          PL.line(ctx, M2, fs.map(f => { const r = Math.log10(f/m.fc), p = r < -1 ? 0 : r > 1 ? -90 : -45*(r + 1); return [f, m.low ? p : p + 90]; }), {color:'#B6A2DE', width:1.6, dash:[6, 4], alpha:va});
         }
         const k = S.vis('curve');
-        PL.line(ctx, M1, upto(fs.map((f, i) => [f, mag[i]]), k), {color:'#ff4fa3', width:2.8, glow:8});
-        PL.line(ctx, M2, upto(fs.map((f, i) => [f, ph[i]]), k), {color:'#41d9e8', width:2.8, glow:8});
+        PL.line(ctx, M1, upto(fs.map((f, i) => [f, mag[i]]), k), {color:'#8AB4F0', width:2.8, glow:8});
+        PL.line(ctx, M2, upto(fs.map((f, i) => [f, ph[i]]), k), {color:'#7CC6BE', width:2.8, glow:8});
         const vp = S.vis('pt'); if (vp > 0){ PL.dot(ctx, M1, m.f, m.dB, {color:'#fff', r:6, alpha:vp, label:`${n4(m.dB, 3)} dB`}); PL.dot(ctx, M2, m.f, m.ph, {color:'#fff', r:6, alpha:vp, label:`${n4(m.ph, 3)}°`}); }
       } }
   ];

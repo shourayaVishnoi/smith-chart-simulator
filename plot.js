@@ -1,8 +1,8 @@
 // plot.js — small canvas plotting kit: frames with linear/log axes, curves, markers, zoom/pan.
 window.PLOT = (() => {
   'use strict';
-  const FONT = 'Bricolage Grotesque, system-ui, sans-serif', MONO = 'IBM Plex Mono, ui-monospace, monospace';
-  const COLORS = ['#ff4fa3', '#41d9e8', '#ffb84d', '#9b7bff', '#4fe3a6', '#ff7b5c', '#e8e4ff', '#ffd84f'];
+  const FONT = 'IBM Plex Sans, system-ui, sans-serif', MONO = 'IBM Plex Mono, ui-monospace, monospace';
+  const COLORS = ['#8AB4F0', '#7CC6BE', '#E2B86F', '#B6A2DE', '#8FC79A', '#E07A6E', '#D5DCE4', '#EBD3A2'];
   const SUP = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
 
   function niceStep(span, n){ const raw = span/Math.max(1, n), e = Math.pow(10, Math.floor(Math.log10(raw))), f = raw/e; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10)*e; }
@@ -39,7 +39,7 @@ window.PLOT = (() => {
     o = Object.assign({mode:'box', grid:true, n:6}, o);
     const M = mapper(box, o);
     ctx.save();
-    ctx.font = `500 11px ${FONT}`; ctx.fillStyle = 'rgba(214,206,255,.62)';
+    ctx.font = `500 11px ${FONT}`; ctx.fillStyle = 'rgba(150,163,178,.62)';
     const tx = o.xstep ? stepTicks(o.xr[0], o.xr[1], Math.max(o.xstep, niceStep(o.xr[1] - o.xr[0], Math.max(3, Math.round(box.w/50))))) : ticks(o.xr[0], o.xr[1], o.xlog, Math.max(3, Math.round(box.w/90))), ty = ticks(o.yr[0], o.yr[1], o.ylog, Math.max(3, Math.round(box.h/60)));
     // grid
     if (o.grid){
@@ -77,7 +77,7 @@ window.PLOT = (() => {
       let last = -1e9; tx.forEach(t => { const x = M.X(t.v); if (t.label && x - last > 34){ ctx.fillText(t.label, x, box.y + box.h + 5); last = x; } });
       ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
       ty.forEach(t => { if (t.label) ctx.fillText(t.label, box.x - 6, M.Y(t.v)); });
-      ctx.font = `600 11.5px ${FONT}`; ctx.fillStyle = 'rgba(233,228,255,.8)';
+      ctx.font = `600 11.5px ${FONT}`; ctx.fillStyle = 'rgba(213,220,228,.8)';
       if (o.xlabel){ ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText(o.xlabel, box.x + box.w, box.y + box.h + 20); }
       if (o.ylabel){ ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(o.ylabel, box.x, box.y - 6); }
       if (o.title){ ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.font = `700 12.5px ${FONT}`; ctx.fillStyle = '#fff'; ctx.fillText(o.title, box.x + (o.ylabel ? ctx.measureText(o.ylabel).width + 60 : 0), box.y - 6); }
@@ -90,7 +90,7 @@ window.PLOT = (() => {
   function style(ctx, s){
     ctx.strokeStyle = s.color || COLORS[0]; ctx.lineWidth = s.width || 2.2; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.globalAlpha = s.alpha ?? 1; ctx.setLineDash(s.dash || []);
-    if (s.glow){ ctx.shadowBlur = s.glow; ctx.shadowColor = s.color || COLORS[0]; }
+    if (s.glow){ ctx.shadowBlur = 0; ctx.shadowColor = s.color || COLORS[0]; }
   }
   // polyline of world points; breaks at NaN and at huge jumps (asymptotes)
   function line(ctx, M, pts, s = {}){
@@ -126,7 +126,7 @@ window.PLOT = (() => {
     const X = M.X(x), Y = M.Y(y);
     if (X < M.box.x - 6 || X > M.box.x + M.box.w + 6 || Y < M.box.y - 6 || Y > M.box.y + M.box.h + 6) return;
     ctx.save(); ctx.globalAlpha = s.alpha ?? 1; ctx.beginPath(); ctx.arc(X, Y, s.r || 4.5, 0, 2*Math.PI);
-    if (s.hollow){ ctx.strokeStyle = s.color || '#fff'; ctx.lineWidth = 2; ctx.stroke(); } else { ctx.fillStyle = s.color || '#fff'; ctx.fill(); if (s.ring !== false){ ctx.strokeStyle = 'rgba(15,10,43,.9)'; ctx.lineWidth = 1.5; ctx.stroke(); } }
+    if (s.hollow){ ctx.strokeStyle = s.color || '#fff'; ctx.lineWidth = 2; ctx.stroke(); } else { ctx.fillStyle = s.color || '#fff'; ctx.fill(); if (s.ring !== false){ ctx.strokeStyle = 'rgba(15,20,26,.9)'; ctx.lineWidth = 1.5; ctx.stroke(); } }
     if (s.label){ label(ctx, X + (s.dx ?? 8), Y + (s.dy ?? -8), s.label, s); }
     ctx.restore();
   }
@@ -138,7 +138,7 @@ window.PLOT = (() => {
   function label(ctx, x, y, text, s = {}){
     ctx.save(); ctx.globalAlpha = s.alpha ?? 1; ctx.font = `${s.weight || 650} ${s.size || 12}px ${s.mono ? MONO : FONT}`;
     ctx.textAlign = s.align || 'left'; ctx.textBaseline = s.base || 'alphabetic';
-    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(15,10,43,.88)'; ctx.lineJoin = 'round'; ctx.strokeText(text, x, y);
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(15,20,26,.88)'; ctx.lineJoin = 'round'; ctx.strokeText(text, x, y);
     ctx.fillStyle = s.color || '#fff'; ctx.fillText(text, x, y); ctx.restore();
   }
   function vline(ctx, M, x, s = {}){ clip(ctx, M); style(ctx, Object.assign({width:1.3, dash:[5, 4]}, s)); const X = M.X(x); ctx.beginPath(); ctx.moveTo(X, M.box.y); ctx.lineTo(X, M.box.y + M.box.h); ctx.stroke(); ctx.restore(); }

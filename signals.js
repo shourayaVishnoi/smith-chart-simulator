@@ -80,15 +80,15 @@ window.SIG = (() => {
     PL.line(ctx, M, tgt, {color:'rgba(255,255,255,.45)', width:1.6});
     // the highest harmonic on its own
     const N = S.N, lastN = (() => { for (let k = N; k >= 1; k--) if (c.a[k] || c.b[k]) return k; return 0; })();
-    if (lastN) PL.fn(ctx, M, t => c.a[lastN]*Math.cos(TAUv*lastN*t) + c.b[lastN]*Math.sin(TAUv*lastN*t), {color:'#41d9e8', width:1.3, alpha:.55, dash:[4, 3]});
-    PL.line(ctx, M, pts, {color:'#ff4fa3', width:2.6, glow:8});
+    if (lastN) PL.fn(ctx, M, t => c.a[lastN]*Math.cos(TAUv*lastN*t) + c.b[lastN]*Math.sin(TAUv*lastN*t), {color:'#7CC6BE', width:1.3, alpha:.55, dash:[4, 3]});
+    PL.line(ctx, M, pts, {color:'#8AB4F0', width:2.6, glow:8});
     const mx = Math.max(...pts.map(p => p[1])), top1 = Math.max(...tgt.map(p => p[1]));
     const Pn = c.a[0]**2 + c.a.slice(1).reduce((s, a, k) => s + (a*a + c.b[k + 1]**2)/2, 0), Pt = wv.P(A, S.d);
     const disc = ['square', 'sawtooth', 'pulse'].includes(S.wave);
     $('sgRead').innerHTML = `${wv.fa}<br>${wv.fb}<br><span class="c">${wv.sym}</span><br>power captured: ${MX.fmt(100*Pn/Pt, 5)}%` + (disc ? `<br>peak of the sum: ${MX.fmt(mx, 4)} (overshoot ${MX.fmt(100*(mx - top1)/(2*A*(S.wave === 'pulse' ? .5 : 1)), 3)}% of the jump)` : '') + (lastN ? `<br><span class="c">dashed: harmonic ${lastN} alone</span>` : '');
     const amps = c.a.map((a, k) => k === 0 ? Math.abs(a) : Math.hypot(a, c.b[k]));
     const M2 = PL.frame(ctx, bot, {xr:[-.6, Math.max(8, N) + .6], yr:[0, Math.max(.2, ...amps)*1.15], mode:'box', xlabel:'harmonic n', ylabel:'amplitude', title:'Line spectrum', xstep:1});
-    PL.stems(ctx, M2, amps.map((v, k) => [k, v]), {color:'#ffb84d', width:2.4});
+    PL.stems(ctx, M2, amps.map((v, k) => [k, v]), {color:'#E2B86F', width:2.4});
   }
   const TAUv = 2*Math.PI;
   function drawConv(W, H){
@@ -97,15 +97,15 @@ window.SIG = (() => {
     const top = {x:56, y:28, w:W - 76, h:H*.5 - 40}, bot = {x:56, y:top.y + top.h + 44, w:W - 76, h:H - top.y - top.h - 82}, xr = [-1.5, 5];
     const M = PL.frame(ctx, top, {xr, yr:[-.15, 1.3], mode:'box', zeroLine:true, xlabel:'τ', title:`x(τ) and h(${t.toFixed(2)} − τ)`});
     const ts = MX.linspace(xr[0], xr[1], 900);
-    PL.area(ctx, M, ts.map(tt => [tt, x(tt)*h(t - tt)]), {color:'#4fe3a6', alpha:.35});
-    PL.line(ctx, M, ts.map(tt => [tt, x(tt)]), {color:'#ff4fa3', width:2.4, glow:6});
-    PL.line(ctx, M, ts.map(tt => [tt, h(t - tt)]), {color:'#41d9e8', width:2.4, glow:6});
+    PL.area(ctx, M, ts.map(tt => [tt, x(tt)*h(t - tt)]), {color:'#8FC79A', alpha:.35});
+    PL.line(ctx, M, ts.map(tt => [tt, x(tt)]), {color:'#8AB4F0', width:2.4, glow:6});
+    PL.line(ctx, M, ts.map(tt => [tt, h(t - tt)]), {color:'#7CC6BE', width:2.4, glow:6});
     PL.vline(ctx, M, t, {color:'rgba(255,255,255,.5)'});
-    PL.label(ctx, top.x + top.w - 210, top.y + 16, 'x(τ)', {color:'#ff4fa3'}); PL.label(ctx, top.x + top.w - 160, top.y + 16, 'h(t − τ)', {color:'#41d9e8'}); PL.label(ctx, top.x + top.w - 90, top.y + 16, 'product', {color:'#4fe3a6'});
+    PL.label(ctx, top.x + top.w - 210, top.y + 16, 'x(τ)', {color:'#8AB4F0'}); PL.label(ctx, top.x + top.w - 160, top.y + 16, 'h(t − τ)', {color:'#7CC6BE'}); PL.label(ctx, top.x + top.w - 90, top.y + 16, 'product', {color:'#8FC79A'});
     const yt = tt => SG.convAt(x, h, xe, he, tt).y, yv = ts.map(yt), cur = SG.convAt(x, h, xe, he, t);
     const M2 = PL.frame(ctx, bot, {xr, yr:[-.1, Math.max(.3, ...yv)*1.18], mode:'box', zeroLine:true, xlabel:'t', title:'y(t) = (x * h)(t)'});
-    PL.line(ctx, M2, ts.map((tt, i) => [tt, yv[i]]), {color:'rgba(255,184,77,.3)', width:1.6});
-    PL.line(ctx, M2, ts.filter(tt => tt <= t).map(tt => [tt, yt(tt)]), {color:'#ffb84d', width:2.8, glow:8});
+    PL.line(ctx, M2, ts.map((tt, i) => [tt, yv[i]]), {color:'rgba(226,184,111,.3)', width:1.6});
+    PL.line(ctx, M2, ts.filter(tt => tt <= t).map(tt => [tt, yt(tt)]), {color:'#E2B86F', width:2.8, glow:8});
     PL.dot(ctx, M2, t, cur.y, {color:'#fff', r:5.5, label:MX.fmt(cur.y, 4)});
     $('sgRead').innerHTML = `x(t) = ${xs.tex(1, px)}<br>h(t) = ${hs.tex(1, ph)}<br>overlap: ${cur.hi > cur.lo ? `τ from ${MX.fmt(cur.lo, 3)} to ${MX.fmt(cur.hi, 3)}` : 'none'}<br>y(${t.toFixed(2)}) = area of the green product = <b>${MX.fmt(cur.y, 5)}</b>`;
   }
@@ -114,15 +114,15 @@ window.SIG = (() => {
     const M = PL.frame(ctx, top, {xr:[0, 1], yr:[-1.3, 1.3], mode:'box', zeroLine:true, xlabel:'t (s)', title:`cos(2π·${f.toFixed(1)}t) sampled at ${fs.toFixed(1)} Hz`});
     PL.fn(ctx, M, t => Math.cos(TAUv*f*t), {color:'rgba(255,255,255,.5)', width:1.5});
     // what an ideal reconstruction from these samples gives: the alias inside ±fs/2
-    PL.fn(ctx, M, t => Math.cos(TAUv*fa*t), {color:'#41d9e8', width:2.2, dash: fa === f ? [] : [6, 4], alpha:.9});
+    PL.fn(ctx, M, t => Math.cos(TAUv*fa*t), {color:'#7CC6BE', width:2.2, dash: fa === f ? [] : [6, 4], alpha:.9});
     const pts = []; for (let n = 0; n/fs <= 1 + 1e-9; n++) pts.push([n/fs, Math.cos(TAUv*f*n/fs)]);
-    PL.stems(ctx, M, pts, {color:'#ff4fa3', width:1.6}); pts.forEach(([a, b]) => PL.dot(ctx, M, a, b, {color:'#ff4fa3', r:4}));
+    PL.stems(ctx, M, pts, {color:'#8AB4F0', width:1.6}); pts.forEach(([a, b]) => PL.dot(ctx, M, a, b, {color:'#8AB4F0', r:4}));
     const fmax = Math.max(2.2*fs, 1.3*f);
     const M2 = PL.frame(ctx, bot, {xr:[-fmax, fmax], yr:[0, 1.25], mode:'box', zeroLineX:true, xlabel:'f (Hz)', title:'Spectrum of the samples: copies every fs'});
-    ctx.save(); ctx.globalAlpha = .12; ctx.fillStyle = '#41d9e8'; ctx.fillRect(M2.X(-fs/2), bot.y, M2.X(fs/2) - M2.X(-fs/2), bot.h); ctx.restore();
+    ctx.save(); ctx.globalAlpha = .12; ctx.fillStyle = '#7CC6BE'; ctx.fillRect(M2.X(-fs/2), bot.y, M2.X(fs/2) - M2.X(-fs/2), bot.h); ctx.restore();
     const lines = []; for (let k = -6; k <= 6; k++){ [f, -f].forEach(q => { const v = q + k*fs; if (Math.abs(v) <= fmax) lines.push([v, k === 0 ? 1 : .7]); }); }
-    PL.stems(ctx, M2, lines.filter(l => l[1] < 1), {color:'rgba(255,79,163,.5)', width:2}); PL.stems(ctx, M2, lines.filter(l => l[1] === 1), {color:'#ff4fa3', width:3});
-    PL.label(ctx, M2.X(0), bot.y + 14, 'Nyquist band ±fs/2', {color:'#41d9e8', align:'center', size:11});
+    PL.stems(ctx, M2, lines.filter(l => l[1] < 1), {color:'rgba(138,180,240,.5)', width:2}); PL.stems(ctx, M2, lines.filter(l => l[1] === 1), {color:'#8AB4F0', width:3});
+    PL.label(ctx, M2.X(0), bot.y + 14, 'Nyquist band ±fs/2', {color:'#7CC6BE', align:'center', size:11});
     $('sgRead').innerHTML = `Nyquist rate 2f = ${MX.fmt(2*f, 4)} Hz<br>` + (fs > 2*f ? `fs > 2f: <b>no aliasing</b>, the samples rebuild ${MX.fmt(f, 4)} Hz` : `fs ≤ 2f: <b>aliasing</b>, the samples look like ${MX.fmt(fa, 4)} Hz`) + `<br><span class="c">blue: the frequency the samples actually describe</span>`;
   }
   let last = performance.now();
@@ -181,11 +181,11 @@ window.FORMULA_PAGE = (G) => {
         const ctx = G.ctx(), [b1, b2] = twoBoxes(S), ts = MX.linspace(-m.T, m.T, 1000), sc = 1/m.T;
         const M = PL.frame(ctx, b1, {xr:[-1, 1], yr:[-1.4*m.A, 1.4*m.A], mode:'box', zeroLine:true, zeroLineX:true, xlabel:'t / T'});
         PL.line(ctx, M, ts.map(t => [t*sc, m.w.f(t, m.T, m.A, m.d)]), {color:'rgba(255,255,255,.6)', width:1.8, alpha:S.vis('wave')});
-        PL.line(ctx, M, upto(ts.map(t => [t*sc, m.ps(t)]), S.vis('sum')), {color:'#ff4fa3', width:2.6, glow:8});
+        PL.line(ctx, M, upto(ts.map(t => [t*sc, m.ps(t)]), S.vis('sum')), {color:'#8AB4F0', width:2.6, glow:8});
         const amps = m.c.a.map((a, k) => k === 0 ? Math.abs(a) : Math.hypot(a, m.c.b[k]));
         const M2 = PL.frame(ctx, b2, {xr:[-.6, Math.max(8, m.N) + .6], yr:[0, Math.max(...amps, 1e-9)*1.2], mode:'box', xlabel:'harmonic n', ylabel:'cₙ', xstep:1});
         const vs = S.vis('spec'), shown = Math.round(vs*amps.length);
-        PL.stems(ctx, M2, amps.slice(0, shown).map((v, k) => [k, v]), {color:'#ffb84d', width:2.6});
+        PL.stems(ctx, M2, amps.slice(0, shown).map((v, k) => [k, v]), {color:'#E2B86F', width:2.6});
       } },
 
     { id:'conv', title:'Convolution y = x * h', desc:'Flip, shift, find the overlap and integrate', glyph:glyph('conv'),
@@ -217,13 +217,13 @@ window.FORMULA_PAGE = (G) => {
         const vf = S.vis('flip'), t = m.xr[0] + (m.t0 - m.xr[0])*G.ease(vf);
         const xv = ts.map(m.x), hv = ts.map(tt => m.h(m.t0 - tt)), ymax = Math.max(...xv.map(Math.abs), ...hv.map(Math.abs), 1e-9);
         const M = PL.frame(ctx, b1, {xr:m.xr, yr:[-.15*ymax, 1.25*ymax], mode:'box', zeroLine:true, xlabel:'τ'});
-        if (S.vis('overlap') > 0 && m.hi > m.lo){ ctx.save(); ctx.globalAlpha = .14*S.vis('overlap'); ctx.fillStyle = '#ffb84d'; ctx.fillRect(M.X(m.lo), b1.y, M.X(m.hi) - M.X(m.lo), b1.h); ctx.restore(); }
-        if (S.vis('area') > 0) PL.area(ctx, M, ts.map(tt => [tt, m.x(tt)*m.h(m.t0 - tt)]), {color:'#4fe3a6', alpha:.4*S.vis('area')});
-        PL.line(ctx, M, ts.map((tt, i) => [tt, xv[i]]), {color:'#ff4fa3', width:2.6, glow:6, alpha:S.vis('x')});
-        if (vf > 0){ PL.line(ctx, M, ts.map(tt => [tt, m.h(t - tt)]), {color:'#41d9e8', width:2.6, glow:6, alpha:vf}); PL.vline(ctx, M, t, {color:'rgba(255,255,255,.5)', alpha:vf}); PL.label(ctx, M.X(t) + 4, b1.y + 14, `τ = t`, {color:'#fff', size:11, alpha:vf}); }
-        PL.label(ctx, b1.x + 8, b1.y + 16, 'x(τ)', {color:'#ff4fa3', alpha:S.vis('x')}); PL.label(ctx, b1.x + 52, b1.y + 16, 'h(t − τ)', {color:'#41d9e8', alpha:vf});
+        if (S.vis('overlap') > 0 && m.hi > m.lo){ ctx.save(); ctx.globalAlpha = .14*S.vis('overlap'); ctx.fillStyle = '#E2B86F'; ctx.fillRect(M.X(m.lo), b1.y, M.X(m.hi) - M.X(m.lo), b1.h); ctx.restore(); }
+        if (S.vis('area') > 0) PL.area(ctx, M, ts.map(tt => [tt, m.x(tt)*m.h(m.t0 - tt)]), {color:'#8FC79A', alpha:.4*S.vis('area')});
+        PL.line(ctx, M, ts.map((tt, i) => [tt, xv[i]]), {color:'#8AB4F0', width:2.6, glow:6, alpha:S.vis('x')});
+        if (vf > 0){ PL.line(ctx, M, ts.map(tt => [tt, m.h(t - tt)]), {color:'#7CC6BE', width:2.6, glow:6, alpha:vf}); PL.vline(ctx, M, t, {color:'rgba(255,255,255,.5)', alpha:vf}); PL.label(ctx, M.X(t) + 4, b1.y + 14, `τ = t`, {color:'#fff', size:11, alpha:vf}); }
+        PL.label(ctx, b1.x + 8, b1.y + 16, 'x(τ)', {color:'#8AB4F0', alpha:S.vis('x')}); PL.label(ctx, b1.x + 52, b1.y + 16, 'h(t − τ)', {color:'#7CC6BE', alpha:vf});
         const yv = ts.map(m.yt), M2 = PL.frame(ctx, b2, {xr:m.xr, yr:PL.range(yv.concat([0]), .15), mode:'box', zeroLine:true, xlabel:'t', ylabel:'y(t)'});
-        PL.line(ctx, M2, upto(ts.map((tt, i) => [tt, yv[i]]), S.vis('yall')), {color:'#ffb84d', width:2.6, glow:8});
+        PL.line(ctx, M2, upto(ts.map((tt, i) => [tt, yv[i]]), S.vis('yall')), {color:'#E2B86F', width:2.6, glow:8});
         PL.dot(ctx, M2, m.t0, m.y, {color:'#fff', r:6, alpha:S.vis('area'), label:n4(m.y, 4)});
       } },
 
@@ -249,14 +249,14 @@ window.FORMULA_PAGE = (G) => {
         PL.fn(ctx, M, t => Math.cos(TAU*m.f*t/sc), {color:'rgba(255,255,255,.55)', width:1.6, alpha:S.vis('sig')});
         const pts = []; for (let n = 0; n/m.fs <= Tw*(1 + 1e-9); n++) pts.push([n/m.fs*sc, Math.cos(TAU*m.f*n/m.fs)]);
         const vs = S.vis('samples'), k = Math.round(vs*pts.length);
-        PL.stems(ctx, M, pts.slice(0, k), {color:'#ff4fa3', width:1.6}); pts.slice(0, k).forEach(([a, b]) => PL.dot(ctx, M, a, b, {color:'#ff4fa3', r:4}));
-        if (S.vis('alias') > 0) PL.fn(ctx, M, t => Math.cos(TAU*m.fa*t/sc), {color:'#41d9e8', width:2.4, glow:6, alpha:S.vis('alias'), dash: m.aliased ? [] : [6, 4]});
+        PL.stems(ctx, M, pts.slice(0, k), {color:'#8AB4F0', width:1.6}); pts.slice(0, k).forEach(([a, b]) => PL.dot(ctx, M, a, b, {color:'#8AB4F0', r:4}));
+        if (S.vis('alias') > 0) PL.fn(ctx, M, t => Math.cos(TAU*m.fa*t/sc), {color:'#7CC6BE', width:2.4, glow:6, alpha:S.vis('alias'), dash: m.aliased ? [] : [6, 4]});
         const fmax = Math.max(2.2*m.fs, 1.3*m.f), fsc = fmax >= 1e3 ? 1e3 : 1, fun = fsc === 1e3 ? 'kHz' : 'Hz';
         const M2 = PL.frame(ctx, b2, {xr:[-fmax/fsc, fmax/fsc], yr:[0, 1.25], mode:'box', zeroLineX:true, xlabel:`f (${fun})`});
-        ctx.save(); ctx.globalAlpha = .12; ctx.fillStyle = '#41d9e8'; ctx.fillRect(M2.X(-m.fs/2/fsc), b2.y, M2.X(m.fs/2/fsc) - M2.X(-m.fs/2/fsc), b2.h); ctx.restore();
+        ctx.save(); ctx.globalAlpha = .12; ctx.fillStyle = '#7CC6BE'; ctx.fillRect(M2.X(-m.fs/2/fsc), b2.y, M2.X(m.fs/2/fsc) - M2.X(-m.fs/2/fsc), b2.h); ctx.restore();
         const vsp = S.vis('spec'); const lines = []; for (let kk = -8; kk <= 8; kk++) [m.f, -m.f].forEach(q => { const v = q + kk*m.fs; if (Math.abs(v) <= fmax) lines.push([v/fsc, kk === 0 ? 1 : .7]); });
-        PL.stems(ctx, M2, lines.filter(l => l[1] === 1), {color:'#ff4fa3', width:3});
-        if (vsp > 0){ PL.stems(ctx, M2, lines.filter(l => l[1] < 1), {color:'rgba(255,79,163,.55)', width:2, alpha:vsp}); PL.dot(ctx, M2, m.fa/fsc, .7, {color:'#41d9e8', r:6, alpha:vsp, label:MX.si(m.fa, 'Hz', 3)}); PL.dot(ctx, M2, -m.fa/fsc, .7, {color:'#41d9e8', r:6, alpha:vsp}); }
+        PL.stems(ctx, M2, lines.filter(l => l[1] === 1), {color:'#8AB4F0', width:3});
+        if (vsp > 0){ PL.stems(ctx, M2, lines.filter(l => l[1] < 1), {color:'rgba(138,180,240,.55)', width:2, alpha:vsp}); PL.dot(ctx, M2, m.fa/fsc, .7, {color:'#7CC6BE', r:6, alpha:vsp, label:MX.si(m.fa, 'Hz', 3)}); PL.dot(ctx, M2, -m.fa/fsc, .7, {color:'#7CC6BE', r:6, alpha:vsp}); }
       } },
 
     { id:'dft', title:'DFT of a short sequence', desc:'X[k] term by term, magnitude and phase', glyph:glyph('dft'),
@@ -284,12 +284,12 @@ window.FORMULA_PAGE = (G) => {
         const ctx = G.ctx(), x = 64, w = S.W - 90, h = (S.H - 150)/3, b = [0, 1, 2].map(i => ({x, y:30 + i*(h + 46), w, h}));
         const xn = Array.from({length:m.N}, (_, n) => [n, n < m.x.length ? m.x[n] : 0]);
         const M1 = PL.frame(ctx, b[0], {xr:[-.7, m.N - .3], yr:PL.range(xn.map(p => p[1]).concat([0]), .2), mode:'box', zeroLine:true, ylabel:'x[n]', xlabel:'n', xstep:1});
-        PL.stems(ctx, M1, xn, {color:'#ff4fa3', width:2.4, alpha:S.vis('x')}); xn.forEach(([a, v]) => PL.dot(ctx, M1, a, v, {color:a < m.x.length ? '#ff4fa3' : 'rgba(255,79,163,.4)', r:4, alpha:S.vis('x')}));
+        PL.stems(ctx, M1, xn, {color:'#8AB4F0', width:2.4, alpha:S.vis('x')}); xn.forEach(([a, v]) => PL.dot(ctx, M1, a, v, {color:a < m.x.length ? '#8AB4F0' : 'rgba(138,180,240,.4)', r:4, alpha:S.vis('x')}));
         const M2 = PL.frame(ctx, b[1], {xr:[-.7, m.N - .3], yr:[0, Math.max(...m.mag, 1e-9)*1.2], mode:'box', ylabel:'|X[k]|', xlabel:'k', xstep:1});
         const k0 = S.vis('X0') > 0 ? 1 : 0, kk = Math.max(k0, Math.round(S.vis('mag')*m.N));
-        PL.stems(ctx, M2, m.mag.slice(0, kk).map((v, k) => [k, v]), {color:'#ffb84d', width:2.6}); m.mag.slice(0, kk).forEach((v, k) => PL.dot(ctx, M2, k, v, {color:'#ffb84d', r:4, label: m.N <= 16 ? n4(v, 3) : ''}));
+        PL.stems(ctx, M2, m.mag.slice(0, kk).map((v, k) => [k, v]), {color:'#E2B86F', width:2.6}); m.mag.slice(0, kk).forEach((v, k) => PL.dot(ctx, M2, k, v, {color:'#E2B86F', r:4, label: m.N <= 16 ? n4(v, 3) : ''}));
         const M3 = PL.frame(ctx, b[2], {xr:[-.7, m.N - .3], yr:[-200, 200], mode:'box', zeroLine:true, ylabel:'∠X[k] (°)', xlabel:'k', xstep:1});
-        const vp = S.vis('ph'); PL.stems(ctx, M3, m.ph.map((v, k) => [k, v]), {color:'#41d9e8', width:2.4, alpha:vp}); m.ph.forEach((v, k) => PL.dot(ctx, M3, k, v, {color:'#41d9e8', r:4, alpha:vp}));
+        const vp = S.vis('ph'); PL.stems(ctx, M3, m.ph.map((v, k) => [k, v]), {color:'#7CC6BE', width:2.4, alpha:vp}); m.ph.forEach((v, k) => PL.dot(ctx, M3, k, v, {color:'#7CC6BE', r:4, alpha:vp}));
       } }
   ];
   const sigOpts = [['rect', 'Rectangular pulse'], ['exp', 'Decaying exponential'], ['step', 'Step'], ['tri', 'Triangle pulse']];

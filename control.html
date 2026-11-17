@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control systems — Engineering simulators</title>
 <meta name="description" content="Type G(s) and drag K to see the step response, root locus, Bode and Nyquist plots, plus step-by-step second-order specs, Routh–Hurwitz, steady-state error, margins and root-locus rules.">
-<meta name="theme-color" content="#150f36">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237047ff'/%3E%3Cstop offset='.55' stop-color='%23ff4fa3'/%3E%3Cstop offset='1' stop-color='%23ffb84d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#12171D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23E2B86F'/%3E%3Cstop offset='.55' stop-color='%238AB4F0'/%3E%3Cstop offset='1' stop-color='%238AB4F0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
-<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7047ff"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ffb84d"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a><a href="graph.html">Graphing</a><a href="circuits.html">Circuits</a><a href="signals.html">Signals</a><a href="control.html" aria-current="page">Control</a></div><script>(function(){var a=document.querySelector(".navlinks [aria-current]");if(a){var p=a.parentNode;if(p.scrollWidth>p.clientWidth)p.scrollLeft=a.offsetLeft-p.offsetLeft-p.clientWidth/2+a.offsetWidth/2;}})();</script></nav>
+<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E2B86F"/><stop offset=".55" stop-color="#8AB4F0"/><stop offset="1" stop-color="#E2B86F"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a><a href="graph.html">Graphing</a><a href="circuits.html">Circuits</a><a href="signals.html">Signals</a><a href="control.html" aria-current="page">Control</a></div><script>(function(){var a=document.querySelector(".navlinks [aria-current]");if(a){var p=a.parentNode;if(p.scrollWidth>p.clientWidth)p.scrollLeft=a.offsetLeft-p.offsetLeft-p.clientWidth/2+a.offsetWidth/2;}})();</script></nav>
 <header class="hero">
   <div>
     <h1 class="rise">Control systems from G(s) to stability</h1>
@@ -32,7 +32,7 @@
   <div class="play-grid">
     <div class="play-side">
       <label class="ctl"><span>Open-loop G(s)</span><input id="ctG" class="wide" spellcheck="false" autocapitalize="off" style="width:100%"></label>
-      <span class="hint2" id="ctErr" role="alert" style="color:#ff8fb8"></span>
+      <span class="hint2" id="ctErr" role="alert" style="color:var(--alarm)"></span>
       <label class="ctl"><span>Gain K</span><span class="row"><input type="range" id="ctK"><output id="ctKo"></output></span></label>
       <h3>Show</h3>
       <div class="seg2" id="ctView"><button type="button" data-v="all">All four</button><button type="button" data-v="step">Step</button><button type="button" data-v="locus">Root locus</button><button type="button" data-v="bode">Bode</button><button type="button" data-v="nyquist">Nyquist</button></div>

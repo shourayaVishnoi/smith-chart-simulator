@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Engineering simulators — graphing, circuits, signals, control and EMTI</title>
 <meta name="description" content="Animated, step-by-step engineering simulators: a graphing calculator, circuits, signals and systems, control systems, and EMTI (Smith chart, interfaces, lossy media, filled lines).">
-<meta name="theme-color" content="#150f36">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237047ff'/%3E%3Cstop offset='.55' stop-color='%23ff4fa3'/%3E%3Cstop offset='1' stop-color='%23ffb84d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#12171D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23E2B86F'/%3E%3Cstop offset='.55' stop-color='%238AB4F0'/%3E%3Cstop offset='1' stop-color='%238AB4F0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
@@ -19,7 +19,7 @@
     function go(){ var h = location.hash.slice(1); if (old.indexOf(h) >= 0) location.replace('lossless.html#' + h); }
     go(); window.addEventListener('hashchange', go); })();
 </script>
-<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7047ff"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ffb84d"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a><a href="graph.html">Graphing</a><a href="circuits.html">Circuits</a><a href="signals.html">Signals</a><a href="control.html">Control</a></div><script>(function(){var a=document.querySelector(".navlinks [aria-current]");if(a){var p=a.parentNode;if(p.scrollWidth>p.clientWidth)p.scrollLeft=a.offsetLeft-p.offsetLeft-p.clientWidth/2+a.offsetWidth/2;}})();</script></nav>
+<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E2B86F"/><stop offset=".55" stop-color="#8AB4F0"/><stop offset="1" stop-color="#E2B86F"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a><a href="graph.html">Graphing</a><a href="circuits.html">Circuits</a><a href="signals.html">Signals</a><a href="control.html">Control</a></div><script>(function(){var a=document.querySelector(".navlinks [aria-current]");if(a){var p=a.parentNode;if(p.scrollWidth>p.clientWidth)p.scrollLeft=a.offsetLeft-p.offsetLeft-p.clientWidth/2+a.offsetWidth/2;}})();</script></nav>
 <header class="home-hero">
   <h1 class="rise">Engineering problems, solved step by step</h1>
   <p class="rise d1">Play with a live graph or circuit, then pick a question type and watch it solved with animated drawings, the working, and every number checked.</p>
@@ -110,7 +110,7 @@
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, TAU = Math.PI*2, items = [];
   document.querySelectorAll('canvas[data-preview]').forEach(function(cv){ items.push({cv:cv, ctx:cv.getContext('2d'), kind:cv.dataset.preview, w:0, h:0}); });
   function size(it){ var r = it.cv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1); it.w = r.width; it.h = r.height; it.cv.width = Math.round(r.width*d); it.cv.height = Math.round(r.height*d); it.ctx.setTransform(d, 0, 0, d, 0, 0); }
-  function wave(c, x0, x1, y, amp, lam, ph, color, decay, glow){ c.beginPath(); for (var x = x0; x <= x1; x += 2){ var e = decay ? Math.exp(-decay*(x - x0)) : 1, yy = y - amp*e*Math.cos(ph - TAU*(x - x0)/lam); x === x0 ? c.moveTo(x, yy) : c.lineTo(x, yy); } c.strokeStyle = color; c.lineWidth = 2.2; c.shadowBlur = glow || 0; c.shadowColor = color; c.stroke(); c.shadowBlur = 0; }
+  function wave(c, x0, x1, y, amp, lam, ph, color, decay, glow){ c.beginPath(); for (var x = x0; x <= x1; x += 2){ var e = decay ? Math.exp(-decay*(x - x0)) : 1, yy = y - amp*e*Math.cos(ph - TAU*(x - x0)/lam); x === x0 ? c.moveTo(x, yy) : c.lineTo(x, yy); } c.strokeStyle = color; c.lineWidth = 2.2; c.shadowBlur = 0; c.shadowColor = color; c.stroke(); c.shadowBlur = 0; }
   function draw(it, t){
     var c = it.ctx, W = it.w, H = it.h, ph = t*TAU*0.35; if (!W) return; c.clearRect(0, 0, W, H);
     if (it.kind === 'smith'){
@@ -120,17 +120,17 @@
       c.strokeStyle = 'rgba(255,255,255,.12)'; [0.33, 1, 3].forEach(function(r){ c.beginPath(); c.arc(cx + R*r/(1 + r), cy, R/(1 + r), 0, TAU); c.stroke(); });
       [0.5, 1, 2].forEach(function(x){ [1, -1].forEach(function(s){ c.beginPath(); c.arc(cx + R, cy - s*R/x, R/x, s > 0 ? Math.PI/2 : -Math.PI/2, Math.PI, s > 0); c.stroke(); }); });
       c.beginPath(); c.moveTo(cx - R, cy); c.lineTo(cx + R, cy); c.stroke(); c.restore();
-      var g = 0.55, a = -ph*0.5; c.strokeStyle = '#ffb84d'; c.lineWidth = 2.4; c.beginPath(); c.arc(cx, cy, R*g, 0, TAU); c.stroke();
-      c.strokeStyle = '#ff4fa3'; c.lineWidth = 3; c.beginPath(); c.arc(cx, cy, R*g, -0.6, -a, a > 0.6); c.stroke();
+      var g = 0.55, a = -ph*0.5; c.strokeStyle = '#E2B86F'; c.lineWidth = 2.4; c.beginPath(); c.arc(cx, cy, R*g, 0, TAU); c.stroke();
+      c.strokeStyle = '#8AB4F0'; c.lineWidth = 3; c.beginPath(); c.arc(cx, cy, R*g, -0.6, -a, a > 0.6); c.stroke();
       c.fillStyle = '#fff'; c.beginPath(); c.arc(cx + R*g*Math.cos(a), cy + R*g*Math.sin(a), 5, 0, TAU); c.fill();
     } else if (it.kind === 'interface'){
-      var bx = W*0.62; c.fillStyle = 'rgba(65,217,232,.12)'; c.fillRect(bx, 0, W - bx, H); c.strokeStyle = 'rgba(65,217,232,.6)'; c.beginPath(); c.moveTo(bx, 8); c.lineTo(bx, H - 8); c.stroke();
+      var bx = W*0.62; c.fillStyle = 'rgba(124,198,190,.12)'; c.fillRect(bx, 0, W - bx, H); c.strokeStyle = 'rgba(124,198,190,.6)'; c.beginPath(); c.moveTo(bx, 8); c.lineTo(bx, H - 8); c.stroke();
       var G = -0.33, pts = []; c.beginPath();
       for (var x = 12; x <= bx; x += 2){ var d = (bx - x)/90, v = Math.cos(ph + TAU*d) + G*Math.cos(ph - TAU*d); var yy = H/2 - 28*v; x === 12 ? c.moveTo(x, yy) : c.lineTo(x, yy); }
-      c.strokeStyle = '#fff'; c.lineWidth = 2.2; c.shadowBlur = 10; c.shadowColor = '#fff'; c.stroke(); c.shadowBlur = 0;
+      c.strokeStyle = '#fff'; c.lineWidth = 2.2; c.shadowBlur = 0; c.shadowColor = '#fff'; c.stroke(); c.shadowBlur = 0;
       c.beginPath(); for (var x2 = bx; x2 <= W - 12; x2 += 2){ var d2 = (bx - x2)/45, yy2 = H/2 - 28*(1 + G)*Math.cos(ph + TAU*d2); x2 === bx ? c.moveTo(x2, yy2) : c.lineTo(x2, yy2); } c.stroke();
     } else if (it.kind === 'lossy'){
-      var x0 = 14, x1 = W - 14, k = 3.2/(x1 - x0); c.strokeStyle = 'rgba(255,79,163,.9)'; c.lineWidth = 1.6;
+      var x0 = 14, x1 = W - 14, k = 3.2/(x1 - x0); c.strokeStyle = 'rgba(138,180,240,.9)'; c.lineWidth = 1.6;
       [1, -1].forEach(function(s){ c.beginPath(); for (var x = x0; x <= x1; x += 3){ var yy = H/2 - s*H*0.36*Math.exp(-k*(x - x0)); x === x0 ? c.moveTo(x, yy) : c.lineTo(x, yy); } c.stroke(); });
       wave(c, x0, x1, H/2, H*0.36, 70, ph, '#ffffff', k, 10);
     } else if (it.kind === 'graph'){
@@ -139,28 +139,28 @@
       for (var gy = oy % u; gy < H; gy += u){ c.beginPath(); c.moveTo(0, gy); c.lineTo(W, gy); c.stroke(); }
       c.strokeStyle = 'rgba(255,255,255,.4)'; c.beginPath(); c.moveTo(0, oy); c.lineTo(W, oy); c.moveTo(ox, 0); c.lineTo(ox, H); c.stroke();
       var A = 1.6 + 0.8*Math.sin(ph*0.6);
-      function plot(f, col){ c.beginPath(); for (var px = 0; px <= W; px += 2){ var y = oy - u*f((px - ox)/u); px === 0 ? c.moveTo(px, y) : c.lineTo(px, y); } c.strokeStyle = col; c.lineWidth = 2.2; c.shadowBlur = 8; c.shadowColor = col; c.stroke(); c.shadowBlur = 0; }
-      plot(function(x){ return A*Math.sin(x); }, '#ff4fa3'); plot(function(x){ return 0.25*x*x - 2; }, '#41d9e8');
-      c.beginPath(); c.arc(ox, oy, 2.4*u, 0, TAU); c.strokeStyle = '#ffb84d'; c.lineWidth = 2.2; c.stroke();
+      function plot(f, col){ c.beginPath(); for (var px = 0; px <= W; px += 2){ var y = oy - u*f((px - ox)/u); px === 0 ? c.moveTo(px, y) : c.lineTo(px, y); } c.strokeStyle = col; c.lineWidth = 2.2; c.shadowBlur = 0; c.shadowColor = col; c.stroke(); c.shadowBlur = 0; }
+      plot(function(x){ return A*Math.sin(x); }, '#8AB4F0'); plot(function(x){ return 0.25*x*x - 2; }, '#7CC6BE');
+      c.beginPath(); c.arc(ox, oy, 2.4*u, 0, TAU); c.strokeStyle = '#E2B86F'; c.lineWidth = 2.2; c.stroke();
       var tx = 3.2*Math.sin(ph*0.4); c.fillStyle = '#fff'; c.beginPath(); c.arc(ox + tx*u, oy - u*A*Math.sin(tx), 4.5, 0, TAU); c.fill();
     } else if (it.kind === 'circuit'){
       var x0c = 16, x1c = W - 16, yb = H - 22, yt = 26, fin = yb - (yb - yt)*0.62, prog = reduce ? 1 : (ph/TAU*0.5) % 1;
       c.strokeStyle = 'rgba(255,255,255,.3)'; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(x0c, fin); c.lineTo(x1c, fin); c.stroke(); c.setLineDash([]);
       c.beginPath(); var last = null;
       for (var xc = x0c; xc <= x0c + (x1c - x0c)*prog; xc += 2){ var tt = (xc - x0c)/(x1c - x0c)*14, v = 1 - Math.exp(-0.32*tt)*(Math.cos(2*tt) + 0.16*Math.sin(2*tt)), yc = yb - (fin < yb ? (yb - fin) : 0)*v; xc === x0c ? c.moveTo(xc, yc) : c.lineTo(xc, yc); last = [xc, yc]; }
-      c.strokeStyle = '#ff4fa3'; c.lineWidth = 2.4; c.shadowBlur = 10; c.shadowColor = '#ff4fa3'; c.stroke(); c.shadowBlur = 0;
+      c.strokeStyle = '#8AB4F0'; c.lineWidth = 2.4; c.shadowBlur = 0; c.shadowColor = '#8AB4F0'; c.stroke(); c.shadowBlur = 0;
       if (last){ c.fillStyle = '#fff'; c.beginPath(); c.arc(last[0], last[1], 4.5, 0, TAU); c.fill(); }
     } else if (it.kind === 'signals'){
       var N = 1 + 2*Math.floor((reduce ? 3 : (ph/TAU*1.2) % 8)), mid = H/2, amp = H*0.3, per = W/2.2;
       c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1.5; c.beginPath();
       for (var xs = 10; xs <= W - 10; xs += 1){ var u2 = (((xs - 10)/per) % 1 + 1) % 1, ys = mid - amp*(u2 < .5 ? 1 : -1)*0.8; xs === 10 ? c.moveTo(xs, ys) : c.lineTo(xs, ys); } c.stroke();
       c.beginPath(); for (var xq = 10; xq <= W - 10; xq += 1.5){ var th = TAU*(xq - 10)/per, sum = 0; for (var n = 1; n <= N; n += 2) sum += Math.sin(n*th)/n; var yq = mid - amp*0.8*4/Math.PI*sum; xq === 10 ? c.moveTo(xq, yq) : c.lineTo(xq, yq); }
-      c.strokeStyle = '#41d9e8'; c.lineWidth = 2.2; c.shadowBlur = 8; c.shadowColor = '#41d9e8'; c.stroke(); c.shadowBlur = 0;
-      c.fillStyle = '#ffd29a'; c.font = '600 12px Bricolage Grotesque, system-ui, sans-serif'; c.fillText(N + (N > 1 ? ' harmonics' : ' harmonic'), 14, 18);
+      c.strokeStyle = '#7CC6BE'; c.lineWidth = 2.2; c.shadowBlur = 0; c.shadowColor = '#7CC6BE'; c.stroke(); c.shadowBlur = 0;
+      c.fillStyle = '#EBD3A2'; c.font = '600 12px IBM Plex Sans, system-ui, sans-serif'; c.fillText(N + (N > 1 ? ' harmonics' : ' harmonic'), 14, 18);
     } else if (it.kind === 'control'){
       var cxl = W*0.66, cyl = H/2, sc = H/6.5;
       c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(10, cyl); c.lineTo(W - 10, cyl); c.moveTo(cxl, 8); c.lineTo(cxl, H - 8); c.stroke();
-      c.fillStyle = 'rgba(255,79,106,.07)'; c.fillRect(cxl, 0, W - cxl, H);
+      c.fillStyle = 'rgba(224,122,110,.07)'; c.fillRect(cxl, 0, W - cxl, H);
       // locus of 1/(s(s+1)(s+5)): sample K and draw the three branches
       function cub(K){ var a = 6, b = 5, d = K, r = [], z = [[-0.1, 0.3], [-1.2, -0.2], [-5.1, 0.1]]; for (var it2 = 0; it2 < 60; it2++){ z = z.map(function(zi, i){ var p = [1, 0]; var f = [zi[0], zi[1]];
           // f(z) = z^3 + a z^2 + b z + d
@@ -169,11 +169,11 @@
           var den = p[0]*p[0] + p[1]*p[1], q = [(fv[0]*p[0] + fv[1]*p[1])/den, (fv[1]*p[0] - fv[0]*p[1])/den]; return [zi[0] - q[0], zi[1] - q[1]]; }); } return z; }
       var Ks = []; for (var kk = -2; kk <= 2.2; kk += 0.05) Ks.push(Math.pow(10, kk));
       var br = [[], [], []]; Ks.forEach(function(K){ var rs = cub(K).sort(function(p, q){ return p[1] - q[1]; }); rs.forEach(function(r, i){ br[i].push(r); }); });
-      c.strokeStyle = '#41d9e8'; c.lineWidth = 2; br.forEach(function(b){ c.beginPath(); b.forEach(function(r, i){ var X = cxl + r[0]*sc, Y = cyl - r[1]*sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.stroke(); });
-      var Kn = Math.pow(10, -1 + 2.4*(0.5 + 0.5*Math.sin(ph*0.5))); cub(Kn).forEach(function(r){ c.fillStyle = '#ff4fa3'; c.beginPath(); c.arc(cxl + r[0]*sc, cyl - r[1]*sc, 5, 0, TAU); c.fill(); });
+      c.strokeStyle = '#7CC6BE'; c.lineWidth = 2; br.forEach(function(b){ c.beginPath(); b.forEach(function(r, i){ var X = cxl + r[0]*sc, Y = cyl - r[1]*sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.stroke(); });
+      var Kn = Math.pow(10, -1 + 2.4*(0.5 + 0.5*Math.sin(ph*0.5))); cub(Kn).forEach(function(r){ c.fillStyle = '#8AB4F0'; c.beginPath(); c.arc(cxl + r[0]*sc, cyl - r[1]*sc, 5, 0, TAU); c.fill(); });
       [[0, 0], [-1, 0], [-5, 0]].forEach(function(p2){ var X = cxl + p2[0]*sc, Y = cyl; c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.moveTo(X - 4, Y - 4); c.lineTo(X + 4, Y + 4); c.moveTo(X - 4, Y + 4); c.lineTo(X + 4, Y - 4); c.stroke(); });
     } else {
-      wave(c, 14, W - 14, H*0.3, H*0.15, 110, ph, '#41d9e8', 0, 8);
+      wave(c, 14, W - 14, H*0.3, H*0.15, 110, ph, '#7CC6BE', 0, 8);
       wave(c, 14, W - 14, H*0.72, H*0.15, 73, ph, '#ffffff', 0, 10);
     }
   }

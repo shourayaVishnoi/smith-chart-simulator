@@ -42,7 +42,7 @@ window.FORMULA_PAGE = (G) => {
     if (ve > 0){
       const top1 = [], bot = [];
       for (let i = 0; i <= 240; i++){ const z = zmax*i/240; top1.push([X(z), yc - amp*envNow(z)]); bot.push([X(z), yc + amp*envNow(z)]); }
-      G.fillPath(top1.concat(bot.slice().reverse()), 'rgba(255,79,163,.12)', {a:ve});
+      G.fillPath(top1.concat(bot.slice().reverse()), 'rgba(138,180,240,.12)', {a:ve});
       G.path(top1, C.pink, 1.8, {glow:8, a:ve}); G.path(bot, C.pink, 1.8, {glow:8, a:ve});
       G.text(`e^(−αz), α = ${num(m.alpha, 3)} Np/m`, X(zmax*0.02) + 4, yc - amp - 10, {color:C.pink, size:12.5, a:ve, halo:true});
     }
@@ -79,13 +79,13 @@ window.FORMULA_PAGE = (G) => {
     const vg = vis('gauge');
     if (vg > 0){
       const gx0 = 24, gx1 = W - 170, gy = 46, lx = v => gx0 + ((clamp(Math.log10(v), -4, 4) + 4)/8)*(gx1 - gx0);
-      G.roundRect(gx0, gy - 6, lx(0.1) - gx0, 12, 6, 'rgba(65,217,232,.55)', {a:vg});
-      G.roundRect(lx(0.1), gy - 6, lx(10) - lx(0.1), 12, 0, 'rgba(155,123,255,.6)', {a:vg});
-      G.roundRect(lx(10), gy - 6, gx1 - lx(10), 12, 6, 'rgba(255,184,77,.6)', {a:vg});
+      G.roundRect(gx0, gy - 6, lx(0.1) - gx0, 12, 6, 'rgba(124,198,190,.55)', {a:vg});
+      G.roundRect(lx(0.1), gy - 6, lx(10) - lx(0.1), 12, 0, 'rgba(182,162,222,.6)', {a:vg});
+      G.roundRect(lx(10), gy - 6, gx1 - lx(10), 12, 6, 'rgba(226,184,111,.6)', {a:vg});
       [1e-4, 1e-2, 1, 1e2, 1e4].forEach(v => G.text(num(v, 1), lx(v), gy + 22, {align:'center', color:C.muted, size:10.5, a:vg}));
       const px = lx(m.lt);
-      if (px > gx0 + 250) G.text('low-loss dielectric', gx0 + 4, gy - 12, {color:'#9fe9f2', size:11.5, a:vg});
-      if (px < gx1 - 230) G.text('good conductor', gx1 - 4, gy - 12, {align:'right', color:'#ffd29a', size:11.5, a:vg}); ctx.save(); ctx.globalAlpha = vg; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(px, gy + 8); ctx.lineTo(px - 7, gy + 20); ctx.lineTo(px + 7, gy + 20); ctx.closePath(); ctx.fill(); ctx.restore();
+      if (px > gx0 + 250) G.text('low-loss dielectric', gx0 + 4, gy - 12, {color:'#A9D2CE', size:11.5, a:vg});
+      if (px < gx1 - 230) G.text('good conductor', gx1 - 4, gy - 12, {align:'right', color:'#EBD3A2', size:11.5, a:vg}); ctx.save(); ctx.globalAlpha = vg; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(px, gy + 8); ctx.lineTo(px - 7, gy + 20); ctx.lineTo(px + 7, gy + 20); ctx.closePath(); ctx.fill(); ctx.restore();
       G.text(`σ/ωε = ${num(m.lt, 3)}`, px, gy - 12, {align:'center', color:'#fff', size:12.5, weight:700, a:vg, halo:true});
     }
     // phasors: E and H, with H lagging by θη

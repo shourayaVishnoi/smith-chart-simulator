@@ -189,8 +189,8 @@ window.CTL = (() => {
     const [ts, tu] = d.T >= 1 ? [1, 's'] : d.T >= 1e-3 ? [1e3, 'ms'] : [1e6, 'µs'];
     const M = PL.frame(ctx, b, {xr:[0, d.T*ts], yr:lim, mode:'box', zeroLine:true, xlabel:`t (${tu})`, title:'Closed-loop step response'});
     if (d.stable) PL.hline(ctx, M, d.info.final, {color:'rgba(255,255,255,.35)'});
-    PL.line(ctx, M, d.r.t.map((t, i) => [t*ts, d.r.y[i]]), {color:'#ff4fa3', width:2.6, glow:8});
-    if (d.stable && d.info.Mp > 1e-4) PL.dot(ctx, M, d.info.tp*ts, d.info.peak, {color:'#ffb84d', r:5, label:`+${MX.fmt(100*d.info.Mp, 3)}%`});
+    PL.line(ctx, M, d.r.t.map((t, i) => [t*ts, d.r.y[i]]), {color:'#8AB4F0', width:2.6, glow:8});
+    if (d.stable && d.info.Mp > 1e-4) PL.dot(ctx, M, d.info.tp*ts, d.info.peak, {color:'#E2B86F', r:5, label:`+${MX.fmt(100*d.info.Mp, 3)}%`});
   }
   function splaneBox(d, b){
     const pts = d.ps.concat(d.zs, d.poles), R0 = Math.max(1, ...pts.map(p => Math.hypot(p[0], p[1]))); d.br.forEach(br => br.forEach(r => { if (Math.hypot(r[0], r[1]) < 2*R0) pts.push(r); }));
@@ -201,11 +201,11 @@ window.CTL = (() => {
   }
   function drawLocus(d, b){
     const v = splaneBox(d, b), M = PL.frame(ctx, b, {xr:v.xr, yr:v.yr, mode:'box', zeroLine:true, zeroLineX:true, xlabel:'σ', ylabel:'jω', title:'Root locus'});
-    ctx.save(); ctx.globalAlpha = .07; ctx.fillStyle = '#ff4f6a'; const x0 = M.X(0); ctx.fillRect(Math.max(x0, b.x), b.y, b.x + b.w - Math.max(x0, b.x), b.h); ctx.restore();
-    d.br.forEach(br => PL.line(ctx, M, br, {color:'#41d9e8', width:2, alpha:.85}));
+    ctx.save(); ctx.globalAlpha = .07; ctx.fillStyle = '#E07A6E'; const x0 = M.X(0); ctx.fillRect(Math.max(x0, b.x), b.y, b.x + b.w - Math.max(x0, b.x), b.h); ctx.restore();
+    d.br.forEach(br => PL.line(ctx, M, br, {color:'#7CC6BE', width:2, alpha:.85}));
     d.ps.forEach(p => PL.cross(ctx, M, p[0], p[1], {color:'#fff', r:5}));
     d.zs.forEach(z => PL.dot(ctx, M, z[0], z[1], {color:'#fff', r:5, hollow:true}));
-    d.poles.forEach(p => PL.dot(ctx, M, p[0], p[1], {color:'#ff4fa3', r:5.5}));
+    d.poles.forEach(p => PL.dot(ctx, M, p[0], p[1], {color:'#8AB4F0', r:5.5}));
   }
   function drawBode(d, b){
     const G = d.G, [w0, w1] = CT.wrange(G.n, G.d), ws = MX.logspace(Math.log10(w0), Math.log10(w1), 600), ph = d.mg.ph;
@@ -213,26 +213,26 @@ window.CTL = (() => {
     const h = (b.h - 34)/2, b1 = {x:b.x, y:b.y, w:b.w, h}, b2 = {x:b.x, y:b.y + h + 34, w:b.w, h};
     const fm = mag.filter(isFinite), M1 = PL.frame(ctx, b1, {xr:[w0, w1], yr:[Math.max(-150, Math.floor(Math.min(...fm)/20)*20), Math.min(150, Math.ceil(Math.max(...fm, 5)/20)*20)], xlog:true, mode:'box', ylabel:'dB', title:'Bode (open loop K·G)'});
     PL.hline(ctx, M1, 0, {color:'rgba(255,255,255,.35)'});
-    PL.line(ctx, M1, ws.map((w, i) => [w, mag[i]]), {color:'#ff4fa3', width:2.4, glow:6});
+    PL.line(ctx, M1, ws.map((w, i) => [w, mag[i]]), {color:'#8AB4F0', width:2.4, glow:6});
     const pr = PL.range(phs.concat([-180]), .08), M2 = PL.frame(ctx, b2, {xr:[w0, w1], yr:pr, xlog:true, mode:'box', ylabel:'deg', xlabel:'ω (rad/s)'});
     PL.hline(ctx, M2, -180, {color:'rgba(255,255,255,.35)'});
-    PL.line(ctx, M2, ws.map((w, i) => [w, phs[i]]), {color:'#41d9e8', width:2.4, glow:6});
-    if (d.mg.pm){ PL.vline(ctx, M1, d.mg.pm.w, {color:'rgba(255,184,77,.7)'}); PL.vline(ctx, M2, d.mg.pm.w, {color:'rgba(255,184,77,.7)'}); PL.label(ctx, M2.X(d.mg.pm.w) + 4, M2.Y(ph(d.mg.pm.w)) - 6, `PM ${MX.fmt(d.mg.pm.pm, 3)}°`, {color:'#ffb84d', size:11}); }
-    if (d.mg.gm){ PL.vline(ctx, M1, d.mg.gm.w, {color:'rgba(79,227,166,.7)'}); PL.label(ctx, M1.X(d.mg.gm.w) + 4, M1.Y(-20*Math.log10(d.mg.gm.gm)) + 14, `GM ${MX.fmt(20*Math.log10(d.mg.gm.gm), 3)} dB`, {color:'#4fe3a6', size:11}); }
+    PL.line(ctx, M2, ws.map((w, i) => [w, phs[i]]), {color:'#7CC6BE', width:2.4, glow:6});
+    if (d.mg.pm){ PL.vline(ctx, M1, d.mg.pm.w, {color:'rgba(226,184,111,.7)'}); PL.vline(ctx, M2, d.mg.pm.w, {color:'rgba(226,184,111,.7)'}); PL.label(ctx, M2.X(d.mg.pm.w) + 4, M2.Y(ph(d.mg.pm.w)) - 6, `PM ${MX.fmt(d.mg.pm.pm, 3)}°`, {color:'#E2B86F', size:11}); }
+    if (d.mg.gm){ PL.vline(ctx, M1, d.mg.gm.w, {color:'rgba(143,199,154,.7)'}); PL.label(ctx, M1.X(d.mg.gm.w) + 4, M1.Y(-20*Math.log10(d.mg.gm.gm)) + 14, `GM ${MX.fmt(20*Math.log10(d.mg.gm.gm), 3)} dB`, {color:'#8FC79A', size:11}); }
   }
   function drawNyquist(d, b){
     const G = d.G, [w0, w1] = CT.wrange(G.n, G.d), ws = MX.logspace(Math.log10(w0) - 1, Math.log10(w1) + 1, 1500), L = ws.map(w => CT.Ljw(G.n, G.d, S.K, w));
     const mags = L.map(z => C.abs(z)).filter(isFinite).sort((a, b) => a - b), R = Math.max(1.6, Math.min(40, 1.3*mags[Math.floor(mags.length*.55)]));
     const ppx = Math.max(2*R/b.w, 2*R/b.h), cx = -R*.35, xr = [cx - ppx*b.w/2, cx + ppx*b.w/2], yr = [-ppx*b.h/2, ppx*b.h/2];
     const M = PL.frame(ctx, b, {xr, yr, mode:'box', zeroLine:true, zeroLineX:true, xlabel:'Re', ylabel:'Im', title:'Nyquist (K·G(jω))'});
-    PL.line(ctx, M, L.map(z => [z[0], -z[1]]), {color:'rgba(65,217,232,.55)', width:1.8, dash:[5, 4]});
-    PL.line(ctx, M, L.map(z => [z[0], z[1]]), {color:'#41d9e8', width:2.4, glow:6});
-    PL.cross(ctx, M, -1, 0, {color:'#ff4f6a', r:6}); PL.label(ctx, M.X(-1), M.Y(0) + 18, '−1', {color:'#ff8fb8', align:'center', size:11});
+    PL.line(ctx, M, L.map(z => [z[0], -z[1]]), {color:'rgba(124,198,190,.55)', width:1.8, dash:[5, 4]});
+    PL.line(ctx, M, L.map(z => [z[0], z[1]]), {color:'#7CC6BE', width:2.4, glow:6});
+    PL.cross(ctx, M, -1, 0, {color:'#E07A6E', r:6}); PL.label(ctx, M.X(-1), M.Y(0) + 18, '−1', {color:'#EE9488', align:'center', size:11});
   }
   function draw(){
     const W = canvas._w, H = canvas._h; ctx.clearRect(0, 0, W, H);
     try { if (!data){ data = compute(); readout(data); } err.textContent = ''; }
-    catch (e){ err.textContent = e.message; data = null; PL.label(ctx, W/2, H/2, 'Fix the transfer function to see the plots', {align:'center', color:'#e9e4ff', size:14}); return; }
+    catch (e){ err.textContent = e.message; data = null; PL.label(ctx, W/2, H/2, 'Fix the transfer function to see the plots', {align:'center', color:'#D5DCE4', size:14}); return; }
     const pad = {l:52, r:18, t:28, b:34};
     if (S.view === 'all'){
       const cw = (W - 2*pad.l - 2*pad.r)/2, ch = (H - 2*pad.t - 2*pad.b)/2;
@@ -385,14 +385,14 @@ window.FORMULA_PAGE = (G) => {
         const ctx = G.ctx(), sw = Math.min(260, S.W*.34), b1 = {x:58, y:32, w:S.W - sw - 112, h:S.H - 80}, b2 = {x:S.W - sw - 22, y:32, w:sw, h:Math.min(sw, S.H - 80)};
         const [ts, tu] = tun(m.T), M = PL.frame(ctx, b1, {xr:[0, m.T*ts], yr:[0, Math.max(1.2, 1 + m.Mp*1.25)], mode:'box', xlabel:`t (${tu})`, ylabel:'c(t)'});
         PL.hline(ctx, M, 1, {color:'rgba(255,255,255,.4)'});
-        const vs = S.vis('settle'); if (vs > 0){ ctx.save(); ctx.globalAlpha = .13*vs; ctx.fillStyle = '#4fe3a6'; ctx.fillRect(b1.x, M.Y(1.02), b1.w, M.Y(.98) - M.Y(1.02)); ctx.restore(); PL.vline(ctx, M, m.ts2*ts, {color:'#4fe3a6', alpha:vs}); PL.label(ctx, M.X(m.ts2*ts) + 4, b1.y + 14, 'ts ≈ 4/ζωn', {color:'#4fe3a6', size:11, alpha:vs});
-          [1, -1].forEach(sg => PL.line(ctx, M, m.r.t.map(t => [t*ts, 1 + sg*Math.exp(-m.sig*t)/Math.sqrt(1 - m.z*m.z)]), {color:'rgba(155,123,255,.7)', width:1.3, dash:[5, 4], alpha:vs})); }
-        PL.line(ctx, M, upto(m.r.t.map((t, i) => [t*ts, m.r.y[i]]), S.vis('curve')), {color:'#ff4fa3', width:2.8, glow:8});
-        const vp = S.vis('peak'); if (vp > 0){ PL.vline(ctx, M, m.tp*ts, {color:'rgba(255,184,77,.7)', alpha:vp}); PL.dot(ctx, M, m.tp*ts, 1 + m.Mp, {color:'#ffb84d', r:6, alpha:vp, label:`Mp ${n4(100*m.Mp, 3)}%`}); }
-        const vr = S.vis('rise'); if (vr > 0){ PL.dot(ctx, M, m.tr0*ts, 1, {color:'#41d9e8', r:5.5, alpha:vr, label:'tr (0–100%)', dy:18}); }
+        const vs = S.vis('settle'); if (vs > 0){ ctx.save(); ctx.globalAlpha = .13*vs; ctx.fillStyle = '#8FC79A'; ctx.fillRect(b1.x, M.Y(1.02), b1.w, M.Y(.98) - M.Y(1.02)); ctx.restore(); PL.vline(ctx, M, m.ts2*ts, {color:'#8FC79A', alpha:vs}); PL.label(ctx, M.X(m.ts2*ts) + 4, b1.y + 14, 'ts ≈ 4/ζωn', {color:'#8FC79A', size:11, alpha:vs});
+          [1, -1].forEach(sg => PL.line(ctx, M, m.r.t.map(t => [t*ts, 1 + sg*Math.exp(-m.sig*t)/Math.sqrt(1 - m.z*m.z)]), {color:'rgba(182,162,222,.7)', width:1.3, dash:[5, 4], alpha:vs})); }
+        PL.line(ctx, M, upto(m.r.t.map((t, i) => [t*ts, m.r.y[i]]), S.vis('curve')), {color:'#8AB4F0', width:2.8, glow:8});
+        const vp = S.vis('peak'); if (vp > 0){ PL.vline(ctx, M, m.tp*ts, {color:'rgba(226,184,111,.7)', alpha:vp}); PL.dot(ctx, M, m.tp*ts, 1 + m.Mp, {color:'#E2B86F', r:6, alpha:vp, label:`Mp ${n4(100*m.Mp, 3)}%`}); }
+        const vr = S.vis('rise'); if (vr > 0){ PL.dot(ctx, M, m.tr0*ts, 1, {color:'#7CC6BE', r:5.5, alpha:vr, label:'tr (0–100%)', dy:18}); }
         // s-plane
         const sp = sPlane(ctx, b2, [[-m.sig, m.wd], [-m.sig, -m.wd]], {title:'Poles'}), vpo = S.vis('poles');
-        if (vpo > 0){ [[-m.sig, m.wd], [-m.sig, -m.wd]].forEach(p => PL.cross(ctx, sp, p[0], p[1], {color:'#ff4fa3', r:6, alpha:vpo})); ctx.save(); ctx.globalAlpha = vpo*.8; ctx.strokeStyle = '#ffb84d'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(sp.X(0), sp.Y(0)); ctx.lineTo(sp.X(-m.sig), sp.Y(m.wd)); ctx.stroke(); ctx.restore(); PL.label(ctx, sp.X(-m.sig) + 8, sp.Y(m.wd), `ωn = ${n4(m.wn, 3)}`, {color:'#ffb84d', size:11, alpha:vpo}); }
+        if (vpo > 0){ [[-m.sig, m.wd], [-m.sig, -m.wd]].forEach(p => PL.cross(ctx, sp, p[0], p[1], {color:'#8AB4F0', r:6, alpha:vpo})); ctx.save(); ctx.globalAlpha = vpo*.8; ctx.strokeStyle = '#E2B86F'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(sp.X(0), sp.Y(0)); ctx.lineTo(sp.X(-m.sig), sp.Y(m.wd)); ctx.stroke(); ctx.restore(); PL.label(ctx, sp.X(-m.sig) + 8, sp.Y(m.wd), `ωn = ${n4(m.wn, 3)}`, {color:'#E2B86F', size:11, alpha:vpo}); }
       } },
 
     { id:'routh', title:'Routh–Hurwitz stability', desc:'Routh array, sign changes, special cases and the K range for stability', glyph:glyph('routh'),
@@ -432,25 +432,25 @@ window.FORMULA_PAGE = (G) => {
         rows.forEach((r, i) => {
           const a = i < 2 ? v0 : Math.min(1, Math.max(0, v1*(nr - 2) - (i - 2))), y = y0 + i*rh;
           if (a <= 0) return;
-          G.text(`s${String(m.n - i).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('')}`, x0 + 8, y + rh*.65, {size:14, color:'#ffd29a', a});
-          r.forEach((txt, j) => { const isFirst = j === 0, neg = !m.hasK && m.rt.rows[i][0] < 0 && isFirst; G.text(txt, x0 + 64 + j*cw, y + rh*.65, {size: m.hasK ? 12 : 13.5, mono:true, color: isFirst && vc > 0 ? (neg ? '#ff8fb8' : '#4fe3a6') : '#fff', a}); });
+          G.text(`s${String(m.n - i).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('')}`, x0 + 8, y + rh*.65, {size:14, color:'#EBD3A2', a});
+          r.forEach((txt, j) => { const isFirst = j === 0, neg = !m.hasK && m.rt.rows[i][0] < 0 && isFirst; G.text(txt, x0 + 64 + j*cw, y + rh*.65, {size: m.hasK ? 12 : 13.5, mono:true, color: isFirst && vc > 0 ? (neg ? '#EE9488' : '#8FC79A') : '#fff', a}); });
           ctx.save(); ctx.globalAlpha = .15*a; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.moveTo(x0, y + rh); ctx.lineTo(x0 + tw, y + rh); ctx.stroke(); ctx.restore();
         });
-        if (vc > 0){ ctx.save(); ctx.globalAlpha = vc*.9; ctx.strokeStyle = '#4fe3a6'; ctx.lineWidth = 2; ctx.strokeRect(x0 + 56, y0 + 2, Math.min(cw, m.hasK ? tw - 70 : cw) - 4, nr*rh - 4); ctx.restore(); }
+        if (vc > 0){ ctx.save(); ctx.globalAlpha = vc*.9; ctx.strokeStyle = '#8FC79A'; ctx.lineWidth = 2; ctx.strokeRect(x0 + 56, y0 + 2, Math.min(cw, m.hasK ? tw - 70 : cw) - 4, nr*rh - 4); ctx.restore(); }
         const vr = S.vis('roots');
         if (!m.hasK && vr > 0){
           const bx = {x:S.W*.62 + 40, y:46, w:S.W*.38 - 64, h:Math.min(S.W*.38 - 64, S.H - 100)}, M = sPlane(ctx, bx, m.roots, {title:'Roots'});
-          ctx.save(); ctx.globalAlpha = .09*vr; ctx.fillStyle = '#ff4f6a'; ctx.fillRect(M.X(0), bx.y, bx.x + bx.w - M.X(0), bx.h); ctx.restore();
-          m.roots.forEach(r => PL.cross(ctx, M, r[0], r[1], {color: r[0] > 1e-7 ? '#ff8fb8' : '#4fe3a6', r:6, alpha:vr}));
+          ctx.save(); ctx.globalAlpha = .09*vr; ctx.fillStyle = '#E07A6E'; ctx.fillRect(M.X(0), bx.y, bx.x + bx.w - M.X(0), bx.h); ctx.restore();
+          m.roots.forEach(r => PL.cross(ctx, M, r[0], r[1], {color: r[0] > 1e-7 ? '#EE9488' : '#8FC79A', r:6, alpha:vr}));
         }
         if (m.hasK && vr > 0){
           // number line of K with the stable intervals
           const lo = Math.min(-1, ...m.crit), hi = Math.max(1, ...m.crit), span = hi - lo, xr = [lo - .25*span, hi + .25*span], bx = {x:40, y:S.H - 70, w:S.W - 80, h:18};
           const X = k => bx.x + (k - xr[0])/(xr[1] - xr[0])*bx.w;
           ctx.save(); ctx.globalAlpha = vr; ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(bx.x, bx.y + bx.h/2); ctx.lineTo(bx.x + bx.w, bx.y + bx.h/2); ctx.stroke();
-          m.ivs.forEach(iv => { const a = X(Math.max(xr[0], iv[0])), b = X(Math.min(xr[1], iv[1])); ctx.globalAlpha = .6*vr; ctx.fillStyle = '#4fe3a6'; ctx.fillRect(a, bx.y, b - a, bx.h); });
+          m.ivs.forEach(iv => { const a = X(Math.max(xr[0], iv[0])), b = X(Math.min(xr[1], iv[1])); ctx.globalAlpha = .6*vr; ctx.fillStyle = '#8FC79A'; ctx.fillRect(a, bx.y, b - a, bx.h); });
           ctx.restore();
-          G.text('stable', X(m.ivs.length ? (Math.max(xr[0], m.ivs[0][0]) + Math.min(xr[1], m.ivs[0][1]))/2 : 0), bx.y + bx.h + 18, {align:'center', color:'#4fe3a6', size:12, a: m.ivs.length ? vr : 0});
+          G.text('stable', X(m.ivs.length ? (Math.max(xr[0], m.ivs[0][0]) + Math.min(xr[1], m.ivs[0][1]))/2 : 0), bx.y + bx.h + 18, {align:'center', color:'#8FC79A', size:12, a: m.ivs.length ? vr : 0});
           m.crit.forEach(k => G.text(`K = ${n4(k, 4)}`, X(k), bx.y - 8, {align:'center', color:'#fff', size:12, a:vr, halo:true}));
         }
       } },
@@ -481,12 +481,12 @@ window.FORMULA_PAGE = (G) => {
       answer: m => [{tone:'y', k:`e<sub>ss</sub> for a ${m.input}`, v: m.stable ? n4(m.ess) : 'unstable', s:`type ${m.type}; K<sub>p</sub> = ${n4(m.Kp)}, K<sub>v</sub> = ${n4(m.Kv)}, K<sub>a</sub> = ${n4(m.Ka)}`}],
       scene: (m, S) => {
         const ctx = G.ctx(), bx = {x:62, y:34, w:S.W - 88, h:S.H - 84};
-        if (!m.stable){ G.text('The closed loop is unstable: the output grows without bound.', S.W/2, S.H/2, {align:'center', size:14, color:'#ff8fb8'}); return; }
+        if (!m.stable){ G.text('The closed loop is unstable: the output grows without bound.', S.W/2, S.H/2, {align:'center', size:14, color:'#EE9488'}); return; }
         const [ts, tu] = tun(m.Tw), yin = m.r.t.map(m.inp), yall = m.r.y.concat(yin), M = PL.frame(ctx, bx, {xr:[0, m.Tw*ts], yr:PL.range(yall.concat([0]), .08), mode:'box', zeroLine:true, xlabel:`t (${tu})`, ylabel:'r(t), c(t)'});
         PL.line(ctx, M, m.r.t.map((t, i) => [t*ts, yin[i]]), {color:'rgba(255,255,255,.55)', width:1.8, dash:[6, 4]});
-        PL.line(ctx, M, upto(m.r.t.map((t, i) => [t*ts, m.r.y[i]]), S.vis('curve')), {color:'#ff4fa3', width:2.8, glow:8});
-        PL.label(ctx, bx.x + 8, bx.y + 16, 'input r(t)', {color:'#e9e4ff'}); PL.label(ctx, bx.x + 90, bx.y + 16, 'output c(t)', {color:'#ff4fa3'});
-        const vc = S.vis('curve'); if (vc > .95 && isFinite(m.ess)){ const k = m.r.t.length - 1, t = m.r.t[k]; ctx.save(); ctx.strokeStyle = '#ffb84d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(M.X(t*ts) - 6, M.Y(yin[k])); ctx.lineTo(M.X(t*ts) - 6, M.Y(m.r.y[k])); ctx.stroke(); ctx.restore(); PL.label(ctx, M.X(t*ts) - 12, (M.Y(yin[k]) + M.Y(m.r.y[k]))/2, `e → ${n4(m.ess, 3)}`, {color:'#ffb84d', align:'right'}); }
+        PL.line(ctx, M, upto(m.r.t.map((t, i) => [t*ts, m.r.y[i]]), S.vis('curve')), {color:'#8AB4F0', width:2.8, glow:8});
+        PL.label(ctx, bx.x + 8, bx.y + 16, 'input r(t)', {color:'#D5DCE4'}); PL.label(ctx, bx.x + 90, bx.y + 16, 'output c(t)', {color:'#8AB4F0'});
+        const vc = S.vis('curve'); if (vc > .95 && isFinite(m.ess)){ const k = m.r.t.length - 1, t = m.r.t[k]; ctx.save(); ctx.strokeStyle = '#E2B86F'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(M.X(t*ts) - 6, M.Y(yin[k])); ctx.lineTo(M.X(t*ts) - 6, M.Y(m.r.y[k])); ctx.stroke(); ctx.restore(); PL.label(ctx, M.X(t*ts) - 12, (M.Y(yin[k]) + M.Y(m.r.y[k]))/2, `e → ${n4(m.ess, 3)}`, {color:'#E2B86F', align:'right'}); }
       } },
 
     { id:'margins', title:'Gain and phase margins', desc:'Crossover frequencies, GM and PM from the Bode plot', glyph:glyph('margin'),
@@ -510,12 +510,12 @@ window.FORMULA_PAGE = (G) => {
         const ws = MX.logspace(Math.log10(m.w0), Math.log10(m.w1), 700), mag = ws.map(om => 20*Math.log10(C.abs(CT.Ljw(m.g.n, m.g.d, 1, om)))), phs = ws.map(m.ph);
         const fm = mag.filter(isFinite), M1 = PL.frame(ctx, b1, {xr:[m.w0, m.w1], yr:[Math.max(-160, Math.floor(Math.min(...fm)/20)*20), Math.min(160, Math.ceil(Math.max(...fm, 5)/20)*20)], xlog:true, mode:'box', ylabel:'|G| (dB)'});
         PL.hline(ctx, M1, 0, {color:'rgba(255,255,255,.4)'});
-        PL.line(ctx, M1, upto(ws.map((om, i) => [om, mag[i]]), S.vis('mag')), {color:'#ff4fa3', width:2.6, glow:8});
+        PL.line(ctx, M1, upto(ws.map((om, i) => [om, mag[i]]), S.vis('mag')), {color:'#8AB4F0', width:2.6, glow:8});
         const M2 = PL.frame(ctx, b2, {xr:[m.w0, m.w1], yr:PL.range(phs.concat([-180]), .08), xlog:true, mode:'box', ylabel:'∠G (°)', xlabel:'ω (rad/s)'});
         PL.hline(ctx, M2, -180, {color:'rgba(255,255,255,.4)'});
-        PL.line(ctx, M2, upto(ws.map((om, i) => [om, phs[i]]), S.vis('ph') || S.vis('pm')), {color:'#41d9e8', width:2.6, glow:8});
-        const vp = S.vis('pm'); if (vp > 0 && m.mg.pm){ const wg = m.mg.pm.w; [M1, M2].forEach(M => PL.vline(ctx, M, wg, {color:'rgba(255,184,77,.8)', alpha:vp})); PL.dot(ctx, M1, wg, 0, {color:'#ffb84d', r:5.5, alpha:vp, label:`ωgc ${n4(wg, 3)}`}); const pg = m.ph(wg); ctx.save(); ctx.globalAlpha = vp; ctx.strokeStyle = '#ffb84d'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M2.X(wg), M2.Y(-180)); ctx.lineTo(M2.X(wg), M2.Y(pg)); ctx.stroke(); ctx.restore(); PL.label(ctx, M2.X(wg) - 8, (M2.Y(-180) + M2.Y(pg))/2 + 4, `PM ${n4(m.mg.pm.pm, 3)}°`, {color:'#ffb84d', alpha:vp, align:'right'}); }
-        const vg = S.vis('gm'); if (vg > 0 && m.mg.gm){ const wp = m.mg.gm.w, gdb = -20*Math.log10(m.mg.gm.gm); [M1, M2].forEach(M => PL.vline(ctx, M, wp, {color:'rgba(79,227,166,.8)', alpha:vg})); PL.dot(ctx, M2, wp, -180, {color:'#4fe3a6', r:5.5, alpha:vg, label:`ωpc ${n4(wp, 3)}`}); ctx.save(); ctx.globalAlpha = vg; ctx.strokeStyle = '#4fe3a6'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M1.X(wp), M1.Y(0)); ctx.lineTo(M1.X(wp), M1.Y(gdb)); ctx.stroke(); ctx.restore(); PL.label(ctx, M1.X(wp) + 6, (M1.Y(0) + M1.Y(gdb))/2, `GM ${n4(-gdb, 3)} dB`, {color:'#4fe3a6', alpha:vg}); }
+        PL.line(ctx, M2, upto(ws.map((om, i) => [om, phs[i]]), S.vis('ph') || S.vis('pm')), {color:'#7CC6BE', width:2.6, glow:8});
+        const vp = S.vis('pm'); if (vp > 0 && m.mg.pm){ const wg = m.mg.pm.w; [M1, M2].forEach(M => PL.vline(ctx, M, wg, {color:'rgba(226,184,111,.8)', alpha:vp})); PL.dot(ctx, M1, wg, 0, {color:'#E2B86F', r:5.5, alpha:vp, label:`ωgc ${n4(wg, 3)}`}); const pg = m.ph(wg); ctx.save(); ctx.globalAlpha = vp; ctx.strokeStyle = '#E2B86F'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M2.X(wg), M2.Y(-180)); ctx.lineTo(M2.X(wg), M2.Y(pg)); ctx.stroke(); ctx.restore(); PL.label(ctx, M2.X(wg) - 8, (M2.Y(-180) + M2.Y(pg))/2 + 4, `PM ${n4(m.mg.pm.pm, 3)}°`, {color:'#E2B86F', alpha:vp, align:'right'}); }
+        const vg = S.vis('gm'); if (vg > 0 && m.mg.gm){ const wp = m.mg.gm.w, gdb = -20*Math.log10(m.mg.gm.gm); [M1, M2].forEach(M => PL.vline(ctx, M, wp, {color:'rgba(143,199,154,.8)', alpha:vg})); PL.dot(ctx, M2, wp, -180, {color:'#8FC79A', r:5.5, alpha:vg, label:`ωpc ${n4(wp, 3)}`}); ctx.save(); ctx.globalAlpha = vg; ctx.strokeStyle = '#8FC79A'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M1.X(wp), M1.Y(0)); ctx.lineTo(M1.X(wp), M1.Y(gdb)); ctx.stroke(); ctx.restore(); PL.label(ctx, M1.X(wp) + 6, (M1.Y(0) + M1.Y(gdb))/2, `GM ${n4(-gdb, 3)} dB`, {color:'#8FC79A', alpha:vg}); }
       } },
 
     { id:'locus', title:'Root locus by the rules', desc:'Asymptotes, centroid, breakaway, jω crossing and departure angles', glyph:glyph('locus'),
@@ -556,13 +556,13 @@ window.FORMULA_PAGE = (G) => {
         const key = m.ps.concat(m.zs, m.brk.map(b => [b.x, 0]), m.jw.flatMap(c => [[0, c.w], [0, -c.w]]), m.cen !== null ? [[m.cen, 0]] : []), R0 = Math.max(1, ...key.map(p => Math.hypot(p[0], p[1])));
         const pts = key.concat(m.br.flat().filter(r => Math.hypot(r[0], r[1]) < 2.2*R0));
         const M = sPlane(ctx, bx, pts);
-        ctx.save(); ctx.globalAlpha = .07; ctx.fillStyle = '#ff4f6a'; ctx.fillRect(Math.max(M.X(0), bx.x), bx.y, bx.x + bx.w - Math.max(M.X(0), bx.x), bx.h); ctx.restore();
-        const vs = S.vis('seg'); m.segs.forEach(([a, b]) => { ctx.save(); ctx.globalAlpha = vs; ctx.strokeStyle = '#41d9e8'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(M.X(isFinite(a) ? a : M.ix(bx.x)), M.Y(0)); ctx.lineTo(M.X(b), M.Y(0)); ctx.stroke(); ctx.restore(); });
-        const va = S.vis('asym'); if (va > 0 && m.na > 0){ m.angles.forEach(a => { const L = 5*R0, r = a/D; PL.line(ctx, M, [[m.cen, 0], [m.cen + L*Math.cos(r), L*Math.sin(r)]], {color:'#9b7bff', width:1.5, dash:[6, 4], alpha:va}); }); PL.dot(ctx, M, m.cen, 0, {color:'#9b7bff', r:5, alpha:va, label:`σa = ${n4(m.cen, 3)}`, dy:20}); }
-        const vf = S.vis('full'); if (vf > 0) m.br.forEach(br => PL.line(ctx, M, br, {color:'#41d9e8', width:2.4, glow:6, alpha:vf}));
-        const vb = S.vis('brk'); m.brk.forEach(b => PL.dot(ctx, M, b.x, 0, {color:'#ffb84d', r:6, alpha:vb, label:n4(b.x, 3), dy:-12}));
-        const vj = S.vis('jw'); m.jw.forEach(c => { [1, -1].forEach(sg => PL.dot(ctx, M, 0, sg*c.w, {color:'#4fe3a6', r:6, alpha:vj, label: sg > 0 ? `±j${n4(c.w, 3)}, K = ${n4(c.K, 3)}` : ''})); });
-        const vp = S.vis('pz'); m.ps.forEach(p => PL.cross(ctx, M, p[0], p[1], {color:'#ff4fa3', r:6, alpha:vp, width:2.6})); m.zs.forEach(z => PL.dot(ctx, M, z[0], z[1], {color:'#ff4fa3', r:6, hollow:true, alpha:vp}));
+        ctx.save(); ctx.globalAlpha = .07; ctx.fillStyle = '#E07A6E'; ctx.fillRect(Math.max(M.X(0), bx.x), bx.y, bx.x + bx.w - Math.max(M.X(0), bx.x), bx.h); ctx.restore();
+        const vs = S.vis('seg'); m.segs.forEach(([a, b]) => { ctx.save(); ctx.globalAlpha = vs; ctx.strokeStyle = '#7CC6BE'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(M.X(isFinite(a) ? a : M.ix(bx.x)), M.Y(0)); ctx.lineTo(M.X(b), M.Y(0)); ctx.stroke(); ctx.restore(); });
+        const va = S.vis('asym'); if (va > 0 && m.na > 0){ m.angles.forEach(a => { const L = 5*R0, r = a/D; PL.line(ctx, M, [[m.cen, 0], [m.cen + L*Math.cos(r), L*Math.sin(r)]], {color:'#B6A2DE', width:1.5, dash:[6, 4], alpha:va}); }); PL.dot(ctx, M, m.cen, 0, {color:'#B6A2DE', r:5, alpha:va, label:`σa = ${n4(m.cen, 3)}`, dy:20}); }
+        const vf = S.vis('full'); if (vf > 0) m.br.forEach(br => PL.line(ctx, M, br, {color:'#7CC6BE', width:2.4, glow:6, alpha:vf}));
+        const vb = S.vis('brk'); m.brk.forEach(b => PL.dot(ctx, M, b.x, 0, {color:'#E2B86F', r:6, alpha:vb, label:n4(b.x, 3), dy:-12}));
+        const vj = S.vis('jw'); m.jw.forEach(c => { [1, -1].forEach(sg => PL.dot(ctx, M, 0, sg*c.w, {color:'#8FC79A', r:6, alpha:vj, label: sg > 0 ? `±j${n4(c.w, 3)}, K = ${n4(c.K, 3)}` : ''})); });
+        const vp = S.vis('pz'); m.ps.forEach(p => PL.cross(ctx, M, p[0], p[1], {color:'#8AB4F0', r:6, alpha:vp, width:2.6})); m.zs.forEach(z => PL.dot(ctx, M, z[0], z[1], {color:'#8AB4F0', r:6, hollow:true, alpha:vp}));
       } }
   ];
   const FIELDS = {

@@ -35,7 +35,7 @@ window.FORMULA_PAGE = (G) => {
     const vv = vis('vf');
     if (vv > 0){
       const bx = x0, by = H - 34, full = Math.min(320, (x1 - x0)*0.5);
-      G.roundRect(bx, by - 7, full, 8, 4, 'rgba(65,217,232,.6)', {a:vv}); G.text('c', bx + full + 8, by + 1, {color:C.cyan, size:12.5, a:vv});
+      G.roundRect(bx, by - 7, full, 8, 4, 'rgba(124,198,190,.6)', {a:vv}); G.text('c', bx + full + 8, by + 1, {color:C.cyan, size:12.5, a:vv});
       G.roundRect(bx, by + 6, full*m.vf, 8, 4, 'rgba(255,255,255,.85)', {a:vv}); G.text(`v_p = ${num(m.vf, 3)} c`, bx + full*m.vf + 8, by + 14, {size:12.5, a:vv});
     }
     G.text('same frequency in both, so the slower wave is packed more tightly', (x0 + x1)/2, 30, {align:'center', color:C.muted, size:12.5, a:vis('line')});
@@ -74,10 +74,10 @@ window.FORMULA_PAGE = (G) => {
   function sceneCoax(m, S){
     const {W, H, vis, t} = S, cx = W*0.4, cy = H*0.52, R = Math.min(H*0.38, W*0.3), r = R*m.a/m.b;
     const vg = vis('geom'), vE = vis('E'), vH = vis('H'), vz = vis('z0'), pulse = fieldPulse(t);
-    G.circle(cx, cy, R + 7, {fill:'rgba(255,184,77,.25)', a:vg}); G.circle(cx, cy, R, {fill:'rgba(155,123,255,.22)', stroke:'rgba(255,184,77,.85)', w:2, a:vg});
-    G.circle(cx, cy, r, {fill:'rgba(255,184,77,.85)', a:vg});
-    G.text(`ε_r = ${num(m.er)}`, cx, cy + (R + r)/2 + 5, {align:'center', color:'#cfc6ff', size:12.5, a:vg});
-    G.line(cx, cy, cx + r, cy, '#140d38', 1.5, {a:vg}); G.text('a', cx + r/2, cy - 6, {align:'center', color:'#140d38', size:12, weight:700, a:vg});
+    G.circle(cx, cy, R + 7, {fill:'rgba(226,184,111,.25)', a:vg}); G.circle(cx, cy, R, {fill:'rgba(182,162,222,.22)', stroke:'rgba(226,184,111,.85)', w:2, a:vg});
+    G.circle(cx, cy, r, {fill:'rgba(226,184,111,.85)', a:vg});
+    G.text(`ε_r = ${num(m.er)}`, cx, cy + (R + r)/2 + 5, {align:'center', color:'#D5DCE4', size:12.5, a:vg});
+    G.line(cx, cy, cx + r, cy, '#0F141A', 1.5, {a:vg}); G.text('a', cx + r/2, cy - 6, {align:'center', color:'#0F141A', size:12, weight:700, a:vg});
     G.line(cx, cy, cx - R*0.7071, cy + R*0.7071, 'rgba(255,255,255,.7)', 1.2, {a:vg, dash:[4, 3]}); G.text('b', cx - R*0.42, cy + R*0.36, {color:'#fff', size:13, weight:700, a:vg, halo:true});
     if (vE > 0) for (let k = 0; k < 16; k++){ const a = k*TAU/16 + 0.1; const r1 = r + 6, r2 = r + (R - r - 6)*0.92*pulse; G.arrow(cx + r1*Math.cos(a), cy + r1*Math.sin(a), cx + r2*Math.cos(a), cy + r2*Math.sin(a), C.white, 1.6, {a:vE*0.9, head:6}); }
     if (vH > 0) [0.3, 0.55, 0.8].forEach((q, i) => { const rr = r + (R - r)*q; G.circle(cx, cy, rr, {stroke:C.cyan, w:1.4, dash:[6, 6], a:vH*(0.5 + 0.5*pulse)}); const a = t*0.8 + i; G.arrow(cx + rr*Math.cos(a), cy + rr*Math.sin(a), cx + rr*Math.cos(a + .18), cy + rr*Math.sin(a + .18), C.cyan, 1.6, {a:vH, head:7}); });
@@ -100,7 +100,7 @@ window.FORMULA_PAGE = (G) => {
     // H lines: the equipotential circles around each wire
     if (vH > 0) [0.25, 0.5, 0.8, 1.2].forEach(u0 => { const u = Math.acosh(h/rw) - u0; if (u <= 0.05) return; const xc = p/Math.tanh(u), rr = p/Math.sinh(u); [1, -1].forEach(sg => G.circle(X(sg*xc), Y(0), rr*sc, {stroke:C.cyan, w:1.3, dash:[5, 5], a:vH*(0.45 + 0.4*pulse)})); });
     ctx.restore();
-    [1, -1].forEach(sg => G.circle(X(sg*h), Y(0), rw*sc, {fill: sg > 0 ? 'rgba(255,184,77,.9)' : 'rgba(255,79,163,.9)', a:vg}));
+    [1, -1].forEach(sg => G.circle(X(sg*h), Y(0), rw*sc, {fill: sg > 0 ? 'rgba(226,184,111,.9)' : 'rgba(138,180,240,.9)', a:vg}));
     G.bracket(X(-h), X(h), Y(0) + rw*sc + 34, `D = ${si(m.D, 'm', 3)}`, C.amber, {a:vg});
     G.text(`d = ${si(m.d, 'm', 3)}`, X(h), Y(0) - rw*sc - 12, {align:'center', color:C.amber, size:12.5, a:vg, halo:true});
     const lx = W*0.74;
