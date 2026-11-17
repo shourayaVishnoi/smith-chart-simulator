@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dielectric-filled lines — EMTI simulator</title>
+<meta name="description" content="Dielectric-filled transmission lines, step by step: velocity factor, wavelength, electrical length, coaxial and two-wire line impedance.">
+<meta name="theme-color" content="#150f36">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237047ff'/%3E%3Cstop offset='.55' stop-color='%23ff4fa3'/%3E%3Cstop offset='1' stop-color='%23ffb84d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7047ff"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ffb84d"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>EMTI simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html" aria-current="page">Filled lines</a></div></nav>
+<header class="hero">
+  <div>
+    <h1 class="rise">Dielectric-filled lines, step by step</h1>
+    <div class="cta rise d1">
+      <button class="btn primary big" id="hStart">Start the walkthrough</button>
+      <button class="btn big" id="hPick">Pick a question type</button>
+    </div>
+  </div>
+</header>
+
+<section class="modes" id="modes">
+  <div class="modes-head">
+    <h2>Choose a question type</h2>
+    <p>Pick what the question asks for and enter its values. You can type numbers like 5.8e7. The walkthrough then solves it step by step, and every number is listed further down.</p>
+  </div>
+  <div class="mode-grid" id="modeGrid"></div>
+  <form class="inputs-bar" id="form" novalidate>
+    <div class="fields" id="fields"></div>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">Solve it</button>
+      <span class="err" id="err" role="alert"></span>
+    </div>
+  </form>
+</section>
+
+<main id="lab">
+  <section id="stage">
+    <div class="frame"><div class="screen">
+      <canvas id="scene" aria-label="Animated picture of the solution"></canvas>
+    </div></div>
+    <div class="progress"><i id="pfill"></i></div>
+    <div class="controls">
+      <button class="btn" id="bRestart" title="Restart (R)" aria-label="Restart">⟲</button>
+      <button class="btn" id="bBack" title="Previous step (←)">◀ Back</button>
+      <button class="btn primary" id="bPlay" title="Play all / pause (Space)" style="min-width:122px">▶ Play all</button>
+      <button class="btn" id="bNext" title="Next step (→)">Next ▶</button>
+      <label class="speed">Speed
+        <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
+      </label>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="hint">Keys: ← → to step, Space to play or pause, R to restart</div>
+  </section>
+
+  <aside class="panel">
+    <div id="pcontent">
+      <div class="stepno" id="stepno"></div>
+      <h2 id="stitle"></h2>
+      <div id="sbody"></div>
+      <div class="work" id="swork"></div>
+    </div>
+  </aside>
+</main>
+
+<section class="results" id="results">
+  <div class="complete-head">
+    <h2>All the numbers</h2>
+    <p>Every value from the walkthrough in one place, ready to copy into your answer.</p>
+  </div>
+  <div class="results-grid">
+    <div class="panel"><h3 style="margin:0 0 4px;font-size:22px">Working</h3><p class="sub" id="resSub" style="color:var(--muted);margin:0 0 10px;font-size:14px"></p><table class="table" id="resTable"></table></div>
+    <aside class="panel solution"><h3>Answer</h3><div id="resAns"></div></aside>
+  </div>
+</section>
+
+<footer>
+  <span>Made for EMTI practice. c = 3 × 10⁸ m/s, ε₀ = 8.854 × 10⁻¹² F/m, μ₀ = 4π × 10⁻⁷ H/m.</span>
+  <a href="https://github.com/shourayaVishnoi/smith-chart-simulator">Source on GitHub</a>
+</footer>
+<script src="filled-lines.js"></script>
+<script src="formula-engine.js"></script>
+</body>
+</html>
