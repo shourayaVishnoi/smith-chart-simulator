@@ -154,7 +154,7 @@
     else if (e.key === ' ' && e.target.tagName !== 'BUTTON'){ togglePlay(); e.preventDefault(); }
     else if (e.key === 'r' || e.key === 'R') restart();
   });
-  $('hStart').addEventListener('click', () => { $('lab').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); playFromStart(); });
+  $('hStart') && $('hStart').addEventListener('click', () => { $('lab').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); playFromStart(); });
   $('hPick').addEventListener('click', () => { $('modes').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); });
   if ('IntersectionObserver' in window){
     new IntersectionObserver((ents, obs) => { if (ents.some(e => e.isIntersecting)){ if (!started){ started = true; running = true; } obs.disconnect(); } }, {threshold:0.3}).observe($('stage'));
@@ -184,7 +184,8 @@
         s.value = MODE.vals[key]; s.addEventListener('change', () => { MODE.vals[key] = s.value; refreshVisibility(); });
         lab.appendChild(s);
       } else {
-        const i = document.createElement('input'); i.type = 'text'; i.inputMode = 'decimal'; i.id = 'f_' + key; i.value = MODE.vals[key] ?? '';
+        const i = document.createElement('input'); i.type = 'text'; i.inputMode = F.type === 'expr' ? 'text' : 'decimal'; i.id = 'f_' + key; i.value = MODE.vals[key] ?? '';
+        if (F.type === 'expr'){ i.className = 'wide'; i.spellcheck = false; i.autocapitalize = 'off'; }
         i.addEventListener('input', () => { MODE.vals[key] = i.value; });
         if (F.units){
           const row = document.createElement('span'); row.className = 'len';
@@ -204,14 +205,17 @@
   function parseNum(raw){
     if (raw == null) return NaN;
     let s = String(raw).trim().replace(/\s+/g, '').replace(/,/g, '.').replace(/[×x*]10\^?/i, 'e').replace(/−/g, '-');
-    if (s === '' || !/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return NaN;
-    return parseFloat(s);
+    if (s === '') return NaN;
+    if (/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return parseFloat(s);
+    if (window.MX){ try { return window.MX.evalNumber(String(raw)); } catch (e) { return NaN; } }
+    return NaN;
   }
   function readVals(){
     const v = {};
     MODE.fields.forEach(k => {
       const F = FIELDS[k], raw = MODE.vals[k];
       if (F.type === 'select'){ v[k] = raw; return; }
+      if (F.type === 'expr'){ v[k] = String(raw ?? '').trim(); return; }
       const n = parseNum(raw);
       if (F.units){ const u = MODE.vals[k + '_u'] || F.units[0][0], mult = (F.units.find(x => x[0] === u) || F.units[0])[1]; v[k] = n*mult; v[k + '_u'] = u; v[k + '_raw'] = n; }
       else v[k] = n;
@@ -248,7 +252,7 @@
   function fillResults(){
     const pr = MODE.problem(M);
     $('resSub').innerHTML = `${MODE.title}: ${pr.chips.join(', ')}`;
-    $('resTable').innerHTML = STEPS.filter(s => s.rd).map(s => { const [k, v] = s.rd(M); return `<tr><td>${k}</td><td>${v}</td></tr>`; }).join('');
+    $('resTable').innerHTML = STEPS.filter(s => s.rd).flatMap(s => { const r = s.rd(M); return Array.isArray(r[0]) ? r : [r]; }).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
     $('resAns').innerHTML = cardsHTML(MODE.answer(M)) + (MODE.note ? `<p class="sub">${MODE.note(M)}</p>` : '');
   }
   PAGE.cardsHTML = cardsHTML;

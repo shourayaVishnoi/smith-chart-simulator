@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EMTI simulators — Smith chart, interfaces, lossy media, filled lines</title>
-<meta name="description" content="Animated, step-by-step simulators for EMTI: lossless lines on the Smith chart, dielectric interfaces, plane waves in lossy media, and dielectric-filled lines.">
+<title>Engineering simulators — graphing, circuits, signals, control and EMTI</title>
+<meta name="description" content="Animated, step-by-step engineering simulators: a graphing calculator, circuits, signals and systems, control systems, and EMTI (Smith chart, interfaces, lossy media, filled lines).">
 <meta name="theme-color" content="#150f36">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237047ff'/%3E%3Cstop offset='.55' stop-color='%23ff4fa3'/%3E%3Cstop offset='1' stop-color='%23ffb84d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,13 +19,54 @@
     function go(){ var h = location.hash.slice(1); if (old.indexOf(h) >= 0) location.replace('lossless.html#' + h); }
     go(); window.addEventListener('hashchange', go); })();
 </script>
-<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7047ff"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ffb84d"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>EMTI simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a></div></nav>
+<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7047ff"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ffb84d"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a><a href="graph.html">Graphing</a><a href="circuits.html">Circuits</a><a href="signals.html">Signals</a><a href="control.html">Control</a></div><script>(function(){var a=document.querySelector(".navlinks [aria-current]");if(a){var p=a.parentNode;if(p.scrollWidth>p.clientWidth)p.scrollLeft=a.offsetLeft-p.offsetLeft-p.clientWidth/2+a.offsetWidth/2;}})();</script></nav>
 <header class="home-hero">
-  <h1 class="rise">EMTI, solved step by step</h1>
-  <p class="rise d1">Choose the kind of question. Each simulator walks through the solution with animated drawings, shows the working, and checks the numbers.</p>
+  <h1 class="rise">Engineering problems, solved step by step</h1>
+  <p class="rise d1">Play with a live graph or circuit, then pick a question type and watch it solved with animated drawings, the working, and every number checked.</p>
 </header>
 
-<main class="families">
+<main class="home-main">
+<section class="group" aria-labelledby="gTools">
+  <div class="group-head"><h2 id="gTools">Graphs and systems</h2><p>Each page has a playground with sliders and live plots, plus step-by-step question types.</p></div>
+  <div class="families">
+  <a class="family rise d1" href="graph.html">
+    <canvas data-preview="graph" aria-hidden="true"></canvas>
+    <h2>Graphing calculator</h2>
+    <p>Plot functions, polar and parametric curves and implicit equations with sliders, then solve calculus questions.</p>
+    <ul><li>Roots: bisection and Newton</li><li>Where curves meet</li><li>Area under a curve</li><li>Derivative and tangent</li></ul>
+    <span class="go">Open the graphing calculator →</span>
+    <span class="tag">Playground</span>
+  </a>
+  <a class="family rise d2" href="circuits.html">
+    <canvas data-preview="circuit" aria-hidden="true"></canvas>
+    <h2>Circuits</h2>
+    <p>RC, RL and RLC circuits with live step and frequency response, transients, resonance and phasors.</p>
+    <ul><li>RC and RL transients</li><li>RLC step response</li><li>Resonance, Q, bandwidth</li><li>AC phasors and power</li><li>RC filters</li></ul>
+    <span class="go">Open the circuits simulator →</span>
+    <span class="tag">Playground</span>
+  </a>
+  <a class="family rise d3" href="signals.html">
+    <canvas data-preview="signals" aria-hidden="true"></canvas>
+    <h2>Signals and systems</h2>
+    <p>Build waves from harmonics, slide signals to convolve them, and sample until they alias.</p>
+    <ul><li>Fourier series</li><li>Convolution</li><li>Sampling and aliasing</li><li>DFT</li></ul>
+    <span class="go">Open the signals simulator →</span>
+    <span class="tag">Playground</span>
+  </a>
+  <a class="family rise d4" href="control.html">
+    <canvas data-preview="control" aria-hidden="true"></canvas>
+    <h2>Control systems</h2>
+    <p>Type G(s), drag the gain and watch the step response, root locus, Bode and Nyquist plots move together.</p>
+    <ul><li>Second-order specs</li><li>Routh–Hurwitz</li><li>Steady-state error</li><li>Gain and phase margins</li><li>Root locus rules</li></ul>
+    <span class="go">Open the control simulator →</span>
+    <span class="tag">Playground</span>
+  </a>
+  </div>
+</section>
+
+<section class="group" aria-labelledby="gEmti">
+  <div class="group-head"><h2 id="gEmti">EMTI: lines and waves</h2><p>Transmission lines on the Smith chart and plane waves in materials.</p></div>
+  <div class="families">
   <a class="family rise d1" href="lossless.html">
     <canvas data-preview="smith" aria-hidden="true"></canvas>
     <h2>Lossless lines</h2>
@@ -56,10 +97,12 @@
     <ul><li>Wavelength and velocity</li><li>Electrical length</li><li>Coaxial line</li><li>Two-wire line</li></ul>
     <span class="go">Open the filled lines simulator →</span>
   </a>
+  </div>
+</section>
 </main>
 
 <footer>
-  <span>Made for EMTI practice. Every answer is worked step by step, with the formulas shown.</span>
+  <span>Made for engineering practice. Every answer is worked step by step, with the formulas shown.</span>
   <a href="https://github.com/shourayaVishnoi/smith-chart-simulator">Source on GitHub</a>
 </footer>
 <script>
@@ -90,6 +133,45 @@
       var x0 = 14, x1 = W - 14, k = 3.2/(x1 - x0); c.strokeStyle = 'rgba(255,79,163,.9)'; c.lineWidth = 1.6;
       [1, -1].forEach(function(s){ c.beginPath(); for (var x = x0; x <= x1; x += 3){ var yy = H/2 - s*H*0.36*Math.exp(-k*(x - x0)); x === x0 ? c.moveTo(x, yy) : c.lineTo(x, yy); } c.stroke(); });
       wave(c, x0, x1, H/2, H*0.36, 70, ph, '#ffffff', k, 10);
+    } else if (it.kind === 'graph'){
+      var ox = W/2, oy = H/2, u = H/7; c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 1;
+      for (var gx = ox % u; gx < W; gx += u){ c.beginPath(); c.moveTo(gx, 0); c.lineTo(gx, H); c.stroke(); }
+      for (var gy = oy % u; gy < H; gy += u){ c.beginPath(); c.moveTo(0, gy); c.lineTo(W, gy); c.stroke(); }
+      c.strokeStyle = 'rgba(255,255,255,.4)'; c.beginPath(); c.moveTo(0, oy); c.lineTo(W, oy); c.moveTo(ox, 0); c.lineTo(ox, H); c.stroke();
+      var A = 1.6 + 0.8*Math.sin(ph*0.6);
+      function plot(f, col){ c.beginPath(); for (var px = 0; px <= W; px += 2){ var y = oy - u*f((px - ox)/u); px === 0 ? c.moveTo(px, y) : c.lineTo(px, y); } c.strokeStyle = col; c.lineWidth = 2.2; c.shadowBlur = 8; c.shadowColor = col; c.stroke(); c.shadowBlur = 0; }
+      plot(function(x){ return A*Math.sin(x); }, '#ff4fa3'); plot(function(x){ return 0.25*x*x - 2; }, '#41d9e8');
+      c.beginPath(); c.arc(ox, oy, 2.4*u, 0, TAU); c.strokeStyle = '#ffb84d'; c.lineWidth = 2.2; c.stroke();
+      var tx = 3.2*Math.sin(ph*0.4); c.fillStyle = '#fff'; c.beginPath(); c.arc(ox + tx*u, oy - u*A*Math.sin(tx), 4.5, 0, TAU); c.fill();
+    } else if (it.kind === 'circuit'){
+      var x0c = 16, x1c = W - 16, yb = H - 22, yt = 26, fin = yb - (yb - yt)*0.62, prog = reduce ? 1 : (ph/TAU*0.5) % 1;
+      c.strokeStyle = 'rgba(255,255,255,.3)'; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(x0c, fin); c.lineTo(x1c, fin); c.stroke(); c.setLineDash([]);
+      c.beginPath(); var last = null;
+      for (var xc = x0c; xc <= x0c + (x1c - x0c)*prog; xc += 2){ var tt = (xc - x0c)/(x1c - x0c)*14, v = 1 - Math.exp(-0.32*tt)*(Math.cos(2*tt) + 0.16*Math.sin(2*tt)), yc = yb - (fin < yb ? (yb - fin) : 0)*v; xc === x0c ? c.moveTo(xc, yc) : c.lineTo(xc, yc); last = [xc, yc]; }
+      c.strokeStyle = '#ff4fa3'; c.lineWidth = 2.4; c.shadowBlur = 10; c.shadowColor = '#ff4fa3'; c.stroke(); c.shadowBlur = 0;
+      if (last){ c.fillStyle = '#fff'; c.beginPath(); c.arc(last[0], last[1], 4.5, 0, TAU); c.fill(); }
+    } else if (it.kind === 'signals'){
+      var N = 1 + 2*Math.floor((reduce ? 3 : (ph/TAU*1.2) % 8)), mid = H/2, amp = H*0.3, per = W/2.2;
+      c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1.5; c.beginPath();
+      for (var xs = 10; xs <= W - 10; xs += 1){ var u2 = (((xs - 10)/per) % 1 + 1) % 1, ys = mid - amp*(u2 < .5 ? 1 : -1)*0.8; xs === 10 ? c.moveTo(xs, ys) : c.lineTo(xs, ys); } c.stroke();
+      c.beginPath(); for (var xq = 10; xq <= W - 10; xq += 1.5){ var th = TAU*(xq - 10)/per, sum = 0; for (var n = 1; n <= N; n += 2) sum += Math.sin(n*th)/n; var yq = mid - amp*0.8*4/Math.PI*sum; xq === 10 ? c.moveTo(xq, yq) : c.lineTo(xq, yq); }
+      c.strokeStyle = '#41d9e8'; c.lineWidth = 2.2; c.shadowBlur = 8; c.shadowColor = '#41d9e8'; c.stroke(); c.shadowBlur = 0;
+      c.fillStyle = '#ffd29a'; c.font = '600 12px Bricolage Grotesque, system-ui, sans-serif'; c.fillText(N + (N > 1 ? ' harmonics' : ' harmonic'), 14, 18);
+    } else if (it.kind === 'control'){
+      var cxl = W*0.66, cyl = H/2, sc = H/6.5;
+      c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(10, cyl); c.lineTo(W - 10, cyl); c.moveTo(cxl, 8); c.lineTo(cxl, H - 8); c.stroke();
+      c.fillStyle = 'rgba(255,79,106,.07)'; c.fillRect(cxl, 0, W - cxl, H);
+      // locus of 1/(s(s+1)(s+5)): sample K and draw the three branches
+      function cub(K){ var a = 6, b = 5, d = K, r = [], z = [[-0.1, 0.3], [-1.2, -0.2], [-5.1, 0.1]]; for (var it2 = 0; it2 < 60; it2++){ z = z.map(function(zi, i){ var p = [1, 0]; var f = [zi[0], zi[1]];
+          // f(z) = z^3 + a z^2 + b z + d
+          var z2 = [zi[0]*zi[0] - zi[1]*zi[1], 2*zi[0]*zi[1]], z3 = [z2[0]*zi[0] - z2[1]*zi[1], z2[0]*zi[1] + z2[1]*zi[0]], fv = [z3[0] + a*z2[0] + b*zi[0] + d, z3[1] + a*z2[1] + b*zi[1]];
+          z.forEach(function(zj, j){ if (j !== i){ var dx = [zi[0] - zj[0], zi[1] - zj[1]]; p = [p[0]*dx[0] - p[1]*dx[1], p[0]*dx[1] + p[1]*dx[0]]; } });
+          var den = p[0]*p[0] + p[1]*p[1], q = [(fv[0]*p[0] + fv[1]*p[1])/den, (fv[1]*p[0] - fv[0]*p[1])/den]; return [zi[0] - q[0], zi[1] - q[1]]; }); } return z; }
+      var Ks = []; for (var kk = -2; kk <= 2.2; kk += 0.05) Ks.push(Math.pow(10, kk));
+      var br = [[], [], []]; Ks.forEach(function(K){ var rs = cub(K).sort(function(p, q){ return p[1] - q[1]; }); rs.forEach(function(r, i){ br[i].push(r); }); });
+      c.strokeStyle = '#41d9e8'; c.lineWidth = 2; br.forEach(function(b){ c.beginPath(); b.forEach(function(r, i){ var X = cxl + r[0]*sc, Y = cyl - r[1]*sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.stroke(); });
+      var Kn = Math.pow(10, -1 + 2.4*(0.5 + 0.5*Math.sin(ph*0.5))); cub(Kn).forEach(function(r){ c.fillStyle = '#ff4fa3'; c.beginPath(); c.arc(cxl + r[0]*sc, cyl - r[1]*sc, 5, 0, TAU); c.fill(); });
+      [[0, 0], [-1, 0], [-5, 0]].forEach(function(p2){ var X = cxl + p2[0]*sc, Y = cyl; c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.moveTo(X - 4, Y - 4); c.lineTo(X + 4, Y + 4); c.moveTo(X - 4, Y + 4); c.lineTo(X + 4, Y - 4); c.stroke(); });
     } else {
       wave(c, 14, W - 14, H*0.3, H*0.15, 110, ph, '#41d9e8', 0, 8);
       wave(c, 14, W - 14, H*0.72, H*0.15, 73, ph, '#ffffff', 0, 10);
