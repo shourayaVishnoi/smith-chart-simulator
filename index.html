@@ -40,7 +40,7 @@
   /* ---------- hero ---------- */
   .hero{max-width:1220px;margin:0 auto;padding:56px 24px 28px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);gap:40px;align-items:center}
   .hero h1{
-    margin:0 0 16px;font-size:clamp(38px,5.4vw,64px);line-height:.98;letter-spacing:-.035em;font-weight:800;
+    margin:0 0 26px;font-size:clamp(38px,5.4vw,64px);line-height:.98;letter-spacing:-.035em;font-weight:800;
     font-variation-settings:"opsz" 96;text-wrap:balance;
     background:linear-gradient(100deg,#ffffff 0%,#ffd6ec 45%,#ffc677 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
   }
@@ -228,9 +228,7 @@
 <header class="hero">
   <div>
     <h1 class="rise">Smith chart, drawn step by step</h1>
-    <p class="lede rise d1" id="lede"></p>
-    <div class="chips rise d2" id="chips"></div>
-    <div class="cta rise d3">
+    <div class="cta rise d1">
       <button class="btn primary big" id="hStart">Start the walkthrough</button>
       <button class="btn big" id="hPick">Pick a question type</button>
     </div>
@@ -1619,8 +1617,6 @@
   // ---------- problem text ----------
   function setProblem(){
     const pr = MODE.problem(M);
-    $('lede').innerHTML = pr.lede;
-    $('chips').innerHTML = pr.chips.map(c => `<span class="chip">${c}</span>`).join('') + `<span class="chip find">${pr.find}</span>`;
     waveCaption();
   }
 
