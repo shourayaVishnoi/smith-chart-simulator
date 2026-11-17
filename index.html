@@ -3,123 +3,313 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Smith Chart — Animated Solution</title>
+<title>Smith Chart Simulator — Animated Solution</title>
+<meta name="description" content="Animated, step-by-step Smith chart solution: find the normalized load admittance and VSWR for any load on a transmission line.">
+<meta name="theme-color" content="#150f36">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237047ff'/%3E%3Cstop offset='.55' stop-color='%23ff4fa3'/%3E%3Cstop offset='1' stop-color='%23ffb84d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f5f3ee; --card:#ffffff; --ink:#1d2329; --muted:#5f6b76; --line:#e3e0d8;
-    --red:#d1495b; --blue:#2e86ab; --green:#2f9e5b; --purple:#8e44ad; --gold:#c98a12;
+    --night:#150f36; --night-2:#23175a; --violet:#7047ff; --magenta:#ff4fa3; --amber:#ffb84d; --cyan:#41d9e8;
+    --text:#f1edff; --muted:#b4acdc; --glass:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.14);
+    --paper:#fdfcff; --ink:#221b45;
+    --c-r:#e0367a; --c-x:#0f8fb3; --c-s:#e58a00; --c-y:#6c3cf0;
+    --grad:linear-gradient(115deg,var(--violet),var(--magenta) 55%,var(--amber));
+    --ease:cubic-bezier(.2,.7,.2,1);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
-  header{max-width:1200px;margin:0 auto;padding:22px 20px 6px}
-  header h1{margin:0;font-size:22px;letter-spacing:-.01em}
-  header p{margin:4px 0 0;color:var(--muted);font-size:14.5px}
-  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
-  main{max-width:1200px;margin:0 auto;padding:14px 20px 30px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-  .chart-card{padding:12px}
-  svg#chart{width:100%;height:auto;display:block;touch-action:manipulation}
+  html{scroll-behavior:smooth}
+  html{background:#140e33}
+  body{
+    margin:0;min-height:100vh;color:var(--text);line-height:1.55;position:relative;
+    font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(1100px 650px at 92% -8%, rgba(255,79,163,.30), transparent 62%),
+      radial-gradient(900px 640px at -12% 18%, rgba(112,71,255,.45), transparent 60%),
+      radial-gradient(900px 700px at 60% 112%, rgba(65,217,232,.16), transparent 62%),
+      linear-gradient(180deg,#150f36 0%,#120c2f 55%,#170f3c 100%);
+  }
+  ::selection{background:rgba(255,79,163,.4)}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:8px}
+
+  /* ---------- hero ---------- */
+  .hero{max-width:1220px;margin:0 auto;padding:56px 24px 28px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);gap:40px;align-items:center}
+  .hero h1{
+    margin:0 0 16px;font-size:clamp(38px,5.4vw,64px);line-height:.98;letter-spacing:-.035em;font-weight:800;
+    font-variation-settings:"opsz" 96;text-wrap:balance;
+    background:linear-gradient(100deg,#ffffff 0%,#ffd6ec 45%,#ffc677 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{font-size:18px;color:#d9d3f7;max-width:46ch;margin:0 0 18px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+  .chip{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13.5px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--stroke);color:#efeaff}
+  .chip.find{border-color:rgba(255,184,77,.5);color:#ffd9a0;background:rgba(255,184,77,.08)}
+  .cta{display:flex;flex-wrap:wrap;gap:12px}
+  .rise{opacity:0;transform:translateY(14px);animation:rise .8s var(--ease) forwards}
+  .rise.d1{animation-delay:.08s}.rise.d2{animation-delay:.18s}.rise.d3{animation-delay:.28s}.rise.d4{animation-delay:.38s}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  .wave-card{margin:0;border-radius:24px;padding:18px 18px 14px;background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid var(--stroke);box-shadow:0 40px 90px -40px rgba(255,79,163,.55),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(10px)}
+  .wave-card canvas{width:100%;height:270px;display:block}
+  .wave-card figcaption{font-size:14px;color:var(--muted);margin-top:8px;padding:0 4px}
+  .wave-card figcaption b{color:#fff;font-weight:600}
+  .wkey{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--muted);padding:0 4px 4px}
+  .wkey span{display:inline-flex;align-items:center;gap:6px}
+  .wkey i{width:16px;height:3px;border-radius:2px;display:inline-block}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font:inherit;font-weight:600;font-size:14.5px;color:var(--text);cursor:pointer;
+    padding:10px 16px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.07);
+    transition:transform .18s var(--ease),background .25s,box-shadow .25s,border-color .25s,opacity .2s;
+  }
+  .btn:hover{background:rgba(255,255,255,.13);transform:translateY(-1px)}
+  .btn:active{transform:translateY(0) scale(.97)}
+  .btn:disabled{opacity:.35;cursor:default;transform:none}
+  .btn.primary{
+    border:none;color:#fff;background:var(--grad);background-size:160% 100%;background-position:0% 50%;
+    box-shadow:0 10px 30px -10px rgba(255,79,163,.85);transition:transform .18s var(--ease),background-position .5s var(--ease),box-shadow .3s;
+  }
+  .btn.primary:hover{background-position:100% 50%;box-shadow:0 14px 36px -10px rgba(255,79,163,1)}
+  .btn.big{padding:13px 22px;font-size:16px;border-radius:14px}
+
+  /* ---------- lab ---------- */
+  main{max-width:1220px;margin:0 auto;padding:18px 24px 40px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:26px;align-items:start;scroll-margin-top:16px}
+  .frame{
+    padding:3px;border-radius:26px;
+    background:linear-gradient(120deg,var(--violet),var(--magenta),var(--amber),var(--cyan),var(--violet));background-size:300% 300%;
+    animation:flow 14s linear infinite;box-shadow:0 40px 100px -40px rgba(112,71,255,.9),0 20px 60px -30px rgba(255,79,163,.6);
+  }
+  @keyframes flow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+  .paper{background:var(--paper);border-radius:23px;padding:12px}
+  svg#chart{width:100%;height:auto;display:block}
   .halo{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
-  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-top:8px}
-  button,select,input{font:inherit}
-  .btn{border:1px solid #cfd5db;background:#fff;color:var(--ink);border-radius:9px;padding:8px 13px;font-size:14px;font-weight:600;cursor:pointer;min-width:44px}
-  .btn:hover{background:#f2f4f6}
-  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);min-width:104px}
-  .btn.primary:hover{background:#343c44}
-  .btn:disabled{opacity:.4;cursor:default}
-  .speed{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
-  .speed select{border:1px solid #cfd5db;border-radius:8px;padding:6px 8px;background:#fff}
-  .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:12px 0 4px}
-  .dot{width:30px;height:30px;border-radius:50%;border:1px solid #cfd5db;background:#fff;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:0}
-  .dot.done{background:#eef1f4;color:var(--ink)}
-  .dot.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .panel{padding:20px 22px}
-  .stepno{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .panel h2{margin:4px 0 8px;font-size:21px;letter-spacing:-.01em}
-  .panel p{margin:0 0 12px;font-size:15px}
-  .work{background:#f7f8fa;border:1px solid #e6e9ed;border-left:4px solid var(--ink);border-radius:8px;padding:12px 14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13.5px;line-height:1.75;overflow-x:auto}
+  .progress{height:6px;border-radius:99px;background:rgba(255,255,255,.1);margin:18px 6px 0;overflow:hidden}
+  .progress i{display:block;height:100%;width:0;border-radius:99px;background:var(--grad);box-shadow:0 0 18px rgba(255,79,163,.8)}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:16px}
+  .speed{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+  select,input{font:inherit;color:var(--text);background:rgba(10,6,32,.45);border:1px solid var(--stroke);border-radius:10px;padding:8px 10px;transition:border-color .2s,box-shadow .2s}
+  select:focus,input:focus{outline:none;border-color:var(--magenta);box-shadow:0 0 0 3px rgba(255,79,163,.25)}
+  select option{background:#1d1450}
+  .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:16px 0 6px}
+  .dot{width:34px;height:34px;border-radius:50%;border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:var(--muted);font:600 12.5px "Bricolage Grotesque",sans-serif;cursor:pointer;padding:0;
+       transition:transform .3s var(--ease),background .35s,color .3s,box-shadow .35s,border-color .3s}
+  .dot:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.35)}
+  .dot.done{background:rgba(255,255,255,.14);color:#fff}
+  .dot.active{background:var(--grad);color:#fff;border-color:transparent;transform:scale(1.14);box-shadow:0 0 0 4px rgba(255,79,163,.18),0 8px 22px -6px rgba(255,79,163,.9)}
+  .hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:6px}
+
+  .panel{border-radius:24px;padding:26px 26px 22px;background:linear-gradient(165deg,rgba(255,255,255,.09),rgba(255,255,255,.035));border:1px solid var(--stroke);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);position:sticky;top:16px}
+  .stepno{font-size:14px;font-weight:600;color:var(--amber)}
+  .panel h2{margin:2px 0 12px;font-size:28px;line-height:1.12;letter-spacing:-.02em;font-weight:750}
+  .panel p{margin:0 0 12px;font-size:16px;color:#e4dffb}
+  .panel b{color:#fff}
+  .work{position:relative;background:rgba(10,6,32,.5);border:1px solid var(--stroke);border-radius:14px;padding:14px 16px 14px 20px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14px;line-height:1.8;overflow-x:auto;color:#fff}
+  .work::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:4px;background:var(--grad)}
   .work:empty{display:none}
-  .work .c{color:var(--muted);font-family:Inter,system-ui,sans-serif;font-size:13px}
-  .answer{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 12px}
-  .ans{border-radius:10px;padding:12px 14px;border:1px solid}
-  .ans .k{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-  .ans .v{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:600;margin-top:2px}
+  .work .c{color:var(--muted);font-family:"Bricolage Grotesque",sans-serif;font-size:13.5px}
+  .answer{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:6px 0 14px}
+  .ans{border-radius:16px;padding:14px 16px;border:1.5px solid transparent;animation:pop .6s var(--ease) both}
+  .ans:nth-child(2){animation-delay:.12s}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+  .ans .k{font-size:13px;font-weight:600;color:var(--muted)}
+  .ans .v{font-family:"IBM Plex Mono",monospace;font-size:19px;white-space:nowrap;font-weight:600;margin:4px 0 2px;background-clip:text;-webkit-background-clip:text;color:transparent}
   .ans .s{font-size:12.5px;color:var(--muted)}
-  .ans.y{border-color:#d9c3e6;background:#f8f1fc}.ans.y .k{color:var(--purple)}
-  .ans.s1{border-color:#bfe2cc;background:#effaf3}.ans.s1 .k{color:var(--green)}
-  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:16px;font-size:12.5px;color:var(--muted)}
-  .legend span{display:inline-flex;align-items:center;gap:6px}
-  .legend i{width:18px;height:3px;border-radius:2px;display:inline-block}
-  details.inputs{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
-  details.inputs summary{cursor:pointer;font-weight:600;font-size:14px}
-  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
-  .form label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
-  .form input{border:1px solid #cfd5db;border-radius:8px;padding:7px 9px;width:100%}
-  .form .row{grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .err{color:var(--red);font-size:13px}
-  .kbd{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
-  @media (max-width:880px){main{grid-template-columns:1fr}}
+  .ans.y{background:linear-gradient(#21175a,#21175a) padding-box,linear-gradient(135deg,var(--violet),var(--magenta)) border-box}
+  .ans.y .v{background-image:linear-gradient(90deg,#c9b8ff,#ff9fd0)}
+  .ans.s1{background:linear-gradient(#21175a,#21175a) padding-box,linear-gradient(135deg,var(--magenta),var(--amber)) border-box}
+  .ans.s1 .v{background-image:linear-gradient(90deg,#ffb1d6,#ffcf80)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:18px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:20px;height:4px;border-radius:2px;display:inline-block}
+  details.inputs{margin-top:20px;border-top:1px solid var(--stroke);padding-top:14px}
+  details.inputs summary{cursor:pointer;font-weight:650;font-size:15px;list-style:none;display:flex;align-items:center;gap:8px}
+  details.inputs summary::-webkit-details-marker{display:none}
+  details.inputs summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--amber);border-bottom:2px solid var(--amber);transform:rotate(-45deg);transition:transform .25s var(--ease)}
+  details.inputs[open] summary::before{transform:rotate(45deg)}
+  .form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+  .form label{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+  .form input{width:100%}
+  .form .row{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .err{color:#ff8fb8;font-size:13.5px}
+
+  footer{max-width:1220px;margin:0 auto;padding:6px 24px 40px;color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+  footer a{color:#ffd9a0;text-decoration:none;border-bottom:1px solid rgba(255,184,77,.4);transition:color .2s,border-color .2s}
+  footer a:hover{color:#fff;border-color:#fff}
+
+
+  /* ---------- complete solution ---------- */
+  .complete{max-width:1220px;margin:0 auto;padding:44px 24px 36px}
+  .complete-head h2{text-wrap:balance;margin:0 0 10px;font-size:clamp(30px,4vw,46px);line-height:1.02;letter-spacing:-.03em;font-weight:800;
+    background:linear-gradient(100deg,#ffffff 0%,#ffd6ec 50%,#ffc677 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .complete-head p{color:#d9d3f7;max-width:64ch;margin:0 0 24px;font-size:16.5px}
+  .complete-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:26px;align-items:start}
+  .frame.still{animation:none;background:linear-gradient(135deg,#7047ff,#ff4fa3 50%,#ffb84d)}
+  .sheet-scroll{overflow:auto;background:#fff;padding:6px;-webkit-overflow-scrolling:touch}
+  #full{width:100%;height:auto;display:block;transition:width .35s var(--ease)}
+  .seg{display:inline-flex;border:1px solid var(--stroke);border-radius:12px;overflow:hidden}
+  .seg .btn{border:none;border-radius:0;background:transparent}
+  .seg .btn[aria-pressed="true"]{background:rgba(255,255,255,.16)}
+  .seg .btn:hover{transform:none}
+  .solution h3{margin:0 0 4px;font-size:23px;letter-spacing:-.015em}
+  .solution .sub{color:var(--muted);font-size:14px;margin:0 0 10px}
+  .readings{list-style:none;counter-reset:rd;margin:0 0 14px;padding:0}
+  .readings li{counter-increment:rd;display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:12px;padding:10px 0;border-bottom:1px solid var(--stroke)}
+  .readings li::before{content:counter(rd);grid-row:span 2;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--stroke);display:grid;place-items:center;font-size:12.5px;font-weight:700;color:var(--amber)}
+  .readings .rk{font-size:14.5px;color:#e4dffb}
+  .readings .rv{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14px;color:#fff}
+  .extras{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin:0 0 14px;font-size:13.5px;color:var(--muted)}
+  .extras b{display:block;font-family:"IBM Plex Mono",monospace;color:#fff;font-size:14px;font-weight:600}
+  #full .sd{stroke-dasharray:1 1;stroke-dashoffset:1}
+  .in-view #full .sd{animation:drawin 1.1s var(--ease) forwards;animation-delay:var(--d)}
+  #full .fd{opacity:0}
+  .in-view #full .fd{animation:fadein .6s var(--ease) forwards;animation-delay:var(--d)}
+  @keyframes drawin{to{stroke-dashoffset:0}}
+  @keyframes fadein{to{opacity:1}}
+  @media (max-width:940px){.complete-grid{grid-template-columns:1fr}.solution{position:static}}
+  @media (max-width:520px){.complete{padding-left:16px;padding-right:16px}.extras{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){
+    #full .sd{stroke-dasharray:none;stroke-dashoffset:0;animation:none!important}
+    #full .fd{opacity:1;animation:none!important}
+    #full{transition:none}
+  }
+  @media (max-width:940px){
+    .hero{grid-template-columns:1fr;padding-top:36px;gap:26px}
+    main{grid-template-columns:1fr}
+    .panel{position:static}
+  }
+  @media (max-width:520px){
+    .wave-card canvas{height:210px}
+    .panel{padding:20px 18px}
+    .panel h2{font-size:24px}
+    .hero,main,footer{padding-left:16px;padding-right:16px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .rise{animation:none;opacity:1;transform:none}
+    .frame{animation:none}
+    .ans{animation:none}
+    .btn,.dot{transition:none}
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Smith chart, step by step</h1>
-  <p id="sub">A 50 Ω line terminated by Z<sub>L</sub> = 25 − j50 Ω. Find the normalized load admittance y<sub>L</sub> and the VSWR.</p>
+<header class="hero">
+  <div>
+    <h1 class="rise">Smith chart, drawn step by step</h1>
+    <p class="lede rise d1" id="lede">A 50 Ω line ends in a 25 − j50 Ω load. Watch the chart find the load admittance y<sub>L</sub> and the VSWR, one construction line at a time.</p>
+    <div class="chips rise d2" id="chips"></div>
+    <div class="cta rise d3">
+      <button class="btn primary big" id="hStart">Start the walkthrough</button>
+      <button class="btn big" id="hTry">Try your own load</button>
+    </div>
+  </div>
+  <figure class="wave-card rise d4">
+    <div class="wkey">
+      <span><i style="background:#41d9e8"></i>incident</span>
+      <span><i style="background:#ffb84d"></i>reflected</span>
+      <span><i style="background:#fff"></i>total voltage</span>
+      <span><i style="background:#ff4fa3"></i>|V| envelope</span>
+    </div>
+    <canvas id="wave" aria-label="Animated standing wave on the transmission line"></canvas>
+    <figcaption id="waveCap"></figcaption>
+  </figure>
 </header>
-<main>
-  <section class="card chart-card">
-    <svg id="chart" viewBox="0 0 600 600" role="img" aria-label="Animated Smith chart">
-      <g id="grid"></g>
-      <g id="ov"></g>
-    </svg>
+
+<main id="lab">
+  <section id="stage">
+    <div class="frame"><div class="paper">
+      <svg id="chart" viewBox="0 0 600 600" role="img" aria-label="Animated Smith chart">
+        <g id="grid"></g>
+        <g id="ov"></g>
+      </svg>
+    </div></div>
+    <div class="progress"><i id="pfill"></i></div>
     <div class="controls">
-      <button class="btn" id="bRestart" title="Restart (R)">⟲</button>
+      <button class="btn" id="bRestart" title="Restart (R)" aria-label="Restart">⟲</button>
       <button class="btn" id="bBack" title="Previous step (←)">◀ Back</button>
-      <button class="btn primary" id="bPlay" title="Play all / pause (Space)">▶ Play all</button>
+      <button class="btn primary" id="bPlay" title="Play all / pause (Space)" style="min-width:122px">▶ Play all</button>
       <button class="btn" id="bNext" title="Next step (→)">Next ▶</button>
       <label class="speed">Speed
         <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
       </label>
     </div>
     <div class="dots" id="dots"></div>
-    <div class="kbd">Keys: ← → to step, Space to play/pause, R to restart</div>
+    <div class="hint">Keys: ← → to step, Space to play or pause, R to restart</div>
   </section>
 
-  <aside class="card panel">
-    <div class="stepno" id="stepno"></div>
-    <h2 id="stitle"></h2>
-    <div id="sbody"></div>
-    <div class="work" id="swork"></div>
-
-    <div class="legend">
-      <span><i style="background:var(--red)"></i>r circle</span>
-      <span><i style="background:var(--blue)"></i>x arc</span>
-      <span><i style="background:var(--green)"></i>VSWR circle</span>
-      <span><i style="background:var(--purple)"></i>λ/4 rotation → admittance</span>
+  <aside class="panel">
+    <div id="pcontent">
+      <div class="stepno" id="stepno"></div>
+      <h2 id="stitle"></h2>
+      <div id="sbody"></div>
+      <div class="work" id="swork"></div>
     </div>
-
-    <details class="inputs">
+    <div class="legend">
+      <span><i style="background:var(--c-r)"></i>r circle</span>
+      <span><i style="background:var(--c-x)"></i>x arc</span>
+      <span><i style="background:var(--c-s)"></i>VSWR circle</span>
+      <span><i style="background:var(--c-y)"></i>λ/4 turn to admittance</span>
+    </div>
+    <details class="inputs" id="tryBox">
       <summary>Try another load</summary>
       <form class="form" id="form">
         <label><span>Z₀ (Ω)</span><input id="iZ0" type="number" step="any" value="50"></label>
         <label><span>R<sub>L</sub> (Ω)</span><input id="iR" type="number" step="any" value="25"></label>
         <label><span>X<sub>L</sub> (Ω)</span><input id="iX" type="number" step="any" value="-50"></label>
-        <div class="row"><button class="btn" type="submit">Solve this load</button><span class="err" id="err"></span></div>
+        <div class="row"><button class="btn primary" type="submit">Solve this load</button><span class="err" id="err" role="alert"></span></div>
       </form>
     </details>
   </aside>
 </main>
 
+<section class="complete" id="complete">
+  <div class="complete-head">
+    <h2>The complete solution</h2>
+    <p>Every construction from the walkthrough on one full Smith chart, with the wavelength and angle rings and the radially scaled rulers underneath. Zoom in and read it the way you would read your paper chart.</p>
+  </div>
+  <div class="complete-grid">
+    <div>
+      <div class="frame still"><div class="paper sheet-scroll" id="sheetScroll">
+        <svg id="full" viewBox="0 0 820 990" role="img" aria-label="Complete Smith chart with the full solution drawn on it"><g id="fGrid"></g><g id="fSol"></g></svg>
+      </div></div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Zoom">
+          <button class="btn" data-zoom="100" aria-pressed="true">Fit</button>
+          <button class="btn" data-zoom="160" aria-pressed="false">1.6×</button>
+          <button class="btn" data-zoom="250" aria-pressed="false">2.5×</button>
+        </div>
+        <button class="btn primary" id="dlSvg">Download chart (SVG)</button>
+      </div>
+    </div>
+    <aside class="panel solution">
+      <h3>Readings off the chart</h3>
+      <p class="sub" id="solSub"></p>
+      <ol class="readings" id="readings"></ol>
+      <div class="extras" id="extras"></div>
+      <div class="answer" id="finalAns"></div>
+    </aside>
+  </div>
+</section>
+
+<footer>
+  <span>Made for EMTI practice. Readings from a paper chart will differ slightly from the exact values shown here.</span>
+  <a href="https://github.com/shourayaVishnoi/smith-chart-simulator">Source on GitHub</a>
+</footer>
+
 <script>
 (() => {
   const NS = 'http://www.w3.org/2000/svg';
   const CX = 300, CY = 300, RAD = 228;
+  const FONT = 'Bricolage Grotesque, system-ui, sans-serif';
   const gridG = document.getElementById('grid');
   const ov = document.getElementById('ov');
-  const COL = {red:'#d1495b', blue:'#2e86ab', green:'#2f9e5b', purple:'#8e44ad', ink:'#1d2329', gold:'#c98a12'};
+  const COL = {red:'#e0367a', blue:'#0f8fb3', green:'#e58a00', purple:'#6c3cf0', ink:'#221b45'};
+  const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---------- math helpers ----------
   const clamp = (v, a=0, b=1) => Math.min(b, Math.max(a, v));
@@ -132,9 +322,7 @@
     for (let i = 0; i <= n; i++){ const a = a0 + (a1 - a0)*i/n; pts.push([cu + rho*Math.cos(a), cv + rho*Math.sin(a)]); }
     return pts;
   }
-  // constant-r circle, starting at its left point on the real axis
   function rPts(r){ const c = r/(1+r), rho = 1/(1+r); return circlePts(c, 0, rho, Math.PI, -Math.PI); }
-  // constant-x arc, from the rim (r = 0) to the right edge (r = ∞)
   function xPts(x, n=200){
     if (Math.abs(x) < 1e-12){ const pts=[]; for(let i=0;i<=n;i++) pts.push([-1 + 2*i/n, 0]); return pts; }
     const ax = Math.abs(x), s = Math.sign(x), g0 = gam(0, ax);
@@ -164,12 +352,11 @@
   function text(u, v, str, o={}, parent){
     const [X, Y] = px(u, v);
     const t = el('text', {x:X, y:Y, 'text-anchor':o.anchor || 'middle', 'dominant-baseline':'middle', fill:o.color || COL.ink,
-      'font-size':o.size || 13, 'font-weight':o.weight || 600, opacity:o.op ?? 1, class:o.halo === false ? '' : 'halo',
-      'font-family':o.mono ? 'JetBrains Mono, monospace' : 'Inter, sans-serif'}, parent);
+      'font-size':o.size || 13, 'font-weight':o.weight || 650, opacity:o.op ?? 1, class:o.halo === false ? '' : 'halo', 'font-family':FONT}, parent);
     t.textContent = str; return t;
   }
-  function dot(u, v, r, color, op=1){ const [X, Y] = px(u, v); return el('circle', {cx:X, cy:Y, r:Math.max(0, r), fill:color, stroke:'#fff', 'stroke-width':1.5, opacity:op}); }
-  function ring(u, v, r, color, op){ const [X, Y] = px(u, v); return el('circle', {cx:X, cy:Y, r:Math.max(0, r), fill:'none', stroke:color, 'stroke-width':2, opacity:op}); }
+  function dot(u, v, r, color, op=1){ const [X, Y] = px(u, v); return el('circle', {cx:X, cy:Y, r:Math.max(0, r), fill:color, stroke:'#fff', 'stroke-width':1.8, opacity:op}); }
+  function ring(u, v, r, color, op){ const [X, Y] = px(u, v); return el('circle', {cx:X, cy:Y, r:Math.max(0, r), fill:'none', stroke:color, 'stroke-width':2.2, opacity:op}); }
   function pointLabel(u, v, str, color, op=1, k=0.08){
     const m = Math.hypot(u, v);
     const dx = m < 1e-6 ? 0.6 : u/m, dy = m < 1e-6 ? 0.8 : v/m;
@@ -185,7 +372,8 @@
     const s = mag < 1 - 1e-12 ? (1 + mag)/(1 - mag) : Infinity;
     const d = r*r + x*x, g = r/d, b = -x/d;
     const w1 = wtg(th), w2 = (w1 + 0.25) % 0.5;
-    return {Z0, RL, XL, r, x, gu, gv, mag, th, s, g, b, w1, w2, yu:-gu, yv:-gv};
+    const dmax = ((th/(4*Math.PI)) % 0.5 + 0.5) % 0.5, dmin = (dmax + 0.25) % 0.5;
+    return {Z0, RL, XL, r, x, gu, gv, mag, th, s, g, b, w1, w2, dmax, dmin, yu:-gu, yv:-gv};
   }
 
   // ---------- grid ----------
@@ -193,12 +381,12 @@
   let gridPieces = null, lastGridP = -1;
   function buildGrid(){
     const pcs = [];
-    pcs.push({pts:rPts(0), color:'#2b333b', w:1.8});
-    pcs.push({pts:xPts(0), color:'#7d8892', w:1});
-    R_MIN.forEach(r => pcs.push({pts:rPts(r), color:'#e4e8ec', w:0.7}));
-    R_MAJ.forEach(r => pcs.push({pts:rPts(r), color:'#b7c1ca', w:1}));
-    R_MIN.forEach(x => { pcs.push({pts:xPts(x), color:'#e4e8ec', w:0.7}); pcs.push({pts:xPts(-x), color:'#e4e8ec', w:0.7}); });
-    R_MAJ.forEach(x => { pcs.push({pts:xPts(x), color:'#b7c1ca', w:1}); pcs.push({pts:xPts(-x), color:'#b7c1ca', w:1}); });
+    pcs.push({pts:rPts(0), color:'#2a2350', w:1.9});
+    pcs.push({pts:xPts(0), color:'#8a83a8', w:1});
+    R_MIN.forEach(r => pcs.push({pts:rPts(r), color:'#e8e5f3', w:0.7}));
+    R_MAJ.forEach(r => pcs.push({pts:rPts(r), color:'#bdb6d8', w:1}));
+    R_MIN.forEach(x => { pcs.push({pts:xPts(x), color:'#e8e5f3', w:0.7}); pcs.push({pts:xPts(-x), color:'#e8e5f3', w:0.7}); });
+    R_MAJ.forEach(x => { pcs.push({pts:xPts(x), color:'#bdb6d8', w:1}); pcs.push({pts:xPts(-x), color:'#bdb6d8', w:1}); });
     gridPieces = pcs;
   }
   function drawGrid(p){
@@ -209,121 +397,90 @@
     gridPieces.forEach((pc, k) => stroke(pc.pts, ease(seg(p, 0.6*k/N, 0.6*k/N + 0.3)), pc.color, pc.w, {}, gridG));
     const lp = seg(p, 0.55, 0.95);
     if (lp > 0){
-      // WTG ring
       const ringG = el('g', {opacity:lp}, gridG);
       const [cx, cy] = px(0, 0);
-      el('circle', {cx, cy, r:RAD*1.075, fill:'none', stroke:'#c9cfd5', 'stroke-width':1}, ringG);
+      el('circle', {cx, cy, r:RAD*1.075, fill:'none', stroke:'#d6d1ea', 'stroke-width':1}, ringG);
       for (let i = 0; i < 50; i++){
-        const w = i/100*1, wl = i*0.01, th = (180 - 720*wl)*Math.PI/180;
-        const big = i % 5 === 0, r1 = 1.0, r2 = big ? 1.055 : 1.03;
-        const [x1, y1] = px(r1*Math.cos(th), r1*Math.sin(th)), [x2, y2] = px(r2*Math.cos(th), r2*Math.sin(th));
-        el('line', {x1, y1, x2, y2, stroke: big ? '#7d8892' : '#b7c1ca', 'stroke-width': big ? 1.2 : 0.8}, ringG);
-        if (big) text(1.13*Math.cos(th), 1.13*Math.sin(th), (i/100).toFixed(2).replace(/^0\.00$/, '0'), {size:10, weight:500, color:'#7d8892', halo:false}, ringG);
+        const th = (180 - 720*i*0.01)*Math.PI/180;
+        const big = i % 5 === 0, r2 = big ? 1.055 : 1.03;
+        const [x1, y1] = px(Math.cos(th), Math.sin(th)), [x2, y2] = px(r2*Math.cos(th), r2*Math.sin(th));
+        el('line', {x1, y1, x2, y2, stroke: big ? '#8a83a8' : '#c4bedb', 'stroke-width': big ? 1.2 : 0.8}, ringG);
+        if (big) text(1.13*Math.cos(th), 1.13*Math.sin(th), i === 0 ? '0' : (i/100).toFixed(2), {size:10, weight:500, color:'#8a83a8', halo:false}, ringG);
       }
-      // r labels on the axis
-      R_MAJ.forEach(r => { const u = gam(r, 0)[0]; text(u + 0.012, 0.032, f(r), {size:10, weight:600, color:'#6c7883', anchor:'start'}, ringG); });
-      text(-0.985, 0.032, '0', {size:10, weight:600, color:'#6c7883', anchor:'start'}, ringG);
-      // x labels just inside the rim
+      R_MAJ.forEach(r => { const u = gam(r, 0)[0]; text(u + 0.012, 0.032, f(r), {size:10, weight:600, color:'#756e95', anchor:'start'}, ringG); });
+      text(-0.985, 0.032, '0', {size:10, weight:600, color:'#756e95', anchor:'start'}, ringG);
       R_MAJ.forEach(x => [x, -x].forEach(xx => {
         const g0 = gam(0, xx);
-        text(0.915*g0[0], 0.915*g0[1], (xx > 0 ? '+j' : '−j') + f(Math.abs(xx)), {size:10, weight:600, color:'#6c7883'}, ringG);
+        text(0.915*g0[0], 0.915*g0[1], (xx > 0 ? '+j' : '−j') + f(Math.abs(xx)), {size:10, weight:600, color:'#756e95'}, ringG);
       }));
-      const t = el('text', {x:12, y:590, 'font-size':11, fill:'#7d8892', 'font-family':'Inter, sans-serif'}, ringG);
+      const t = el('text', {x:12, y:590, 'font-size':11, fill:'#8a83a8', 'font-family':FONT}, ringG);
       t.textContent = 'Outer scale: wavelengths toward generator (clockwise)';
     }
   }
 
   // ---------- steps ----------
   const steps = [
-    { // 0
-      dot:'◎', dur:3600,
+    { dot:'◎', dur:3600,
       info: m => ({
         title:'Meet the Smith chart',
         body:`<p>Every point inside the big circle is a normalized impedance <b>z = r + jx</b>.</p>
         <p>The <b>full circles</b> are constant-<i>r</i> circles. They all touch the right edge, where r = ∞. The <b>arcs</b> are constant-<i>x</i> arcs: the upper half is +x (inductive) and the lower half is −x (capacitive).</p>
         <p>The horizontal line is pure resistance. The centre is z = 1, a perfect match. The outer ring is the wavelength scale, read toward the generator.</p>`,
-        work:''
-      }),
-      draw: () => {}
-    },
-    { // 1 normalize
-      dot:'1', dur:1600,
+        work:'' }),
+      draw: () => {} },
+    { dot:'1', dur:1600,
       info: m => ({
         title:'Normalize the load',
         body:`<p>The chart only works with normalized values, so divide the load by Z<sub>0</sub> first. The centre O (z = 1 + j0) is your reference point.</p>`,
-        work:`z<sub>L</sub> = Z<sub>L</sub> / Z<sub>0</sub><br>&nbsp;&nbsp;&nbsp;= (${fc(m.RL, m.XL)}) / ${f(m.Z0)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.r, m.x)}</b><br><span class="c">So r = ${f(m.r)} and x = ${f(m.x)}.</span>`
-      }),
-      draw: (m, p) => {
-        const e = ease(p);
-        dot(0, 0, 5*e, COL.ink);
-        text(0.03, -0.055, 'O (z = 1)', {size:12, op:e, anchor:'start'});
-      }
-    },
-    { // 2 r circle
-      dot:'2', dur:2200,
+        work:`z<sub>L</sub> = Z<sub>L</sub> / Z<sub>0</sub><br>&nbsp;&nbsp;&nbsp;= (${fc(m.RL, m.XL)}) / ${f(m.Z0)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.r, m.x)}</b><br><span class="c">So r = ${f(m.r)} and x = ${f(m.x)}.</span>` }),
+      draw: (m, p) => { const e = ease(p); dot(0, 0, 5*e, COL.ink); text(0.03, -0.055, 'O (z = 1)', {size:12, op:e, anchor:'start'}); } },
+    { dot:'2', dur:2200,
       info: m => ({
         title:`Find the r = ${f(m.r)} circle`,
         body:`<p>Find the constant-resistance circle for <b>r = ${f(m.r)}</b>. It crosses the horizontal axis at the point marked ${f(m.r)}. The point we want lies somewhere on this circle.</p>`,
-        work:`<span class="c">Centre of the r-circle: (r/(1+r), 0) = (${f(m.r/(1+m.r))}, 0)<br>Radius: 1/(1+r) = ${f(1/(1+m.r))}</span>`
-      }),
+        work:`<span class="c">Centre of the r-circle: (r/(1+r), 0) = (${f(m.r/(1+m.r))}, 0)<br>Radius: 1/(1+r) = ${f(1/(1+m.r))}</span>` }),
       draw: (m, p) => {
-        stroke(rPts(m.r), ease(p), COL.red, 2.6);
+        stroke(rPts(m.r), ease(p), COL.red, 2.8);
         const c = m.r/(1+m.r), rho = 1/(1+m.r);
         text(c, rho > 0.25 ? rho - 0.06 : rho + 0.045, `r = ${f(m.r)}`, {color:COL.red, op:seg(p, .6, 1), size:13.5});
-      }
-    },
-    { // 3 x arc
-      dot:'3', dur:2200,
+      } },
+    { dot:'3', dur:2200,
       info: m => ({
         title:`Find the x = ${f(m.x)} arc`,
         body: Math.abs(m.x) < 1e-12
           ? `<p>x = 0, so the load is purely resistive and the point lies on the horizontal axis.</p>`
           : `<p>x is <b>${m.x < 0 ? 'negative (capacitive)' : 'positive (inductive)'}</b>, so look in the <b>${m.x < 0 ? 'lower' : 'upper'} half</b>. Start at <b>${m.x < 0 ? '−' : '+'}j${f(Math.abs(m.x))}</b> on the rim and follow that arc toward the right edge.</p>`,
-        work: Math.abs(m.x) < 1e-12 ? '' : `<span class="c">Centre of the x-arc: (1, 1/x) = (1, ${f(1/m.x)})<br>Radius: 1/|x| = ${f(1/Math.abs(m.x))}</span>`
-      }),
+        work: Math.abs(m.x) < 1e-12 ? '' : `<span class="c">Centre of the x-arc: (1, 1/x) = (1, ${f(1/m.x)})<br>Radius: 1/|x| = ${f(1/Math.abs(m.x))}</span>` }),
       draw: (m, p) => {
-        const pts = xPts(m.x);
-        stroke(pts, ease(p), COL.blue, 2.6);
-        if (Math.abs(m.x) > 1e-12){
-          const g0 = gam(0, m.x);
-          text(0.8*g0[0] - 0.03, 0.8*g0[1], `x = ${f(m.x)}`, {color:COL.blue, op:seg(p, .6, 1), size:13.5, anchor:'end'});
-        }
-      }
-    },
-    { // 4 plot point
-      dot:'4', dur:1600,
+        stroke(xPts(m.x), ease(p), COL.blue, 2.8);
+        if (Math.abs(m.x) > 1e-12){ const g0 = gam(0, m.x); text(0.8*g0[0] - 0.03, 0.8*g0[1], `x = ${f(m.x)}`, {color:COL.blue, op:seg(p, .6, 1), size:13.5, anchor:'end'}); }
+      } },
+    { dot:'4', dur:1600,
       info: m => ({
         title:'Plot z<sub>L</sub> where they cross',
         body:`<p>The r circle and the x arc cross at one point. That point is <b>z<sub>L</sub> = ${fc(m.r, m.x)}</b>. Label it <b>P</b>.</p>
               <p>The distance OP, as a fraction of the chart's radius, is the size of the reflection coefficient |Γ<sub>L</sub>|.</p>`,
-        work:`Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1)<br>&nbsp;&nbsp;&nbsp;= ${fc(m.gu, m.gv)}<br>|Γ<sub>L</sub>| = <b>${f(m.mag)}</b>&nbsp;&nbsp;∠Γ<sub>L</sub> = ${f(m.th*180/Math.PI, 1)}°`
-      }),
+        work:`Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1)<br>&nbsp;&nbsp;&nbsp;= ${fc(m.gu, m.gv)}<br>|Γ<sub>L</sub>| = <b>${f(m.mag)}</b>&nbsp;&nbsp;∠Γ<sub>L</sub> = ${f(m.th*180/Math.PI, 1)}°` }),
       draw: (m, p) => {
-        const e = ease(seg(p, 0, .5));
-        const pp = seg(p, .3, 1);
+        const e = ease(seg(p, 0, .5)), pp = seg(p, .3, 1);
         if (pp > 0 && pp < 1) ring(m.gu, m.gv, 6 + 22*pp, COL.ink, 1 - pp);
         dot(m.gu, m.gv, 6*e, COL.ink);
         pointLabel(m.gu, m.gv, `P: z = ${fc(m.r, m.x)}`, COL.ink, seg(p, .4, .9));
-      }
-    },
-    { // 5 VSWR circle
-      dot:'5', dur:3000,
+      } },
+    { dot:'5', dur:3000,
       info: m => ({
         title:'Draw the constant-VSWR circle',
         body:`<p>Put the compass point on <b>O</b>, open it to <b>P</b>, and draw a full circle.</p>
               <p>|Γ| stays the same everywhere on a lossless line. So moving along the line only moves you <b>around this circle</b>, and every impedance on the line sits on it.</p>`,
-        work:`<span class="c">Circle radius = OP = |Γ<sub>L</sub>| × (chart radius)</span><br>|Γ<sub>L</sub>| = ${f(m.mag)}`
-      }),
+        work:`<span class="c">Circle radius = OP = |Γ<sub>L</sub>| × (chart radius)</span><br>|Γ<sub>L</sub>| = ${f(m.mag)}` }),
       draw: (m, p) => {
         const p1 = ease(seg(p, 0, .25)), p2 = ease(seg(p, .25, 1));
         stroke([[0,0],[m.gu, m.gv]], p1, COL.green, 2, {'stroke-dasharray':'5 4'});
         if (p1 >= 1 && m.mag > 0.12) text(m.gu/2 + 0.03, m.gv/2, `|Γ| = ${f(m.mag, 2)}`, {color:COL.green, size:12, anchor:'start'});
-        stroke(circlePts(0, 0, m.mag, m.th, m.th - 2*Math.PI, 360), p2, COL.green, 2.6);
+        stroke(circlePts(0, 0, m.mag, m.th, m.th - 2*Math.PI, 360), p2, COL.green, 2.8);
         dot(0, 0, 5, COL.ink); dot(m.gu, m.gv, 6, COL.ink);
-      }
-    },
-    { // 6 read VSWR
-      dot:'6', dur:2400,
+      } },
+    { dot:'6', dur:2400,
       info: m => ({
         title:'Read the VSWR',
         body: isFinite(m.s)
@@ -332,8 +489,7 @@
           : `<p>|Γ| = 1, so the circle is the rim itself and the VSWR is infinite. All the power is reflected.</p>`,
         work: isFinite(m.s)
           ? `VSWR = (1 + |Γ|)/(1 − |Γ|)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${f(1 + m.mag)}/${f(1 - m.mag)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b>${f(m.s, 2)}</b><br><span class="c">On a paper chart, expect a reading within about ±0.1 of this.</span>`
-          : `VSWR = ∞`
-      }),
+          : `VSWR = ∞` }),
       draw: (m, p) => {
         if (isFinite(m.s) && m.s < 60) stroke(rPts(m.s), ease(seg(p, 0, .6)), COL.green, 1.6, {'stroke-dasharray':'4 4', opacity:.8});
         const e = ease(seg(p, .4, .8));
@@ -344,10 +500,8 @@
           text(m.mag + 0.02, -0.075, `VSWR ≈ ${f(m.s, 2)}`, {color:COL.green, op:lo, size:14, anchor: m.mag > 0.75 ? 'end' : 'start'});
           if (m.mag > 0.02) text(-m.mag, -0.075, `1/VSWR ≈ ${f(1/m.s, 2)}`, {color:COL.green, op:lo*.85, size:11.5});
         } else text(0.98, -0.075, 'VSWR = ∞', {color:COL.green, op:lo, size:14, anchor:'end'});
-      }
-    },
-    { // 7 rotate
-      dot:'7', dur:4200,
+      } },
+    { dot:'7', dur:4200,
       info: m => {
         const sum = m.w1 + 0.25;
         return {
@@ -360,66 +514,58 @@
       draw: (m, p) => {
         const pa = ease(seg(p, 0, .18)), pb = ease(seg(p, .18, .78)), pc = ease(seg(p, .78, 1));
         const radial = (th, q) => stroke([[0,0],[1.075*Math.cos(th), 1.075*Math.sin(th)]], q, COL.purple, 1.3, {'stroke-dasharray':'3 4', opacity:.85});
-        const wlab = (th, w, op) => text(1.2*Math.cos(th), 1.2*Math.sin(th), `${f(w)}λ`, {color:COL.purple, size:12.5, op, anchor: Math.cos(th) > .4 ? 'start' : Math.cos(th) < -.4 ? 'end' : 'middle'});
-        radial(m.th, pa); if (pa >= 1) wlab(m.th, m.w1, 1);
-        const trail = circlePts(0, 0, m.mag, m.th, m.th - Math.PI, 180);
-        stroke(trail, pb, COL.purple, 3.2, {opacity:.9});
+        const wlab = (th, w) => text(1.2*Math.cos(th), 1.2*Math.sin(th), `${f(w)}λ`, {color:COL.purple, size:12.5, anchor: Math.cos(th) > .4 ? 'start' : Math.cos(th) < -.4 ? 'end' : 'middle'});
+        radial(m.th, pa); if (pa >= 1) wlab(m.th, m.w1);
+        stroke(circlePts(0, 0, m.mag, m.th, m.th - Math.PI, 180), pb, COL.purple, 3.4, {opacity:.9});
         if (pb > 0 && pb < 1){
           const a = m.th - Math.PI*pb;
-          const ra = 6;
-          dot(m.mag*Math.cos(a), m.mag*Math.sin(a), ra, COL.purple);
+          dot(m.mag*Math.cos(a), m.mag*Math.sin(a), 6.5, COL.purple);
           text(0, 0.11, `${Math.round(180*pb)}°`, {color:COL.purple, size:13});
         }
         if (pc > 0){
           stroke([[m.gu, m.gv],[m.yu, m.yv]], pc, COL.purple, 1.6, {'stroke-dasharray':'6 4'});
           radial(m.th + Math.PI, pc);
-          if (pc >= 1) wlab(m.th + Math.PI, m.w2, 1);
+          if (pc >= 1) wlab(m.th + Math.PI, m.w2);
         }
         dot(m.gu, m.gv, 6, COL.ink);
         if (pb >= 1){ dot(m.yu, m.yv, 6.5, COL.purple); pointLabel(m.yu, m.yv, 'P′', COL.purple, 1, 0.07); }
-      }
-    },
-    { // 8 read y
-      dot:'8', dur:2600,
+      } },
+    { dot:'8', dur:2600,
       info: m => ({
         title:'Read y<sub>L</sub> at P′',
         body:`<p>Read P′ like any other point. It sits on the <b>${f(m.g)}</b> circle and the <b>${m.b < 0 ? '−' : '+'}${f(Math.abs(m.b))}</b> arc. Because P′ is an admittance, call these <b>g</b> (conductance) and <b>b</b> (susceptance).</p>`,
-        work:`<span class="c">Check by algebra:</span><br>y<sub>L</sub> = 1/z<sub>L</sub> = 1/(${fc(m.r, m.x)})<br>&nbsp;&nbsp;&nbsp;= (${fc(m.r, -m.x)})/${f(m.r*m.r + m.x*m.x)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.g, m.b)}</b>`
-      }),
+        work:`<span class="c">Check by algebra:</span><br>y<sub>L</sub> = 1/z<sub>L</sub> = 1/(${fc(m.r, m.x)})<br>&nbsp;&nbsp;&nbsp;= (${fc(m.r, -m.x)})/${f(m.r*m.r + m.x*m.x)}<br>&nbsp;&nbsp;&nbsp;= <b>${fc(m.g, m.b)}</b>` }),
       draw: (m, p) => {
         stroke(rPts(m.g), ease(seg(p, 0, .55)), COL.purple, 1.6, {'stroke-dasharray':'5 4', opacity:.75});
         stroke(xPts(m.b), ease(seg(p, .3, .85)), COL.purple, 1.6, {'stroke-dasharray':'5 4', opacity:.75});
         dot(m.yu, m.yv, 6.5, COL.purple);
         pointLabel(m.yu, m.yv, `P′: y = ${fc(m.g, m.b)}`, COL.purple, seg(p, .7, 1));
-      }
-    },
-    { // 9 answer
-      dot:'✓', dur:1600,
+      } },
+    { dot:'✓', dur:1600,
       info: m => ({
         title:'Answer',
         body:`<div class="answer">
-            <div class="ans y"><div class="k">Normalized admittance</div><div class="v">y<sub>L</sub> = ${fc(m.g, m.b, 2)}</div><div class="s">Y<sub>L</sub> = y<sub>L</sub>/Z<sub>0</sub> = ${fc(1000*m.g/m.Z0, 1000*m.b/m.Z0, 2)} mS</div></div>
-            <div class="ans s1"><div class="k">VSWR</div><div class="v">${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '∞'}</div><div class="s">|Γ<sub>L</sub>| = ${f(m.mag, 2)}</div></div>
+            <div class="ans y"><div class="k">Normalized load admittance</div><div class="v">y<sub>L</sub> = ${fc(m.g, m.b, 2)}</div><div class="s">Y<sub>L</sub> = y<sub>L</sub>/Z<sub>0</sub> = ${fc(1000*m.g/m.Z0, 1000*m.b/m.Z0, 2)} mS</div></div>
+            <div class="ans s1"><div class="k">Voltage standing wave ratio</div><div class="v">VSWR ${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '= ∞'}</div><div class="s">|Γ<sub>L</sub>| = ${f(m.mag, 2)}</div></div>
           </div>
           <p><b>What to write in the exam:</b> z<sub>L</sub> = ${fc(m.r, m.x)} plotted at P. Draw the VSWR circle through P; it cuts the right half of the axis at VSWR ≈ ${isFinite(m.s) ? f(m.s, 1) : '∞'}. P′ is diametrically opposite P, so y<sub>L</sub> ≈ ${fc(m.g, m.b, 2)}.</p>`,
-        work:''
-      }),
+        work:'' }),
       draw: (m, p) => {
         const q = seg(p, 0, 1);
         if (q < 1){ ring(m.yu, m.yv, 7 + 20*q, COL.purple, 1 - q); if (isFinite(m.s)) ring(m.mag, 0, 7 + 20*q, COL.green, 1 - q); }
-      }
-    }
+      } }
   ];
   const LAST = steps.length - 1;
 
   // ---------- state & UI ----------
-  let idx = 0, prog = 0, running = true, auto = false, holdUntil = 0, speed = 1, dirty = true, lastT = performance.now();
+  let idx = 0, prog = 0, running = false, auto = false, started = false, holdUntil = 0, speed = 1, dirty = true, lastT = performance.now();
   const $ = id => document.getElementById(id);
   const dotsEl = $('dots');
   steps.forEach((s, i) => {
     const b = document.createElement('button');
     b.className = 'dot'; b.textContent = s.dot; b.title = i === 0 ? 'The chart' : i === LAST ? 'Answer' : 'Step ' + i;
-    b.addEventListener('click', () => { goTo(i); });
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', () => goTo(i));
     dotsEl.appendChild(b);
   });
 
@@ -428,15 +574,18 @@
     if (shownIdx === idx) return;
     shownIdx = idx;
     const inf = steps[idx].info(M);
-    $('stepno').textContent = idx === 0 ? 'Intro' : idx === LAST ? 'Result' : `Step ${idx} of ${LAST - 1}`;
+    $('stepno').textContent = idx === 0 ? 'Before you start' : idx === LAST ? 'Result' : `Step ${idx} of ${LAST - 1}`;
     $('stitle').innerHTML = inf.title;
     $('sbody').innerHTML = inf.body;
     $('swork').innerHTML = inf.work;
     [...dotsEl.children].forEach((d, i) => { d.className = 'dot' + (i === idx ? ' active' : i < idx ? ' done' : ''); });
     $('bBack').disabled = idx === 0;
+    if (!reduceMotion && $('pcontent').animate)
+      $('pcontent').animate([{opacity:0, transform:'translateY(10px)'}, {opacity:1, transform:'none'}], {duration:420, easing:'cubic-bezier(.2,.7,.2,1)'});
   }
   function updateButtons(){
     $('bPlay').textContent = auto ? '❚❚ Pause' : (idx === LAST && prog >= 1 ? '▶ Replay' : '▶ Play all');
+    $('pfill').style.width = ((idx + prog)/(LAST + 1)*100).toFixed(2) + '%';
   }
   function render(){
     drawGrid(idx === 0 ? prog : 1);
@@ -445,23 +594,26 @@
     if (idx > 0) steps[idx].draw(M, prog);
     updatePanel(); updateButtons();
   }
-  function goTo(i, p=0, run=true){ idx = clamp(i, 0, LAST); prog = p; running = run && p < 1; auto = false; dirty = true; }
+  function goTo(i, p=0, run=true){ started = true; idx = clamp(i, 0, LAST); prog = p; running = run && p < 1; auto = false; dirty = true; }
   function next(){
+    started = true;
     if (prog < 1){ prog = 1; running = false; }
     else if (idx < LAST){ idx++; prog = 0; running = true; }
     dirty = true;
   }
   function back(){ if (idx > 0){ idx--; prog = 1; running = false; auto = false; dirty = true; } }
   function togglePlay(){
+    started = true;
     if (auto){ auto = false; running = false; }
     else {
       auto = true;
       if (idx === LAST && prog >= 1){ idx = 0; prog = 0; }
-      if (prog >= 1){ holdUntil = 0; } else running = true;
+      if (prog >= 1) holdUntil = 0; else running = true;
     }
     dirty = true;
   }
   function restart(){ goTo(0, 0, true); }
+  function playFromStart(){ goTo(0, 0, true); auto = true; }
 
   function tick(t){
     const dt = Math.min(64, t - lastT); lastT = t;
@@ -483,32 +635,393 @@
   $('bRestart').addEventListener('click', restart);
   $('speed').addEventListener('change', e => { speed = +e.target.value; });
   document.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
     if (e.key === 'ArrowRight'){ next(); e.preventDefault(); }
     else if (e.key === 'ArrowLeft'){ back(); e.preventDefault(); }
-    else if (e.key === ' '){ togglePlay(); e.preventDefault(); }
+    else if (e.key === ' ' && e.target.tagName !== 'BUTTON'){ togglePlay(); e.preventDefault(); }
     else if (e.key === 'r' || e.key === 'R'){ restart(); }
   });
+  $('hStart').addEventListener('click', () => { $('lab').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); playFromStart(); });
+  $('hTry').addEventListener('click', () => {
+    const box = $('tryBox'); box.open = true;
+    box.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'center'});
+    setTimeout(() => $('iR').focus({preventScroll:true}), reduceMotion ? 0 : 450);
+  });
 
-  function setSub(m){
-    $('sub').innerHTML = `A ${f(m.Z0)} Ω line terminated by Z<sub>L</sub> = ${fc(m.RL, m.XL)} Ω. Find the normalized load admittance y<sub>L</sub> and the VSWR.`;
+  // start drawing the chart the first time it scrolls into view
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver((ents, obs) => {
+      if (ents.some(e => e.isIntersecting)){ if (!started){ started = true; running = true; dirty = true; } obs.disconnect(); }
+    }, {threshold:0.3}).observe($('stage'));
+  } else { started = true; running = true; }
+
+  // ---------- hero: standing wave ----------
+  const cv = $('wave'), ctx = cv.getContext('2d');
+  let W = 0, H = 0, waveVisible = true, waveT0 = performance.now();
+  function sizeWave(){
+    const r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = r.width; H = r.height; cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function drawWave(now){
+    if (!W) return;
+    const m = M, g = Math.min(m.mag, 1), th = m.th;
+    const reveal = reduceMotion ? 1 : ease(clamp((now - waveT0)/1800));
+    const phi = reduceMotion ? 0.9 : now/1000*2*Math.PI*0.3;
+    const D = 1.25, L = 30, R = W - 58, mid = H/2 + 2, A = (H/2 - 34)/(1 + g);
+    const xOf = d => R - (d/D)*(R - L);
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '600 11.5px Bricolage Grotesque, system-ui, sans-serif';
+
+    // axis & distance ticks
+    ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(L, mid); ctx.lineTo(R, mid); ctx.stroke();
+    ctx.fillStyle = 'rgba(214,206,255,.6)'; ctx.textAlign = 'center';
+    [[0,'0'],[0.25,'λ/4'],[0.5,'λ/2'],[0.75,'3λ/4'],[1,'λ']].forEach(([d, lab]) => {
+      const x = xOf(d); ctx.beginPath(); ctx.moveTo(x, H - 24); ctx.lineTo(x, H - 18); ctx.stroke(); ctx.fillText(lab, x, H - 7);
+    });
+    ctx.textAlign = 'left'; ctx.fillText('← toward generator', L, 14);
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(R - (R - L + 6)*reveal, 0, (R - L + 6)*reveal + 2, H); ctx.clip();
+    const N = 320, ds = [];
+    for (let i = 0; i <= N; i++) ds.push(D*i/N);
+    const env = d => Math.sqrt(Math.max(0, 1 + g*g + 2*g*Math.cos(th - 4*Math.PI*d)));
+    // envelope band
+    const grad = ctx.createLinearGradient(0, mid - A*(1+g), 0, mid + A*(1+g));
+    grad.addColorStop(0, 'rgba(255,79,163,.30)'); grad.addColorStop(.5, 'rgba(112,71,255,.06)'); grad.addColorStop(1, 'rgba(255,79,163,.30)');
+    ctx.beginPath();
+    ds.forEach((d, i) => { const x = xOf(d), y = mid - A*env(d); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    for (let i = N; i >= 0; i--){ const d = ds[i]; ctx.lineTo(xOf(d), mid + A*env(d)); }
+    ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+    const curve = (fn, color, w, glow) => {
+      ctx.beginPath(); ds.forEach((d, i) => { const x = xOf(d), y = mid - A*fn(d); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.strokeStyle = color; ctx.lineWidth = w; ctx.shadowBlur = glow || 0; ctx.shadowColor = color; ctx.stroke(); ctx.shadowBlur = 0;
+    };
+    curve(env, '#ff4fa3', 1.8, 8);
+    curve(d => -env(d), '#ff4fa3', 1.8, 8);
+    curve(d => Math.cos(phi + 2*Math.PI*d), 'rgba(65,217,232,.75)', 1.5);
+    if (g > 0.005) curve(d => g*Math.cos(phi - 2*Math.PI*d + th), 'rgba(255,184,77,.8)', 1.5);
+    curve(d => Math.cos(phi + 2*Math.PI*d) + g*Math.cos(phi - 2*Math.PI*d + th), '#ffffff', 2.6, 14);
+    ctx.restore();
+
+    // Vmax / Vmin markers nearest the load
+    if (g > 0.02 && reveal > .9){
+      const mark = (d, lab, top) => {
+        if (d > D) return;
+        const x = xOf(d), y = mid - A*env(d);
+        ctx.fillStyle = '#ffd9ec'; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 2*Math.PI); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.fillText(lab, x, top ? y - 10 : y - 10);
+      };
+      mark(m.dmax, 'Vmax', true); mark(m.dmin, 'Vmin', true);
+    }
+    // load block
+    const lx = R + 10, ly = mid - 22;
+    const lg = ctx.createLinearGradient(lx, ly, lx + 38, ly + 44);
+    lg.addColorStop(0, '#7047ff'); lg.addColorStop(1, '#ff4fa3');
+    ctx.fillStyle = lg; ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(lx, ly, 38, 44, 9); else ctx.rect(lx, ly, 38, 44);
+    ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.font = '700 13px Bricolage Grotesque, system-ui, sans-serif';
+    ctx.fillText('ZL', lx + 19, mid + 6);
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(R, mid); ctx.lineTo(lx, mid); ctx.stroke();
+  }
+  function waveCaption(){
+    const m = M;
+    $('waveCap').innerHTML = isFinite(m.s)
+      ? `The standing wave on this line. Peaks reach 1 + |Γ| = <b>${f(1 + m.mag, 2)}</b> and troughs fall to 1 − |Γ| = <b>${f(1 - m.mag, 2)}</b>. Their ratio is the VSWR, <b>${f(m.s, 2)}</b>. The first voltage minimum sits <b>${f(m.dmin, 3)}λ</b> from the load.`
+      : `Total reflection: the troughs fall all the way to zero, so the VSWR is infinite.`;
+  }
+  function waveLoop(t){ if (waveVisible) drawWave(t); if (!reduceMotion) requestAnimationFrame(waveLoop); }
+  if ('ResizeObserver' in window) new ResizeObserver(() => { sizeWave(); drawWave(performance.now()); }).observe(cv);
+  else window.addEventListener('resize', () => { sizeWave(); drawWave(performance.now()); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(ents => { waveVisible = ents[0].isIntersecting; }).observe(cv);
+
+  // ---------- problem text ----------
+  function setProblem(m){
+    $('lede').innerHTML = `A ${f(m.Z0)} Ω line ends in a ${fc(m.RL, m.XL)} Ω load. Watch the chart find the load admittance y<sub>L</sub> and the VSWR, one construction line at a time.`;
+    $('chips').innerHTML = `<span class="chip">Z<sub>0</sub> = ${f(m.Z0)} Ω</span><span class="chip">Z<sub>L</sub> = ${fc(m.RL, m.XL)} Ω</span><span class="chip find">find y<sub>L</sub> and VSWR</span>`;
+    waveCaption();
+    if (typeof updateFull === 'function') updateFull();
   }
   $('form').addEventListener('submit', e => {
     e.preventDefault();
     const Z0 = parseFloat($('iZ0').value), R = parseFloat($('iR').value), X = parseFloat($('iX').value);
     const err = $('err');
-    if (![Z0, R, X].every(isFinite)) { err.textContent = 'Enter numbers in all three boxes.'; return; }
-    if (Z0 <= 0) { err.textContent = 'Z₀ must be positive.'; return; }
-    if (R < 0) { err.textContent = 'R must be zero or positive for a passive load.'; return; }
+    if (![Z0, R, X].every(isFinite)) { err.textContent = 'Enter a number in all three boxes.'; return; }
+    if (Z0 <= 0) { err.textContent = 'Z₀ must be greater than 0.'; return; }
+    if (R < 0) { err.textContent = 'R must be 0 or more for a passive load.'; return; }
     if (R === 0 && X === 0) { err.textContent = 'A short circuit has infinite admittance. Try another load.'; return; }
     err.textContent = '';
-    M = compute(Z0, R, X); setSub(M); shownIdx = -1; lastGridP = -1; restart();
+    M = compute(Z0, R, X); setProblem(M); shownIdx = -1; lastGridP = -1;
+    waveT0 = performance.now(); if (reduceMotion) drawWave(waveT0);
+    playFromStart();
   });
+
+
+  // ---------- complete chart ----------
+  const FX = 410, FY = 430, FR = 330;
+  const fGrid = $('fGrid'), fSol = $('fSol'), fsvg = $('full');
+  const fp = (u, v) => [FX + FR*u, FY - FR*v];
+  const INK = '#1b1b1f';
+  function fel(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+  function fpath(pts){ let d = ''; pts.forEach((q, i) => { const [X, Y] = fp(q[0], q[1]); d += (i ? 'L' : 'M') + X.toFixed(1) + ' ' + Y.toFixed(1); }); return d; }
+  function rArc(r, X){
+    const c = r/(1+r), rho = 1/(1+r);
+    let a0 = Math.PI, a1 = -Math.PI;
+    if (isFinite(X)){ const g = gam(r, X); const aX = Math.atan2(g[1], g[0] - c); a0 = aX; a1 = 2*Math.PI - aX; }
+    const n = Math.max(24, Math.round(Math.abs(a1 - a0)*rho*120));
+    return circlePts(c, 0, rho, a0, a1, n);
+  }
+  function xArc(x, Rl){
+    const ax = Math.abs(x), sg = Math.sign(x), g0 = gam(0, ax);
+    let a0 = Math.atan2(g0[1] - 1/ax, g0[0] - 1);
+    while (a0 < Math.PI/2) a0 += 2*Math.PI;
+    while (a0 > 1.5*Math.PI) a0 -= 2*Math.PI;
+    let a1 = 1.5*Math.PI;
+    if (isFinite(Rl)){ const g = gam(Rl, ax); a1 = Math.atan2(g[1] - 1/ax, g[0] - 1); while (a1 < a0) a1 += 2*Math.PI; while (a1 > 1.5*Math.PI + 1e-9) a1 -= 2*Math.PI; }
+    const rho = 1/ax, n = Math.max(16, Math.min(400, Math.round((a1 - a0)*rho*120)));
+    return circlePts(1, 1/ax, rho, a0, a1, n).map(q => [q[0], sg*q[1]]);
+  }
+  const polar = (k, deg) => { const a = deg*Math.PI/180; return [FX + FR*k*Math.cos(a), FY - FR*k*Math.sin(a)]; };
+  function ftext(x, y, str, o, parent){
+    const t = fel('text', {x:x.toFixed(1), y:y.toFixed(1), 'text-anchor':o.anchor || 'middle', 'dominant-baseline':'middle', fill:o.color || INK,
+      'font-size':o.size || 8, 'font-weight':o.weight || 500, 'font-family':FONT}, parent);
+    if (o.rot != null) t.setAttribute('transform', `rotate(${o.rot.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})`);
+    if (o.cls) t.setAttribute('class', o.cls);
+    if (o.style) t.setAttribute('style', o.style);
+    if (o.html) t.innerHTML = str; else t.textContent = str;
+    return t;
+  }
+  const tangent = deg => { let r = 90 - deg; r = ((r + 180) % 360 + 360) % 360 - 180; if (r > 90) r -= 180; if (r < -90) r += 180; return r; };
+  const num = v => String(v).replace('-', '−');
+
+  // radially scaled rulers: each maps a value to |Γ|
+  const SCALES = {
+    vswr:{name:'VSWR', side:1, toG:s => s === Infinity ? 1 : (s - 1)/(s + 1),
+      ticks:[...Array.from({length:10}, (_, i) => 1 + i*0.1), 2.2, 2.4, 2.6, 2.8, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 15, 20, 40],
+      labels:[1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 4, 5, 6, 8, 10, 20, Infinity]},
+    rl:{name:'Return loss (dB)', side:1, toG:d => d === Infinity ? 0 : Math.pow(10, -d/20),
+      ticks:[...Array.from({length:21}, (_, i) => i*0.5), 11, 12, 13, 14, 15, 16, 18, 20, 25, 30],
+      labels:[0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30]},
+    g:{name:'Refl. coeff. |Γ|', side:1, toG:v => v,
+      ticks:Array.from({length:51}, (_, i) => i*0.02), labels:Array.from({length:11}, (_, i) => +(i*0.1).toFixed(1))},
+    dbs:{name:'SWR (dB)', side:-1, toG:d => { const sv = Math.pow(10, d/20); return (sv - 1)/(sv + 1); },
+      ticks:[...Array.from({length:21}, (_, i) => i*0.5), 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40],
+      labels:[0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 30, 40]},
+    loss:{name:'Refl. loss (dB)', side:-1, toG:L => Math.sqrt(Math.max(0, 1 - Math.pow(10, -L/10))),
+      ticks:[0, .05, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 4, 5, 6, 7, 8, 10, 15],
+      labels:[0, .1, .2, .4, .6, 1, 1.5, 2, 3, 4, 6, 10, 15]},
+    pw:{name:'Power refl. |Γ|²', side:-1, toG:P => Math.sqrt(P),
+      ticks:Array.from({length:21}, (_, i) => i*0.05), labels:Array.from({length:11}, (_, i) => +(i*0.1).toFixed(1))}
+  };
+  const ROWS = [{y:874, left:'dbs', right:'vswr'}, {y:916, left:'loss', right:'rl'}, {y:958, left:'pw', right:'g'}];
+
+  function buildFullGrid(){
+    fGrid.innerHTML = '';
+    fel('rect', {x:0, y:0, width:820, height:990, fill:'#ffffff'}, fGrid);
+    // title + ring key
+    ftext(18, 28, 'Complete Smith chart', {anchor:'start', size:19, weight:800}, fGrid);
+    const key = ['Outer ring: wavelengths toward generator (clockwise)', 'Middle ring: wavelengths toward load (anticlockwise)', 'Inner ring: angle of reflection coefficient (°)'];
+    key.forEach((k, i) => ftext(804, 20 + i*14, k, {anchor:'end', size:9.5, weight:500, color:'#444'}, fGrid));
+
+    // dense impedance grid
+    const BANDS = [[0,.2,.01],[.2,.5,.02],[.5,1,.05],[1,2,.1],[2,5,.2],[5,10,1],[10,20,2],[20,50,10]];
+    const NICE = [.2,.5,1,2,5,10,20,50], DELTA = 0.008;
+    const snap = v => { let b = null; NICE.forEach(n => { if (n <= v + 1e-9) b = n; }); return b; };
+    const wt = v => NICE.some(n => Math.abs(n - v) < 1e-9) ? '0.95' : ((v < 1 ? Math.abs(v*10 - Math.round(v*10)) : Math.abs(v - Math.round(v))) < 1e-6 ? '0.55' : '0.28');
+    const groups = {'0.95':'', '0.55':'', '0.28':''};
+    BANDS.forEach(([a, b, st]) => {
+      for (let k = 1; a + k*st < b - 1e-9; k++){
+        const v = +(a + k*st).toFixed(4);
+        const lr = 2*st/DELTA - (1 + v)*(1 + v);
+        if (lr > 0){ const xl = snap(Math.sqrt(lr)); if (xl) groups[wt(v)] += fpath(rArc(v, xl)); }
+        const lx = 2*st/DELTA - v*v;
+        if (lx > 0){ const rl = snap(Math.sqrt(lx) - 1); if (rl) groups[wt(v)] += fpath(xArc(v, rl)) + fpath(xArc(-v, rl)); }
+      }
+    });
+    NICE.forEach(v => { groups['0.95'] += fpath(rArc(v, Infinity)) + fpath(xArc(v, Infinity)) + fpath(xArc(-v, Infinity)); });
+    groups['0.95'] += fpath([[-1, 0], [1, 0]]);
+    for (const w in groups) fel('path', {d:groups[w], fill:'none', stroke:INK, 'stroke-width':w}, fGrid);
+
+    // rings
+    [1, 1.045, 1.09, 1.135].forEach(k => fel('circle', {cx:FX, cy:FY, r:FR*k, fill:'none', stroke:INK, 'stroke-width':k === 1 ? 1.6 : 0.8}, fGrid));
+    let td = '';
+    const tick = (k, deg, len) => { const [x1, y1] = polar(k, deg), [x2, y2] = polar(k + len, deg); td += `M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`; };
+    for (let i = -179; i <= 180; i++){
+      tick(1, i, i % 10 === 0 ? 0.016 : i % 5 === 0 ? 0.011 : 0.006);
+      if (i % 10 === 0){ const [x, y] = polar(1.031, i); ftext(x, y, i === 180 ? '±180' : num(i), {size:7, rot:tangent(i)}, fGrid); }
+    }
+    for (let j = 0; j < 250; j++){
+      const w = j*0.002, big = j % 5 === 0;
+      const aL = 180 + 720*w, aG = 180 - 720*w;
+      tick(1.045, aL, big ? 0.012 : 0.006);
+      tick(1.09, aG, big ? 0.012 : 0.006);
+      if (big){
+        const lab = j === 0 ? '0.00' : w.toFixed(2);
+        let [x, y] = polar(1.075, aL); ftext(x, y, lab, {size:6.8, rot:tangent(aL)}, fGrid);
+        [x, y] = polar(1.12, aG); ftext(x, y, lab, {size:6.8, rot:tangent(aG)}, fGrid);
+      }
+    }
+    fel('path', {d:td, stroke:INK, 'stroke-width':0.6, fill:'none'}, fGrid);
+
+    // r labels along the axis, x labels inside the rim
+    const RLAB = [.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.2,1.4,1.6,1.8,2,3,4,5,10,20,50];
+    RLAB.forEach(v => { const [x, y] = fp(gam(v, 0)[0], 0); ftext(x - 2.5, y - 4, String(v), {anchor:'start', size:7, rot:-90, weight:600}, fGrid); });
+    ftext(fp(-1, 0)[0] + 4, FY - 5, '0', {anchor:'start', size:7.5, weight:600}, fGrid);
+    const XLAB = [.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.2,1.4,1.6,1.8,2,3,4,5,10,20];
+    XLAB.forEach(v => [v, -v].forEach(xx => {
+      const g0 = gam(0, xx), [x, y] = fp(0.972*g0[0], 0.972*g0[1]);
+      const deg = Math.atan2(g0[1], g0[0])*180/Math.PI;
+      ftext(x, y, (xx > 0 ? '+' : '−') + v, {size:6.8, weight:600, rot:tangent(deg)}, fGrid);
+    }));
+
+    // radially scaled rulers
+    ftext(FX, 846, 'Radially scaled parameters (distance from centre = |Γ| × chart radius)', {size:9.5, weight:700}, fGrid);
+    let rd = '';
+    ROWS.forEach(row => {
+      rd += `M${FX - FR} ${row.y}L${FX + FR} ${row.y}M${FX} ${row.y - 9}L${FX} ${row.y + 4}`;
+      [row.left, row.right].forEach(key => {
+        const sc = SCALES[key];
+        sc.ticks.forEach(v => { const x = FX + sc.side*FR*sc.toG(v); if (isFinite(x)) rd += `M${x.toFixed(1)} ${row.y}L${x.toFixed(1)} ${row.y - 4}`; });
+        let lastX = null;
+        sc.labels.forEach(v => {
+          const x = FX + sc.side*FR*sc.toG(v);
+          if (lastX !== null && Math.abs(x - lastX) < 13) return;
+          lastX = x;
+          rd += `M${x.toFixed(1)} ${row.y}L${x.toFixed(1)} ${row.y - 7}`;
+          ftext(x, row.y - 13, v === Infinity ? '∞' : String(v), {size:7.5, weight:600}, fGrid);
+        });
+        ftext(sc.side > 0 ? FX + FR : FX - FR, row.y + 12, sc.name, {anchor:sc.side > 0 ? 'end' : 'start', size:8.5, weight:700, color:'#333'}, fGrid);
+      });
+    });
+    fel('path', {d:rd, stroke:INK, 'stroke-width':0.8, fill:'none'}, fGrid);
+    ftext(FX - 8, 980, '← measure toward load side', {anchor:'end', size:8, color:'#555'}, fGrid);
+    ftext(FX + 8, 980, 'measure toward generator side →', {anchor:'start', size:8, color:'#555'}, fGrid);
+  }
+
+  function drawFullSol(){
+    const m = M, g = Math.min(m.mag, 1), thDeg = m.th*180/Math.PI;
+    fSol.innerHTML = '';
+    const sd = (pts, color, w, d, extra={}) => fel('path', Object.assign({d:fpath(pts), fill:'none', stroke:color, 'stroke-width':w, 'stroke-linecap':'round', pathLength:1, class:'sd', style:`--d:${d}s`}, extra), fSol);
+    const dash = (d0, color, w, d, da='6 4') => fel('path', {d:d0, fill:'none', stroke:color, 'stroke-width':w, 'stroke-dasharray':da, class:'fd', style:`--d:${d}s`}, fSol);
+    const fdot = (x, y, r, color, d) => fel('circle', {cx:x.toFixed(1), cy:y.toFixed(1), r, fill:color, stroke:'#fff', 'stroke-width':1.6, class:'fd', style:`--d:${d}s`}, fSol);
+    const lab = (x, y, str, color, d, o={}) => ftext(x, y, str, Object.assign({size:12.5, weight:750, color, cls:'halo fd', style:`--d:${d}s`, html:true}, o), fSol);
+    const sub = t => `<tspan dy="3" font-size="9">${t}</tspan><tspan dy="-3">`;
+    const outLab = (u, v, k=0.09) => { const mm = Math.hypot(u, v); const dx = mm < 1e-6 ? .6 : u/mm, dy = mm < 1e-6 ? .8 : v/mm; const [x, y] = fp(u + dx*k, v + dy*k); return {x, y, anchor: dx > .35 ? 'start' : dx < -.35 ? 'end' : 'middle'}; };
+
+    ftext(18, 48, `Z<tspan dy="2" font-size="8">0</tspan><tspan dy="-2"> = ${f(m.Z0)} Ω,  Z</tspan><tspan dy="2" font-size="8">L</tspan><tspan dy="-2"> = ${fc(m.RL, m.XL)} Ω, solved</tspan>`, {anchor:'start', size:11, weight:600, color:'#5b3fd6', html:true}, fSol);
+
+    sd(rPts(m.r), COL.red, 1.8, 0.0, {opacity:.85});
+    sd(xPts(m.x), COL.blue, 1.8, 0.35, {opacity:.85});
+    const [Px, Py] = fp(m.gu, m.gv);
+    fdot(Px, Py, 5.5, COL.ink, 0.8);
+    let L = outLab(m.gu, m.gv); lab(L.x, L.y, `P: z${sub('L')} = ${fc(m.r, m.x)}</tspan>`, COL.ink, 0.9, {anchor:L.anchor});
+    if (g > 0.003) sd(circlePts(0, 0, g, m.th, m.th - 2*Math.PI, 360), COL.green, 2.4, 1.1);
+
+    // VSWR (Vmax) and Vmin points on the real axis
+    const [Sx] = fp(g, 0), [Nx] = fp(-g, 0);
+    fdot(Sx, FY, 5, COL.green, 1.9);
+    lab(Sx + 6, FY + 13, isFinite(m.s) ? `VSWR = ${f(m.s, 2)}` : 'VSWR = ∞', COL.green, 2.0, {anchor:'start', size:12});
+    if (g > 0.02){
+      fdot(Nx, FY, 4.5, COL.green, 1.9);
+      lab(Nx, FY + 13, `V min: 1/VSWR = ${f(1/m.s, 2)}`, COL.green, 2.0, {size:11});
+    }
+
+    // diameter P → O → P′, extended to the rings
+    const [a1x, a1y] = polar(1.135, thDeg), [a2x, a2y] = polar(1.135, thDeg + 180);
+    dash(`M${a1x.toFixed(1)} ${a1y.toFixed(1)}L${a2x.toFixed(1)} ${a2y.toFixed(1)}`, COL.purple, 1.5, 2.2);
+    fdot(FX, FY, 3.5, COL.ink, 2.2);
+    const [Yx, Yy] = fp(m.yu, m.yv);
+    fdot(Yx, Yy, 6, COL.purple, 2.5);
+    L = outLab(m.yu, m.yv); lab(L.x, L.y, `P′: y${sub('L')} = ${fc(m.g, m.b)}</tspan>`, COL.purple, 2.6, {anchor:L.anchor});
+    // admittance check lines
+    sd(rPts(m.g), COL.purple, 1.1, 2.8, {opacity:.55});
+    sd(xPts(m.b), COL.purple, 1.1, 2.9, {opacity:.55});
+
+    // ring readings
+    const ringLab = (deg, lines, color, d) => {
+      const [x, y] = polar(1.175, deg), up = Math.sin(deg*Math.PI/180) > 0;
+      const anchor = Math.cos(deg*Math.PI/180) > .45 ? 'start' : Math.cos(deg*Math.PI/180) < -.45 ? 'end' : 'middle';
+      lines.forEach((t, i) => lab(x, y + (up ? -(lines.length - 1 - i)*14 : i*14), t, color, d, {anchor, size:11.5}));
+    };
+    ringLab(thDeg, [`WTG ${f(m.w1)}λ`, `∠Γ = ${f(thDeg, 1)}°`], COL.ink, 3.0);
+    ringLab(thDeg + 180, [`WTG ${f(m.w2)}λ`], COL.purple, 3.0);
+
+    // distance from the load to the first voltage minimum, along the WTG ring
+    if (g > 0.02){
+      const sweep = (((thDeg - 180) % 360) + 360) % 360;
+      const pts = []; for (let i = 0; i <= 120; i++){ const a = (thDeg - sweep*i/120)*Math.PI/180; pts.push([1.158*Math.cos(a), 1.158*Math.sin(a)]); }
+      sd(pts, COL.green, 2.6, 3.3);
+      const mid = thDeg - sweep/2;
+      ringLab(mid, ['first V min', `${f(m.dmin)}λ from load`], COL.green, 3.6);
+    }
+
+    // compass transfer down to the rulers
+    const yEnd = ROWS[ROWS.length - 1].y + 4;
+    dash(`M${Sx.toFixed(1)} ${FY}L${Sx.toFixed(1)} ${yEnd}`, COL.green, 1.3, 3.9, '4 4');
+    if (g > 0.02) dash(`M${Nx.toFixed(1)} ${FY}L${Nx.toFixed(1)} ${yEnd}`, COL.green, 1.3, 3.9, '4 4');
+    const vals = {
+      vswr: isFinite(m.s) ? f(m.s, 2) : '∞', rl: g > 0 ? f(-20*Math.log10(g), 2) + ' dB' : '∞', g: f(g, 3),
+      dbs: isFinite(m.s) ? f(20*Math.log10(m.s), 1) + ' dB' : '∞', loss: g < 1 ? f(-10*Math.log10(1 - g*g), 2) + ' dB' : '∞', pw: f(g*g, 3)
+    };
+    ROWS.forEach((row, i) => {
+      fdot(Sx, row.y, 3.6, COL.green, 4.1 + i*0.1);
+      lab(Sx + 6, row.y + 11, vals[row.right], COL.green, 4.2 + i*0.1, {anchor:'start', size:10.5});
+      if (g > 0.02){ fdot(Nx, row.y, 3.6, COL.green, 4.1 + i*0.1); lab(Nx - 6, row.y + 11, vals[row.left], COL.green, 4.2 + i*0.1, {anchor:'end', size:10.5}); }
+    });
+    return vals;
+  }
+
+  function fillReadings(vals){
+    const m = M;
+    $('solSub').innerHTML = `Z<sub>0</sub> = ${f(m.Z0)} Ω, Z<sub>L</sub> = ${fc(m.RL, m.XL)} Ω`;
+    const items = [
+      ['Normalize the load', `z<sub>L</sub> = ${fc(m.r, m.x)}`],
+      [`Plot P where r = ${f(m.r)} meets x = ${f(m.x)}`, 'point P'],
+      ['Measure OP on the |Γ| ruler', `|Γ<sub>L</sub>| = ${f(m.mag, 3)}`],
+      ['VSWR circle meets the right axis', `VSWR = ${vals.vswr}`],
+      ['Read the inner ring through P', `∠Γ<sub>L</sub> = ${f(m.th*180/Math.PI, 1)}°`],
+      ['Read P on the WTG ring, add 0.25λ', `${f(m.w1)}λ → ${f(m.w2)}λ`],
+      ['Read P′, diametrically opposite P', `y<sub>L</sub> = ${fc(m.g, m.b)}`]
+    ];
+    $('readings').innerHTML = items.map(([k, v]) => `<li><span class="rk">${k}</span><span class="rv">${v}</span></li>`).join('');
+    $('extras').innerHTML = `
+      <div>First V<sub>min</sub> from the load<b>${f(m.dmin)}λ</b></div>
+      <div>First V<sub>max</sub> from the load<b>${f(m.dmax)}λ</b></div>
+      <div>Return loss<b>${vals.rl}</b></div>
+      <div>SWR in dB<b>${vals.dbs}</b></div>`;
+    $('finalAns').innerHTML = `
+      <div class="ans y"><div class="k">Normalized load admittance</div><div class="v">y<sub>L</sub> = ${fc(m.g, m.b, 2)}</div><div class="s">Y<sub>L</sub> = ${fc(1000*m.g/m.Z0, 1000*m.b/m.Z0, 2)} mS</div></div>
+      <div class="ans s1"><div class="k">Voltage standing wave ratio</div><div class="v">VSWR ${isFinite(m.s) ? '≈ ' + f(m.s, 2) : '= ∞'}</div><div class="s">|Γ<sub>L</sub>| = ${f(m.mag, 2)}</div></div>`;
+  }
+  function updateFull(){ fillReadings(drawFullSol()); }
+
+  document.querySelectorAll('[data-zoom]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-zoom]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    fsvg.style.width = b.dataset.zoom + '%';
+  }));
+  $('dlSvg').addEventListener('click', () => {
+    const clone = fsvg.cloneNode(true);
+    clone.setAttribute('xmlns', NS); clone.setAttribute('width', '820'); clone.setAttribute('height', '990'); clone.removeAttribute('style');
+    clone.querySelectorAll('.halo').forEach(t => { t.setAttribute('stroke', '#fff'); t.setAttribute('stroke-width', '4'); t.setAttribute('paint-order', 'stroke'); t.setAttribute('stroke-linejoin', 'round'); });
+    clone.querySelectorAll('[class]').forEach(e => { e.removeAttribute('class'); e.removeAttribute('style'); });
+    const blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)], {type:'image/svg+xml'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'smith-chart-solution.svg';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver((ents, obs) => { if (ents.some(e => e.isIntersecting)){ $('complete').classList.add('in-view'); obs.disconnect(); } }, {threshold:0.12}).observe($('complete'));
+  } else $('complete').classList.add('in-view');
 
   buildGrid();
   M = compute(50, 25, -50);
+  buildFullGrid();
+  setProblem(M);
+  sizeWave();
   window.__smith = {get state(){ return {idx, prog, running, auto, M}; }, goTo, next, back, steps:steps.length};
   requestAnimationFrame(t => { lastT = t; tick(t); });
+  requestAnimationFrame(t => { if (reduceMotion) drawWave(t); else waveLoop(t); });
 })();
 </script>
 </body>
