@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog electronics — Engineering simulators</title>
+<meta name="description" content="Diode load lines, BJT output characteristics and op-amp waveforms you can adjust, plus step-by-step diode, BJT, MOSFET, op-amp and active filter questions.">
+<meta name="theme-color" content="#12171D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23E2B86F'/%3E%3Cstop offset='.55' stop-color='%238AB4F0'/%3E%3Cstop offset='1' stop-color='%238AB4F0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E2B86F"/><stop offset=".55" stop-color="#8AB4F0"/><stop offset="1" stop-color="#E2B86F"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><details class="ng"><summary><span>Fields<span class="ng-rest"> &amp; lines</span></span></summary><div class="ngm"><a href="electrostatics.html"><b>Electrostatics</b><span>Charges, field lines, Gauss, capacitors</span></a><a href="lossless.html"><b>Lossless lines</b><span>Smith chart, VSWR, stubs</span></a><a href="interfaces.html"><b>Dielectric interfaces</b><span>Reflection and transmission</span></a><a href="lossy-media.html"><b>Lossy media</b><span>Skin depth, loss tangent</span></a><a href="filled-lines.html"><b>Filled lines</b><span>Coax, twin-lead, microstrip</span></a></div></details><details class="ng"><summary class="here"><span>Circuits<span class="ng-rest"> &amp; systems</span></span></summary><div class="ngm"><a href="circuits.html"><b>Circuits</b><span>DC, AC phasors, transients</span></a><a href="electronics.html" aria-current="page"><b>Analog electronics</b><span>Diodes, BJTs, MOSFETs, op-amps</span></a><a href="logic.html"><b>Digital logic</b><span>K-maps, number bases, flip-flops</span></a><a href="signals.html"><b>Signals</b><span>Fourier, convolution, sampling</span></a><a href="control.html"><b>Control</b><span>Step response, Bode, root locus</span></a></div></details><details class="ng"><summary><span>Maths<span class="ng-rest"> &amp; physics</span></span></summary><div class="ngm"><a href="graph.html"><b>Graphing</b><span>Plot functions, roots, areas</span></a><a href="probability.html"><b>Probability</b><span>Distributions, Bayes, intervals</span></a><a href="matrices.html"><b>Matrices</b><span>Determinants, systems, eigenvalues</span></a><a href="mechanics.html"><b>Mechanics &amp; waves</b><span>Projectiles, oscillators, waves</span></a></div></details></div><script>(function(){var d=document.querySelectorAll(".topnav details");d.forEach(function(x){x.addEventListener("toggle",function(){if(x.open)d.forEach(function(y){if(y!==x)y.open=false;});});});document.addEventListener("click",function(e){d.forEach(function(x){if(x.open&&!x.contains(e.target))x.open=false;});});document.addEventListener("keydown",function(e){if(e.key==="Escape")d.forEach(function(x){if(x.open){x.open=false;x.querySelector("summary").focus();}});});})();</script></nav>
+<header class="hero">
+  <div>
+    <h1 class="rise">Diodes, transistors and op-amps, worked out</h1>
+    <div class="cta rise d1">
+      <button class="btn primary big" id="hPlay">Open the playground</button>
+      <button class="btn big" id="hPick">Solve a question step by step</button>
+    </div>
+  </div>
+</header>
+
+<section class="play" id="play">
+  <div class="play-head">
+    <h2>Electronics playground</h2>
+    <p>Move the sliders and watch the operating point slide along the load line, or see how an op-amp circuit shapes a 1 kHz sine and where it clips.</p>
+  </div>
+  <div class="play-grid">
+    <div class="play-side">
+      <div class="seg2" id="aeTab"><button type="button" data-v="diode">Diode</button><button type="button" data-v="bjt">BJT</button><button type="button" data-v="opamp">Op-amp</button></div>
+      <div id="p_diode">
+        <label class="ctl"><span>Source voltage V<sub>s</sub></span><span class="row"><input type="range" id="aeVs"><output id="aeVso"></output></span></label>
+        <label class="ctl"><span>Series resistor R</span><span class="row"><input type="range" id="aeR"><output id="aeRo"></output></span></label>
+        <label class="ctl"><span>Saturation current I<sub>s</sub></span><span class="row"><input type="range" id="aeIs"><output id="aeIso"></output></span></label>
+        <label class="ctl"><span>Ideality factor n</span><span class="row"><input type="range" id="aeN"><output id="aeNo"></output></span></label>
+      </div>
+      <div id="p_bjt" hidden>
+        <label class="ctl"><span>Supply V<sub>CC</sub></span><span class="row"><input type="range" id="aeVCC"><output id="aeVCCo"></output></span></label>
+        <label class="ctl"><span>Collector resistor R<sub>C</sub></span><span class="row"><input type="range" id="aeRC"><output id="aeRCo"></output></span></label>
+        <label class="ctl"><span>Base current I<sub>B</sub></span><span class="row"><input type="range" id="aeIB"><output id="aeIBo"></output></span></label>
+        <label class="ctl"><span>Current gain β</span><span class="row"><input type="range" id="aeB"><output id="aeBo"></output></span></label>
+      </div>
+      <div id="p_opamp" hidden>
+        <h3>Circuit</h3>
+        <div class="seg2" id="aeCfg"><button type="button" data-v="inv">Inverting</button><button type="button" data-v="non">Non-inverting</button><button type="button" data-v="fol">Follower</button><button type="button" data-v="int">Integrator</button><button type="button" data-v="dif">Differentiator</button><button type="button" data-v="comp">Comparator</button></div>
+        <label class="ctl" id="rowGain"><span>R<sub>f</sub>/R₁</span><span class="row"><input type="range" id="aeG"><output id="aeGo"></output></span></label>
+        <label class="ctl"><span>Input amplitude</span><span class="row"><input type="range" id="aeA"><output id="aeAo"></output></span></label>
+        <label class="ctl"><span>Supply rails</span><span class="row"><input type="range" id="aeSat"><output id="aeSato"></output></span></label>
+      </div>
+      <div class="readout" id="aeRead" aria-live="polite"></div>
+    </div>
+    <div class="play-canvas">
+      <div class="frame"><div class="screen"><canvas id="aeCanvas" aria-label="Device characteristics and waveforms"></canvas></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="modes" id="modes">
+  <div class="modes-head">
+    <h2>Choose a question type</h2>
+    <p>Pick what the question asks for and enter its values with their units. Numbers can be typed like 2.2e3 or 1e-14. The walkthrough solves it step by step, and every number is listed further down.</p>
+  </div>
+  <div class="mode-grid" id="modeGrid"></div>
+  <form class="inputs-bar" id="form" novalidate>
+    <div class="fields" id="fields"></div>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">Solve it</button>
+      <span class="err" id="err" role="alert"></span>
+    </div>
+  </form>
+</section>
+
+<main id="lab">
+  <section id="stage">
+    <div class="frame"><div class="screen">
+      <canvas id="scene" aria-label="Animated picture of the solution"></canvas>
+    </div></div>
+    <div class="progress"><i id="pfill"></i></div>
+    <div class="controls">
+      <button class="btn" id="bRestart" title="Restart (R)" aria-label="Restart">⟲</button>
+      <button class="btn" id="bBack" title="Previous step (←)">◀ Back</button>
+      <button class="btn primary" id="bPlay" title="Play all / pause (Space)" style="min-width:122px">▶ Play all</button>
+      <button class="btn" id="bNext" title="Next step (→)">Next ▶</button>
+      <label class="speed">Speed
+        <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
+      </label>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="hint">Keys: ← → to step, Space to play or pause, R to restart</div>
+  </section>
+
+  <aside class="panel">
+    <div id="pcontent">
+      <div class="stepno" id="stepno"></div>
+      <h2 id="stitle"></h2>
+      <div id="sbody"></div>
+      <div class="work" id="swork"></div>
+    </div>
+  </aside>
+</main>
+
+<section class="results" id="results">
+  <div class="complete-head">
+    <h2>All the numbers</h2>
+    <p>Every value from the walkthrough in one place, ready to copy into your answer.</p>
+  </div>
+  <div class="results-grid">
+    <div class="panel"><h3 style="margin:0 0 4px;font-size:22px">Working</h3><p class="sub" id="resSub" style="color:var(--muted);margin:0 0 10px;font-size:14px"></p><table class="table" id="resTable"></table></div>
+    <aside class="panel solution"><h3>Answer</h3><div id="resAns"></div></aside>
+  </div>
+</section>
+
+<footer>
+  <span>Ideal op-amps (infinite gain, no input current) limited by their rails. BJT saturation is taken as V<sub>CE</sub> = 0.2 V.</span>
+  <a href="https://github.com/shourayaVishnoi/smith-chart-simulator">Source on GitHub</a>
+</footer>
+<script src="mathx.js"></script>
+<script src="plot.js"></script>
+<script src="electronics.js"></script>
+<script src="formula-engine.js"></script>
+</body>
+</html>

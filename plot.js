@@ -76,7 +76,7 @@ window.PLOT = (() => {
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       let last = -1e9; tx.forEach(t => { const x = M.X(t.v); if (t.label && x - last > 34){ ctx.fillText(t.label, x, box.y + box.h + 5); last = x; } });
       ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-      ty.forEach(t => { if (t.label) ctx.fillText(t.label, box.x - 6, M.Y(t.v)); });
+      if (!o.noY) ty.forEach(t => { if (t.label) ctx.fillText(t.label, box.x - 6, M.Y(t.v)); });
       ctx.font = `600 11.5px ${FONT}`; ctx.fillStyle = 'rgba(213,220,228,.8)';
       if (o.xlabel){ ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText(o.xlabel, box.x + box.w, box.y + box.h + 20); }
       if (o.ylabel){ ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(o.ylabel, box.x, box.y - 6); }

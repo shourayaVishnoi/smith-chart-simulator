@@ -252,7 +252,7 @@
   function fillResults(){
     const pr = MODE.problem(M);
     $('resSub').innerHTML = `${MODE.title}: ${pr.chips.join(', ')}`;
-    $('resTable').innerHTML = STEPS.filter(s => s.rd).flatMap(s => { const r = s.rd(M); return Array.isArray(r[0]) ? r : [r]; }).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+    $('resTable').innerHTML = STEPS.filter(s => s.rd).flatMap(s => { const r = s.rd(M); return !r || !r.length ? [] : Array.isArray(r[0]) ? r : [r]; }).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
     $('resAns').innerHTML = cardsHTML(MODE.answer(M)) + (MODE.note ? `<p class="sub">${MODE.note(M)}</p>` : '');
   }
   PAGE.cardsHTML = cardsHTML;

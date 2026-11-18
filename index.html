@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Engineering simulators — graphing, circuits, signals, control and EMTI</title>
-<meta name="description" content="Animated, step-by-step engineering simulators: a graphing calculator, circuits, signals and systems, control systems, and EMTI (Smith chart, interfaces, lossy media, filled lines).">
+<title>Engineering simulators — fields, circuits, logic, signals, control, maths and mechanics</title>
+<meta name="description" content="Animated, step-by-step engineering simulators: electrostatics and EMTI (Smith chart, interfaces, lossy media, filled lines), circuits, analog electronics, digital logic, signals, control, graphing, probability, matrices and mechanics.">
 <meta name="theme-color" content="#12171D">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23E2B86F'/%3E%3Cstop offset='.55' stop-color='%238AB4F0'/%3E%3Cstop offset='1' stop-color='%238AB4F0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='21' cy='16' r='9' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='url(%23g)' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,25 +19,61 @@
     function go(){ var h = location.hash.slice(1); if (old.indexOf(h) >= 0) location.replace('lossless.html#' + h); }
     go(); window.addEventListener('hashchange', go); })();
 </script>
-<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E2B86F"/><stop offset=".55" stop-color="#8AB4F0"/><stop offset="1" stop-color="#E2B86F"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><a href="lossless.html">Lossless lines</a><a href="interfaces.html">Dielectric interfaces</a><a href="lossy-media.html">Lossy media</a><a href="filled-lines.html">Filled lines</a><a href="graph.html">Graphing</a><a href="circuits.html">Circuits</a><a href="signals.html">Signals</a><a href="control.html">Control</a></div><script>(function(){var a=document.querySelector(".navlinks [aria-current]");if(a){var p=a.parentNode;if(p.scrollWidth>p.clientWidth)p.scrollLeft=a.offsetLeft-p.offsetLeft-p.clientWidth/2+a.offsetWidth/2;}})();</script></nav>
+<nav class="topnav" aria-label="Simulators"><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E2B86F"/><stop offset=".55" stop-color="#8AB4F0"/><stop offset="1" stop-color="#E2B86F"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#bg)" stroke-width="2.6"/><circle cx="21" cy="16" r="8" fill="none" stroke="url(#bg)" stroke-width="1.8"/><path d="M3 16 H29" stroke="url(#bg)" stroke-width="1.8"/></svg><span>Engineering simulators</span></a><div class="navlinks"><details class="ng"><summary><span>Fields<span class="ng-rest"> &amp; lines</span></span></summary><div class="ngm"><a href="electrostatics.html"><b>Electrostatics</b><span>Charges, field lines, Gauss, capacitors</span></a><a href="lossless.html"><b>Lossless lines</b><span>Smith chart, VSWR, stubs</span></a><a href="interfaces.html"><b>Dielectric interfaces</b><span>Reflection and transmission</span></a><a href="lossy-media.html"><b>Lossy media</b><span>Skin depth, loss tangent</span></a><a href="filled-lines.html"><b>Filled lines</b><span>Coax, twin-lead, microstrip</span></a></div></details><details class="ng"><summary><span>Circuits<span class="ng-rest"> &amp; systems</span></span></summary><div class="ngm"><a href="circuits.html"><b>Circuits</b><span>DC, AC phasors, transients</span></a><a href="electronics.html"><b>Analog electronics</b><span>Diodes, BJTs, MOSFETs, op-amps</span></a><a href="logic.html"><b>Digital logic</b><span>K-maps, number bases, flip-flops</span></a><a href="signals.html"><b>Signals</b><span>Fourier, convolution, sampling</span></a><a href="control.html"><b>Control</b><span>Step response, Bode, root locus</span></a></div></details><details class="ng"><summary><span>Maths<span class="ng-rest"> &amp; physics</span></span></summary><div class="ngm"><a href="graph.html"><b>Graphing</b><span>Plot functions, roots, areas</span></a><a href="probability.html"><b>Probability</b><span>Distributions, Bayes, intervals</span></a><a href="matrices.html"><b>Matrices</b><span>Determinants, systems, eigenvalues</span></a><a href="mechanics.html"><b>Mechanics &amp; waves</b><span>Projectiles, oscillators, waves</span></a></div></details></div><script>(function(){var d=document.querySelectorAll(".topnav details");d.forEach(function(x){x.addEventListener("toggle",function(){if(x.open)d.forEach(function(y){if(y!==x)y.open=false;});});});document.addEventListener("click",function(e){d.forEach(function(x){if(x.open&&!x.contains(e.target))x.open=false;});});document.addEventListener("keydown",function(e){if(e.key==="Escape")d.forEach(function(x){if(x.open){x.open=false;x.querySelector("summary").focus();}});});})();</script></nav>
 <header class="home-hero">
   <h1 class="rise">Engineering problems, solved step by step</h1>
-  <p class="rise d1">Play with a live graph or circuit, then pick a question type and watch it solved with animated drawings, the working, and every number checked.</p>
+  <p class="rise d1">Play with a live graph, circuit or field, then pick a question type and watch it solved with animated drawings, the working, and every number checked.</p>
 </header>
 
 <main class="home-main">
-<section class="group" aria-labelledby="gTools">
-  <div class="group-head"><h2 id="gTools">Graphs and systems</h2><p>Each page has a playground with sliders and live plots, plus step-by-step question types.</p></div>
+<section class="group" aria-labelledby="gFields">
+  <div class="group-head"><h2 id="gFields">Fields and lines</h2><p>Electrostatics, then transmission lines on the Smith chart and plane waves in materials.</p></div>
   <div class="families">
-  <a class="family rise d1" href="graph.html">
-    <canvas data-preview="graph" aria-hidden="true"></canvas>
-    <h2>Graphing calculator</h2>
-    <p>Plot functions, polar and parametric curves and implicit equations with sliders, then solve calculus questions.</p>
-    <ul><li>Roots: bisection and Newton</li><li>Where curves meet</li><li>Area under a curve</li><li>Derivative and tangent</li></ul>
-    <span class="go">Open the graphing calculator →</span>
-    <span class="tag">Playground</span>
+  <a class="family rise d1 wide" href="electrostatics.html">
+    <canvas data-preview="field" aria-hidden="true"></canvas>
+    <h2>Electrostatics</h2>
+    <p>Drag point charges around and watch the field lines and equipotentials redraw, then solve force, field, Gauss and capacitor questions.</p>
+    <ul><li>Coulomb force on a charge</li><li>E and V at a point</li><li>Gauss’s law</li><li>Capacitance</li></ul>
+    <span class="go">Open the electrostatics simulator →</span>
+    <span class="tag">New</span>
   </a>
-  <a class="family rise d2" href="circuits.html">
+  <a class="family rise d2" href="lossless.html">
+    <canvas data-preview="smith" aria-hidden="true"></canvas>
+    <h2>Lossless lines</h2>
+    <p>Smith chart solutions for transmission-line questions, with a full chart for every answer.</p>
+    <ul><li>Admittance and VSWR</li><li>Input impedance</li><li>V max and min</li><li>Load from measurements</li><li>Single and double stub</li><li>Quarter-wave transformer</li><li>Stub length</li></ul>
+    <span class="go">Open the Smith chart simulator →</span>
+    <span class="tag">Smith chart</span>
+  </a>
+  <a class="family rise d3" href="interfaces.html">
+    <canvas data-preview="interface" aria-hidden="true"></canvas>
+    <h2>Dielectric interfaces</h2>
+    <p>Plane waves hitting dielectric boundaries head-on, solved on the Smith chart with wave impedances.</p>
+    <ul><li>Single interface</li><li>Dielectric slab</li><li>Quarter-wave coating</li><li>Medium from SWR</li></ul>
+    <span class="go">Open the interfaces simulator →</span>
+    <span class="tag">Smith chart</span>
+  </a>
+  <a class="family rise d2" href="lossy-media.html">
+    <canvas data-preview="lossy" aria-hidden="true"></canvas>
+    <h2>Lossy media</h2>
+    <p>Waves that weaken as they travel: loss tangent, α, β, η, skin depth and attenuation.</p>
+    <ul><li>Wave in a lossy medium</li><li>Good conductor</li><li>Low-loss dielectric</li><li>Attenuation over a distance</li></ul>
+    <span class="go">Open the lossy media simulator →</span>
+  </a>
+  <a class="family rise d3" href="filled-lines.html">
+    <canvas data-preview="filled" aria-hidden="true"></canvas>
+    <h2>Dielectric-filled lines</h2>
+    <p>What the dielectric does to speed and wavelength, and line impedance from the geometry.</p>
+    <ul><li>Wavelength and velocity</li><li>Electrical length</li><li>Coaxial line</li><li>Two-wire line</li></ul>
+    <span class="go">Open the filled lines simulator →</span>
+  </a>
+  </div>
+</section>
+
+<section class="group" aria-labelledby="gCircuits">
+  <div class="group-head"><h2 id="gCircuits">Circuits and systems</h2><p>From a single resistor to feedback loops: live circuits, devices, logic, signals and control.</p></div>
+  <div class="families">
+  <a class="family rise d1 wide" href="circuits.html">
     <canvas data-preview="circuit" aria-hidden="true"></canvas>
     <h2>Circuits</h2>
     <p>RC, RL and RLC circuits with live step and frequency response, transients, resonance and phasors.</p>
@@ -45,7 +81,23 @@
     <span class="go">Open the circuits simulator →</span>
     <span class="tag">Playground</span>
   </a>
-  <a class="family rise d3" href="signals.html">
+  <a class="family rise d2" href="electronics.html">
+    <canvas data-preview="amp" aria-hidden="true"></canvas>
+    <h2>Analog electronics</h2>
+    <p>Move a diode’s load line, bias a BJT, and push an op-amp until its output clips at the rails.</p>
+    <ul><li>Diode Q-point</li><li>BJT bias</li><li>MOSFET drain current</li><li>Op-amp circuits</li><li>Active filters</li></ul>
+    <span class="go">Open the electronics simulator →</span>
+    <span class="tag">New</span>
+  </a>
+  <a class="family rise d3" href="logic.html">
+    <canvas data-preview="kmap" aria-hidden="true"></canvas>
+    <h2>Digital logic</h2>
+    <p>Type a Boolean expression and get its truth table, K-map, minimal form and gate circuit, all linked.</p>
+    <ul><li>K-map minimisation</li><li>Canonical SOP and POS</li><li>Number bases</li><li>Two’s complement</li><li>Flip-flop timing</li></ul>
+    <span class="go">Open the digital logic simulator →</span>
+    <span class="tag">New</span>
+  </a>
+  <a class="family rise d2" href="signals.html">
     <canvas data-preview="signals" aria-hidden="true"></canvas>
     <h2>Signals and systems</h2>
     <p>Build waves from harmonics, slide signals to convolve them, and sample until they alias.</p>
@@ -53,7 +105,7 @@
     <span class="go">Open the signals simulator →</span>
     <span class="tag">Playground</span>
   </a>
-  <a class="family rise d4" href="control.html">
+  <a class="family rise d3" href="control.html">
     <canvas data-preview="control" aria-hidden="true"></canvas>
     <h2>Control systems</h2>
     <p>Type G(s), drag the gain and watch the step response, root locus, Bode and Nyquist plots move together.</p>
@@ -64,38 +116,40 @@
   </div>
 </section>
 
-<section class="group" aria-labelledby="gEmti">
-  <div class="group-head"><h2 id="gEmti">EMTI: lines and waves</h2><p>Transmission lines on the Smith chart and plane waves in materials.</p></div>
+<section class="group" aria-labelledby="gMaths">
+  <div class="group-head"><h2 id="gMaths">Maths and physics</h2><p>The maths behind the rest: graphs, probability, matrices, and things that move.</p></div>
   <div class="families">
-  <a class="family rise d1" href="lossless.html">
-    <canvas data-preview="smith" aria-hidden="true"></canvas>
-    <h2>Lossless lines</h2>
-    <p>Smith chart solutions for transmission-line questions, with a full chart for every answer.</p>
-    <ul><li>Admittance and VSWR</li><li>Input impedance</li><li>V max and min</li><li>Load from measurements</li><li>Single and double stub</li><li>Quarter-wave transformer</li><li>Stub length</li></ul>
-    <span class="go">Open the Smith chart simulator →</span>
-    <span class="tag">Smith chart</span>
+  <a class="family rise d1" href="graph.html">
+    <canvas data-preview="graph" aria-hidden="true"></canvas>
+    <h2>Graphing calculator</h2>
+    <p>Plot functions, polar and parametric curves and implicit equations with sliders, then solve calculus questions.</p>
+    <ul><li>Roots: bisection and Newton</li><li>Where curves meet</li><li>Area under a curve</li><li>Derivative and tangent</li></ul>
+    <span class="go">Open the graphing calculator →</span>
+    <span class="tag">Playground</span>
   </a>
-  <a class="family rise d2" href="interfaces.html">
-    <canvas data-preview="interface" aria-hidden="true"></canvas>
-    <h2>Dielectric interfaces</h2>
-    <p>Plane waves hitting dielectric boundaries head-on, solved on the Smith chart with wave impedances.</p>
-    <ul><li>Single interface</li><li>Dielectric slab</li><li>Quarter-wave coating</li><li>Medium from SWR</li></ul>
-    <span class="go">Open the interfaces simulator →</span>
-    <span class="tag">Smith chart</span>
+  <a class="family rise d2" href="probability.html">
+    <canvas data-preview="normal" aria-hidden="true"></canvas>
+    <h2>Probability and statistics</h2>
+    <p>Seven distributions with shaded probabilities and live sampling, plus worked statistics questions.</p>
+    <ul><li>Normal probabilities</li><li>Binomial and Poisson</li><li>Mean, spread, regression</li><li>Bayes’ theorem</li><li>Confidence intervals</li></ul>
+    <span class="go">Open the probability simulator →</span>
+    <span class="tag">New</span>
   </a>
-  <a class="family rise d3" href="lossy-media.html">
-    <canvas data-preview="lossy" aria-hidden="true"></canvas>
-    <h2>Lossy media</h2>
-    <p>Waves that weaken as they travel: loss tangent, α, β, η, skin depth and attenuation.</p>
-    <ul><li>Wave in a lossy medium</li><li>Good conductor</li><li>Low-loss dielectric</li><li>Attenuation over a distance</li></ul>
-    <span class="go">Open the lossy media simulator →</span>
+  <a class="family rise d1" href="matrices.html">
+    <canvas data-preview="matrix" aria-hidden="true"></canvas>
+    <h2>Matrices and linear algebra</h2>
+    <p>Watch a 2×2 matrix stretch the plane and find its eigenvectors, then work bigger matrices by row reduction.</p>
+    <ul><li>Determinant</li><li>Inverse by Gauss–Jordan</li><li>Linear systems</li><li>Eigenvalues and eigenvectors</li></ul>
+    <span class="go">Open the matrices simulator →</span>
+    <span class="tag">New</span>
   </a>
-  <a class="family rise d4" href="filled-lines.html">
-    <canvas data-preview="filled" aria-hidden="true"></canvas>
-    <h2>Dielectric-filled lines</h2>
-    <p>What the dielectric does to speed and wavelength, and line impedance from the geometry.</p>
-    <ul><li>Wavelength and velocity</li><li>Electrical length</li><li>Coaxial line</li><li>Two-wire line</li></ul>
-    <span class="go">Open the filled lines simulator →</span>
+  <a class="family rise d2" href="mechanics.html">
+    <canvas data-preview="projectile" aria-hidden="true"></canvas>
+    <h2>Mechanics and waves</h2>
+    <p>Throw projectiles, drive a damped spring until it resonates, and add waves into standing waves and beats.</p>
+    <ul><li>Projectile motion</li><li>Simple harmonic motion</li><li>Damped and driven oscillators</li><li>Travelling waves</li><li>Standing waves</li></ul>
+    <span class="go">Open the mechanics simulator →</span>
+    <span class="tag">New</span>
   </a>
   </div>
 </section>
@@ -144,7 +198,7 @@
       c.beginPath(); c.arc(ox, oy, 2.4*u, 0, TAU); c.strokeStyle = '#E2B86F'; c.lineWidth = 2.2; c.stroke();
       var tx = 3.2*Math.sin(ph*0.4); c.fillStyle = '#fff'; c.beginPath(); c.arc(ox + tx*u, oy - u*A*Math.sin(tx), 4.5, 0, TAU); c.fill();
     } else if (it.kind === 'circuit'){
-      var x0c = 16, x1c = W - 16, yb = H - 22, yt = 26, fin = yb - (yb - yt)*0.62, prog = reduce ? 1 : (ph/TAU*0.5) % 1;
+      var x0c = 16, x1c = W - 16, yb = H - 22, yt = 26, fin = yb - (yb - yt)*0.5, prog = reduce ? 1 : (ph/TAU*0.5) % 1;
       c.strokeStyle = 'rgba(255,255,255,.3)'; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(x0c, fin); c.lineTo(x1c, fin); c.stroke(); c.setLineDash([]);
       c.beginPath(); var last = null;
       for (var xc = x0c; xc <= x0c + (x1c - x0c)*prog; xc += 2){ var tt = (xc - x0c)/(x1c - x0c)*14, v = 1 - Math.exp(-0.32*tt)*(Math.cos(2*tt) + 0.16*Math.sin(2*tt)), yc = yb - (fin < yb ? (yb - fin) : 0)*v; xc === x0c ? c.moveTo(xc, yc) : c.lineTo(xc, yc); last = [xc, yc]; }
@@ -172,6 +226,52 @@
       c.strokeStyle = '#7CC6BE'; c.lineWidth = 2; br.forEach(function(b){ c.beginPath(); b.forEach(function(r, i){ var X = cxl + r[0]*sc, Y = cyl - r[1]*sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.stroke(); });
       var Kn = Math.pow(10, -1 + 2.4*(0.5 + 0.5*Math.sin(ph*0.5))); cub(Kn).forEach(function(r){ c.fillStyle = '#8AB4F0'; c.beginPath(); c.arc(cxl + r[0]*sc, cyl - r[1]*sc, 5, 0, TAU); c.fill(); });
       [[0, 0], [-1, 0], [-5, 0]].forEach(function(p2){ var X = cxl + p2[0]*sc, Y = cyl; c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.moveTo(X - 4, Y - 4); c.lineTo(X + 4, Y + 4); c.moveTo(X - 4, Y + 4); c.lineTo(X + 4, Y - 4); c.stroke(); });
+    } else if (it.kind === 'field'){
+      if (!it.lines || it.lw !== W){ it.lw = W; it.lines = []; var qa = [W*0.33, H/2], qb = [W*0.67, H/2];
+        for (var n = 0; n < 14; n++){ var an = TAU*(n + 0.5)/14, p = [qa[0] + 8*Math.cos(an), qa[1] + 8*Math.sin(an)], L = [p.slice()];
+          for (var st = 0; st < 900; st++){ var dx1 = p[0] - qa[0], dy1 = p[1] - qa[1], dx2 = p[0] - qb[0], dy2 = p[1] - qb[1], r1 = Math.pow(dx1*dx1 + dy1*dy1, 1.5), r2 = Math.pow(dx2*dx2 + dy2*dy2, 1.5), ex = dx1/r1 - dx2/r2, ey = dy1/r1 - dy2/r2, m = Math.hypot(ex, ey) || 1;
+            p = [p[0] + 2*ex/m, p[1] + 2*ey/m]; L.push(p.slice()); if (Math.hypot(p[0] - qb[0], p[1] - qb[1]) < 7 || p[0] < -20 || p[0] > W + 20 || p[1] < -20 || p[1] > H + 20) break; }
+          it.lines.push(L); } it.qa = qa; it.qb = qb; }
+      c.lineWidth = 1.3; c.strokeStyle = 'rgba(138,180,240,.45)'; it.lines.forEach(function(L){ c.beginPath(); L.forEach(function(p, i){ i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); }); c.stroke(); });
+      c.fillStyle = '#EBD3A2'; it.lines.forEach(function(L){ var k = Math.floor(((ph/TAU*0.25) % 1)*L.length) % L.length; for (var j = k % 60; j < L.length; j += 60){ c.beginPath(); c.arc(L[j][0], L[j][1], 2.2, 0, TAU); c.fill(); } });
+      [[it.qa, '#E07A6E', '+'], [it.qb, '#8AB4F0', '−']].forEach(function(q){ c.fillStyle = q[1]; c.beginPath(); c.arc(q[0][0], q[0][1], 11, 0, TAU); c.fill(); c.fillStyle = '#12171D'; c.font = '600 16px IBM Plex Sans, system-ui, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(q[2], q[0][0], q[0][1] + 1); });
+      c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    } else if (it.kind === 'amp'){
+      var x0a = 14, x1a = W - 14, mida = H/2, rail = H*0.34, gain = 2.2 + 1.6*Math.sin(ph*0.35);
+      c.strokeStyle = 'rgba(224,122,110,.6)'; c.setLineDash([5, 4]); c.lineWidth = 1; c.beginPath(); c.moveTo(x0a, mida - rail); c.lineTo(x1a, mida - rail); c.moveTo(x0a, mida + rail); c.lineTo(x1a, mida + rail); c.stroke(); c.setLineDash([]);
+      var vin = function(x){ return H*0.13*Math.sin(TAU*(x - x0a)/(W/2.4) - ph); };
+      c.beginPath(); for (var xa = x0a; xa <= x1a; xa += 2){ var ya = mida - vin(xa); xa === x0a ? c.moveTo(xa, ya) : c.lineTo(xa, ya); } c.strokeStyle = '#7CC6BE'; c.lineWidth = 1.8; c.stroke();
+      c.beginPath(); for (var xb = x0a; xb <= x1a; xb += 2){ var yb2 = mida - Math.max(-rail, Math.min(rail, gain*vin(xb))); xb === x0a ? c.moveTo(xb, yb2) : c.lineTo(xb, yb2); } c.strokeStyle = '#8AB4F0'; c.lineWidth = 2.4; c.stroke();
+      c.fillStyle = '#EBD3A2'; c.font = '600 12px IBM Plex Sans, system-ui, sans-serif'; c.fillText('gain ' + gain.toFixed(1) + (gain*0.13 > 0.34 ? ' · clipping' : ''), 14, 18);
+    } else if (it.kind === 'kmap'){
+      var cs = Math.min((H - 30)/4, 34), gx0 = W/2 - 2*cs - 50, gy0 = (H - 4*cs)/2 + 6, ones = [[1,0,0,1],[0,1,1,0],[0,1,1,0],[1,0,0,1]], gsel = Math.floor(reduce ? 2 : (ph/TAU*0.5) % 3);
+      c.font = '600 11px IBM Plex Mono, monospace'; c.fillStyle = 'rgba(213,220,228,.55)'; c.textAlign = 'center'; ['00','01','11','10'].forEach(function(g, i){ c.fillText(g, gx0 + (i + 0.5)*cs, gy0 - 6); c.fillText(g, gx0 - 14, gy0 + (i + 0.62)*cs); });
+      for (var r = 0; r < 4; r++) for (var cc = 0; cc < 4; cc++){ c.strokeStyle = 'rgba(255,255,255,.18)'; c.lineWidth = 1; c.strokeRect(gx0 + cc*cs, gy0 + r*cs, cs, cs); c.fillStyle = ones[r][cc] ? '#E4E8ED' : 'rgba(213,220,228,.35)'; c.font = '600 14px IBM Plex Mono, monospace'; c.fillText(ones[r][cc], gx0 + (cc + 0.5)*cs, gy0 + (r + 0.64)*cs); }
+      c.lineWidth = 2.2; if (gsel !== 1){ c.strokeStyle = '#E2B86F'; [[0,0],[0,3],[3,0],[3,3]].forEach(function(q){ var rx = gx0 + q[1]*cs + 3, ry = gy0 + q[0]*cs + 3; c.beginPath(); c.roundRect ? c.roundRect(rx, ry, cs - 6, cs - 6, 6) : c.rect(rx, ry, cs - 6, cs - 6); c.stroke(); }); }
+      if (gsel !== 0){ c.strokeStyle = '#7CC6BE'; c.beginPath(); c.roundRect ? c.roundRect(gx0 + cs + 4, gy0 + cs + 4, 2*cs - 8, 2*cs - 8, 8) : c.rect(gx0 + cs + 4, gy0 + cs + 4, 2*cs - 8, 2*cs - 8); c.stroke(); }
+      c.textAlign = 'left'; c.font = '600 15px IBM Plex Mono, monospace'; var tx0 = gx0 + 4*cs + 26;
+      c.fillStyle = '#E4E8ED'; c.fillText('F =', tx0, H/2 - 4); c.fillStyle = gsel !== 1 ? '#E2B86F' : 'rgba(226,184,111,.35)'; c.fillText('B′D′', tx0 + 36, H/2 - 4); c.fillStyle = '#E4E8ED'; c.fillText('+', tx0 + 80, H/2 - 4); c.fillStyle = gsel !== 0 ? '#7CC6BE' : 'rgba(124,198,190,.35)'; c.fillText('BD', tx0 + 96, H/2 - 4);
+    } else if (it.kind === 'normal'){
+      var x0n = 14, x1n = W - 14, base = H - 22, sx = (x1n - x0n)/8, sy = (H - 44)/0.4, zc = 0.4 + 1.8*(0.5 + 0.5*Math.sin(ph*0.4)), pdf = function(z){ return Math.exp(-z*z/2)/Math.sqrt(TAU); }, Xn = function(z){ return (x0n + x1n)/2 + z*sx; };
+      c.beginPath(); c.moveTo(Xn(-zc), base); for (var z = -zc; z <= zc; z += 0.04) c.lineTo(Xn(z), base - sy*pdf(z)); c.lineTo(Xn(zc), base - sy*pdf(zc)); c.lineTo(Xn(zc), base); c.closePath(); c.fillStyle = 'rgba(138,180,240,.25)'; c.fill();
+      c.beginPath(); for (var z2 = -4; z2 <= 4; z2 += 0.05){ var yn = base - sy*pdf(z2); z2 === -4 ? c.moveTo(Xn(z2), yn) : c.lineTo(Xn(z2), yn); } c.strokeStyle = '#8AB4F0'; c.lineWidth = 2.2; c.stroke();
+      c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(x0n, base); c.lineTo(x1n, base); c.stroke();
+      var tt2 = 1/(1 + 0.3275911*zc/Math.SQRT2), erf = 1 - (((((1.061405429*tt2 - 1.453152027)*tt2) + 1.421413741)*tt2 - 0.284496736)*tt2 + 0.254829592)*tt2*Math.exp(-zc*zc/2);
+      c.fillStyle = '#EBD3A2'; c.font = '600 12px IBM Plex Sans, system-ui, sans-serif'; c.fillText('P(|Z| < ' + zc.toFixed(2) + ') = ' + (100*erf).toFixed(1) + '%', 14, 18);
+    } else if (it.kind === 'matrix'){
+      var cxm = W/2, cym = H/2 + 6, um = H/3.4, sm = 0.5 - 0.5*Math.cos(ph*0.4), a11 = 1 + 0.6*sm, a12 = 0.7*sm, a21 = 0.3*sm, a22 = 1 - 0.1*sm, T = function(x, y){ return [cxm + um*(a11*x + a12*y), cym - um*(a21*x + a22*y)]; };
+      c.strokeStyle = 'rgba(138,180,240,.22)'; c.lineWidth = 1;
+      for (var gi = -5; gi <= 5; gi++){ var p1 = T(gi, -3), p2 = T(gi, 3), p3 = T(-5, gi), p4 = T(5, gi); c.beginPath(); c.moveTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.moveTo(p3[0], p3[1]); c.lineTo(p4[0], p4[1]); c.stroke(); }
+      var q0 = T(0, 0), q1 = T(1, 0), q2 = T(1, 1), q3 = T(0, 1); c.fillStyle = 'rgba(226,184,111,.18)'; c.beginPath(); c.moveTo(q0[0], q0[1]); c.lineTo(q1[0], q1[1]); c.lineTo(q2[0], q2[1]); c.lineTo(q3[0], q3[1]); c.closePath(); c.fill();
+      [[q1, '#E2B86F'], [q3, '#7CC6BE']].forEach(function(v){ c.strokeStyle = v[1]; c.lineWidth = 2.6; c.beginPath(); c.moveTo(q0[0], q0[1]); c.lineTo(v[0][0], v[0][1]); c.stroke(); c.fillStyle = v[1]; c.beginPath(); c.arc(v[0][0], v[0][1], 3.5, 0, TAU); c.fill(); });
+      c.fillStyle = '#EBD3A2'; c.font = '600 12px IBM Plex Sans, system-ui, sans-serif'; c.fillText('det = ' + (a11*a22 - a12*a21).toFixed(2), 14, 18);
+    } else if (it.kind === 'projectile'){
+      var gxp = 16, gyp = H - 18, vx = (W - 40)/1.12, vy = (H - 44)*3.2, gp = 2*vy/1.1, Tp = 2*vy/gp, tp = reduce ? Tp*0.6 : (ph/TAU*0.45 % 1.25)*Tp*1.0;
+      c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(8, gyp); c.lineTo(W - 8, gyp); c.stroke();
+      c.setLineDash([4, 5]); c.strokeStyle = 'rgba(138,180,240,.35)'; c.beginPath(); for (var s1 = 0; s1 <= Tp; s1 += Tp/80){ var xx = gxp + vx*s1, yy3 = gyp - (vy*s1 - gp*s1*s1/2); s1 ? c.lineTo(xx, yy3) : c.moveTo(xx, yy3); } c.stroke(); c.setLineDash([]);
+      var te = Math.min(tp, Tp); c.strokeStyle = '#8AB4F0'; c.lineWidth = 2.4; c.beginPath(); for (var s2 = 0; s2 <= te; s2 += Tp/80){ var xx2 = gxp + vx*s2, yy4 = gyp - (vy*s2 - gp*s2*s2/2); s2 ? c.lineTo(xx2, yy4) : c.moveTo(xx2, yy4); } c.stroke();
+      var bxp = gxp + vx*te, byp = gyp - (vy*te - gp*te*te/2); c.fillStyle = '#fff'; c.beginPath(); c.arc(bxp, byp, 5, 0, TAU); c.fill();
+      c.fillStyle = '#E2B86F'; c.beginPath(); c.arc(gxp + vx*Tp/2, gyp - vy*vy/(2*gp), 3.5, 0, TAU); c.fill();
     } else {
       wave(c, 14, W - 14, H*0.3, H*0.15, 110, ph, '#7CC6BE', 0, 8);
       wave(c, 14, W - 14, H*0.72, H*0.15, 73, ph, '#ffffff', 0, 10);
